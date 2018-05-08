@@ -12,6 +12,10 @@ class IRI(object):
     def elem_type(self):
         return _IRI_ELEM_TYPE
 
+    @property
+    def iri(self):
+        return self._content
+
     def __eq__(self, other):
         if type(other) != type(self):
             return False
