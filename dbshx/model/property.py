@@ -12,3 +12,6 @@ class Property(object):
         if type(other) != type(self):
             return False
         return str(self) == str(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)

@@ -43,6 +43,8 @@ class TtlTriplesYielder(object):
                 else:
                     yield (self._tune_token(pieces[0]), self._tune_prop(pieces[1]), self._tune_token(pieces[2]))
                     self._triples_count += 1
+                    # if self._triples_count % 100000 == 0:
+                    #     print "Reading...", self._triples_count
 
 
     def _tune_token(self, a_token):
