@@ -17,7 +17,7 @@ from dbshx.model.property import Property
 
 
 
-class TtlTriplesYielder(object):
+class MultiTtlTriplesYielder(object):
     def __init__(self, list_of_files):
         self._list_of_files = list_of_files
         self._triples_count = 0
@@ -28,6 +28,7 @@ class TtlTriplesYielder(object):
     def yield_triples(self):
         self._reset_count()
         for a_source_file in self._list_of_files:
+            print "New file! --> ", a_source_file
             for a_triple in self._yield_triples_of_file(a_source_file):
                 yield a_triple
 
