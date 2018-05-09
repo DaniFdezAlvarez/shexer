@@ -1,5 +1,4 @@
 
-
 class Property(object):
 
     def __init__(self, content):
@@ -15,3 +14,7 @@ class Property(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    @property
+    def iri(self):
+        return self._content
