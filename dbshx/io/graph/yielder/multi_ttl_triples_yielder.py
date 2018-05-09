@@ -16,22 +16,29 @@ from dbshx.model.bnode import BNode
 from dbshx.model.property import Property
 
 
+
 class TtlTriplesYielder(object):
-    def __init__(self, source_file):
-        self._source_file = source_file
+    def __init__(self, list_of_files):
+        self._list_of_files = list_of_files
         self._triples_count = 0
         self._error_triples = 0
 
 
+
     def yield_triples(self):
         self._reset_count()
-        with open(self._source_file, "r") as in_stream:
+        for a_source_file in self._list_of_files:
+            for a_triple in self._yield_triples_of_file(a_source_file):
+                yield a_triple
+
+    def _yield_triples_of_file(self, a_source_file):
+        with open(a_source_file, "r") as in_stream:
             for a_line in in_stream:
                 pieces = a_line.strip().split(" ")
                 if len(pieces) != 4:
                     self._error_triples += 1
                     log_to_error(msg="This line caused error: " + a_line,
-                                 source=self._source_file)
+                                 source=a_source_file)
                 else:
                     yield (self._tune_token(pieces[0]), self._tune_prop(pieces[1]), self._tune_token(pieces[2]))
                     self._triples_count += 1
