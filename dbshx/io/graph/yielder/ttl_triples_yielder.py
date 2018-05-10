@@ -29,18 +29,10 @@ class TtlTriplesYielder(object):
             for a_line in in_stream:
                 tokens = self._look_for_tokens(a_line.strip())
                 if len(tokens) != 3:
-                    print a_line
-                    for a_token in tokens:
-                        print "WOOOOOOOOO,", a_token
-                    print "------"
                     self._error_triples += 1
-                    # log_to_error(msg="This line caused error: " + a_line,
-                    #              source=self._source_file)
+                    log_to_error(msg="This line caused error: " + a_line,
+                                 source=self._source_file)
                 else:
-                    # print "MIRA UNA WENAAA ------------- "
-                    # print a_line
-                    # for a_token in tokens:
-                    #     print "EJ,", a_token
                     yield (self._tune_token(tokens[0]), self._tune_prop(tokens[1]), self._tune_token(tokens[2]))
                     self._triples_count += 1
                     # if self._triples_count % 100000 == 0:
@@ -56,7 +48,6 @@ class TtlTriplesYielder(object):
                 current_first_index = last_index +1
             elif str_line[current_first_index] == '"':
                 last_index = self._look_for_last_index_of_literal_token(str_line, current_first_index)
-                print str_line, last_index, current_first_index, "'", str_line[current_first_index:last_index + 1], "'"
                 result.append(str_line[current_first_index:last_index + 1])
                 current_first_index = last_index + 1
             elif str_line[current_first_index] == '.':
@@ -79,18 +70,12 @@ class TtlTriplesYielder(object):
             success = False
             index_of_quotes = 1
             while not success:
-                index_of_second_quotes = target_substring[index_of_quotes+1:].find('"')
+                index_of_second_quotes = target_substring[index_of_quotes+1:].find('"') + index_of_quotes + 1
                 if target_substring[index_of_second_quotes-1] != "\\":
                     success = True
                 index_of_quotes = index_of_second_quotes
-                # print "tratratra"
             return index_of_quotes + (len(target_str) - len(target_substring))
         else:  # Typed
-            # print "Por aqui eh", \
-            #     target_substring[target_substring.find("^^"):].find(" ") - 1 , \
-            #     "'" , \
-            #     target_str[target_substring[target_substring.find("^^"):].find(" ") - 1 + (len(target_str) - len(target_substring))] ,\
-            #     "'", target_substring
             return target_substring[target_substring.find("^^"):].find(" ") - 1 + target_str.find("^^")
 
 
