@@ -1,12 +1,3 @@
-"""
-CAUTION! This yielder is able to parse a huge file without loading the whole graph in memory,
-but it is expecting a perfectly well-formed ttl. Syntax errors may cause unpredicted failures.
-
-Also, it is ignoring b-nodes, which does not neccesarily make sense for all the sources.
-If you want to include bnodes in your classrank computation, you should use/implement
-a different yielder.
-
-"""
 
 from dbshx.utils.log import log_to_error
 from dbshx.utils.uri import remove_corners, parse_literal
@@ -16,36 +7,27 @@ from dbshx.model.bnode import BNode
 from dbshx.model.property import Property
 
 
-
-class MultiTtlTriplesYielder(object):
-    def __init__(self, list_of_files):
-        self._list_of_files = list_of_files
+class NtTriplesYielder(object):
+    def __init__(self, source_file):
+        self._source_file = source_file
         self._triples_count = 0
         self._error_triples = 0
 
 
-
     def yield_triples(self):
         self._reset_count()
-        for a_source_file in self._list_of_files:
-            print "New file! --> ", a_source_file
-            for a_triple in self._yield_triples_of_file(a_source_file):
-                yield a_triple
-
-    def _yield_triples_of_file(self, a_source_file):
-        with open(a_source_file, "r") as in_stream:
+        with open(self._source_file, "r") as in_stream:
             for a_line in in_stream:
                 tokens = self._look_for_tokens(a_line.strip())
                 if len(tokens) != 3:
                     self._error_triples += 1
                     log_to_error(msg="This line caused error: " + a_line,
-                                 source=a_source_file)
+                                 source=self._source_file)
                 else:
                     yield (self._tune_token(tokens[0]), self._tune_prop(tokens[1]), self._tune_token(tokens[2]))
                     self._triples_count += 1
                     # if self._triples_count % 100000 == 0:
                     #     print "Reading...", self._triples_count
-
 
     def _look_for_tokens(self, str_line):
         result = []
@@ -81,6 +63,8 @@ class MultiTtlTriplesYielder(object):
             while not success:
                 index_of_second_quotes = target_substring[index_of_quotes+1:].find('"') + index_of_quotes + 1
                 if target_substring[index_of_second_quotes-1] != "\\":
+                    success = True
+                elif target_substring[index_of_second_quotes-2] == "\\":  # Case of escaped slash "\\"
                     success = True
                 index_of_quotes = index_of_second_quotes
             return index_of_quotes + (len(target_str) - len(target_substring))
