@@ -56,7 +56,7 @@ class ClassProfiler(object):
         for a_feature_3tuple in features_3tuple:
             self._introduce_needed_elements_in_shape_classes_dict(a_class, a_feature_3tuple)
             # 3tuple: 0->str_prop, 1->str_type, 2->cardinality
-            self._classes_shape_dict[a_class][a_feature_3tuple[0]][a_feature_3tuple[1]][a_feature_3tuple[2]] = 0
+            self._classes_shape_dict[a_class][a_feature_3tuple[0]][a_feature_3tuple[1]][a_feature_3tuple[2]] += 1
 
     def _introduce_needed_elements_in_shape_classes_dict(self, a_class, a_feature_3tuple):
         str_prop = a_feature_3tuple[0]

@@ -27,12 +27,14 @@ def decide_literal_type(a_literal):
     if there_is_arroba_after_last_quotes(a_literal):
         return STRING_TYPE
     if "xsd:" in a_literal:
-        return a_literal[a_literal.find("xsd:"): a_literal.find(" ")]
+        return a_literal[a_literal.find("xsd:"):]
     if "rdf:" in a_literal:
-        return a_literal[a_literal.find("rdf:"): a_literal.find(" ")]
+        return a_literal[a_literal.find("rdf:"):]
+    if "dt:" in a_literal:
+        return a_literal[a_literal.find("dt:"):]
     if XSD_NAMESPACE in a_literal:
-        substring = a_literal[a_literal.find("\"^^")]
-        return _add_prefix(substring[substring.find("#")+1:substring.find(">")], XSD_PREFIX)
+        substring = a_literal[a_literal.find("\"^^"):]
+        return _add_prefix(substring[substring.rfind("#")+1:-1], XSD_PREFIX)
     if RDF_SYNTAX_NAMESPACE in a_literal:
         substring = a_literal[a_literal.find("\"^^")]
         return _add_prefix(substring[substring.find("#") + 1:substring.find(">")], RDF_PREFIX)

@@ -8,6 +8,7 @@ class Literal(object):
     def __str__(self):
         return self._content
 
+    @property
     def elem_type(self):
         return self._elem_type
 
