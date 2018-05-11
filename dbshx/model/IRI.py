@@ -9,6 +9,7 @@ class IRI(object):
     def __str__(self):
         return self._content
 
+    @property
     def elem_type(self):
         return _IRI_ELEM_TYPE
 
