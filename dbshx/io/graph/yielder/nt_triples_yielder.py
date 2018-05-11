@@ -1,6 +1,6 @@
 
 from dbshx.utils.log import log_to_error
-from dbshx.utils.uri import remove_corners, parse_literal
+from dbshx.utils.uri import remove_corners, parse_literal, there_is_arroba_after_last_quotes
 from dbshx.model.IRI import IRI
 from dbshx.model.literal import Literal
 from dbshx.model.bnode import BNode
@@ -57,7 +57,9 @@ class NtTriplesYielder(object):
     def _look_for_last_index_of_literal_token(self, target_str, first_index):
         target_substring = target_str[first_index:]
 
-        if "^^" not in target_substring:  # Not typed
+        if there_is_arroba_after_last_quotes(target_substring):  # String labelled with language
+            return target_substring[target_substring.rfind("@"):].find(" ") - 1 + target_str.rfind("@")
+        elif "^^" not in target_substring:  # Not typed
             success = False
             index_of_quotes = 1
             while not success:

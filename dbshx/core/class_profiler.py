@@ -22,7 +22,9 @@ class ClassProfiler(object):
 
     def profile_classes(self):
         self._build_shape_of_instances()
+        print "Profiler... shape of instances built!"
         self._build_class_profile()
+        print "Profiler... class profile built!"
         return self._classes_shape_dict
 
 
