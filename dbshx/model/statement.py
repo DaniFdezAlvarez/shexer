@@ -4,7 +4,7 @@
 class Statement(object):
 
     def __init__(self, st_property, st_type, cardinality, probability):
-        self._st_property = property
+        self._st_property = st_property
         self._st_type = st_type
         self._cardinality = cardinality
         self._probability = probability

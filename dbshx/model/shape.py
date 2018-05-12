@@ -1,5 +1,4 @@
 
-
 class Shape(object):
 
     def __init__(self, name, class_uri, statements):
@@ -18,3 +17,7 @@ class Shape(object):
     def yield_statements(self):
         for a_statement in self._statements:
             yield a_statement
+
+
+    def sort_statements(self, callback, reverse=False):
+        self._statements.sort(key=lambda x :callback(x), reverse=reverse)
