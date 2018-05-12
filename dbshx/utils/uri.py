@@ -37,10 +37,10 @@ def decide_literal_type(a_literal):
         return _add_prefix(substring[substring.rfind("#")+1:-1], XSD_PREFIX)
     if RDF_SYNTAX_NAMESPACE in a_literal:
         substring = a_literal[a_literal.find("\"^^")]
-        return _add_prefix(substring[substring.find("#") + 1:substring.find(">")], RDF_PREFIX)
+        return _add_prefix(substring[substring.rfind("#")+1:-1], RDF_PREFIX)
     if DT_NAMESPACE in a_literal:
         substring = a_literal[a_literal.find("\"^^")]
-        return _add_prefix(substring[substring.find("#") + 1:substring.find(">")], DT_PREFIX)
+        return _add_prefix(substring[substring.rfind("#")+1:-1], DT_PREFIX)
 
     else:
         raise RuntimeError("Unrecognized literal type:" + a_literal + ". Check whats happening before the big show")
