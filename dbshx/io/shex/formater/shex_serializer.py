@@ -1,3 +1,6 @@
+
+from dbshx.core.class_profiler import RDF_TYPE_STR
+
 _SPACES_GAP_FOR_FREQUENCY = "          "
 _SPACES_GAP_BETWEEN_TOKENS = "  "
 _TARGET_LINE_LENGHT = 80
@@ -6,11 +9,12 @@ _SPACES_LEVEL_INDENTATION = "   "
 
 class ShexSerializer(object):
 
-    def __init__(self, target_file, shapes_list, aceptance_threshold=0.4):
+    def __init__(self, target_file, shapes_list, aceptance_threshold=0.4, namespaces_dict=None):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._aceptance_theshold = aceptance_threshold
         self._lines_buffer = []
+        self._namespaces_dict = namespaces_dict if namespaces_dict is not None else []
 
 
     def serialize_shex(self):
@@ -29,12 +33,10 @@ class ShexSerializer(object):
 
 
     def _flush(self):
-        print "Flush! ========"
         self._write_lines_buffer()
 
 
     def _write_line(self, a_line, indent_level=0):
-        print "--------", a_line
         self._lines_buffer.append(self._indentation_spaces(indent_level) + a_line + "\n")
         if len(self._lines_buffer) >= 5000:
             self._write_lines_buffer()
@@ -42,7 +44,6 @@ class ShexSerializer(object):
 
 
     def _write_lines_buffer(self):
-        print "Me piden que escriba -----------------", len(self._lines_buffer)
         with open(self._target_file, "a") as out_stream:
             for a_line in self._lines_buffer:
                 out_stream.write(a_line)
@@ -72,12 +73,35 @@ class ShexSerializer(object):
 
 
     def _serialize_statement(self, a_statement, is_last_statement_of_shape):
-        result = a_statement.st_property + _SPACES_GAP_BETWEEN_TOKENS + a_statement.st_type + _SPACES_GAP_BETWEEN_TOKENS + self._cardinality_representation(
-            a_statement.cardinality) + self._closure_of_statement(is_last_statement_of_shape)
+        st_property = self._tune_token(a_statement.st_property)
+        st_target_element = self._str_of_target_element(a_statement.st_type,
+                                                        a_statement.st_property)
+        cardinality = self._cardinality_representation(
+            a_statement.cardinality)
+        result = st_property + _SPACES_GAP_BETWEEN_TOKENS + st_target_element + _SPACES_GAP_BETWEEN_TOKENS + \
+                 cardinality + self._closure_of_statement(is_last_statement_of_shape)
+
         result += self._adequate_amount_of_final_spaces(result)
         result += self._probability_representation(a_statement.probability)
         self._write_line(result, indent_level=1)
 
+
+    def _str_of_target_element(self, target_element, st_property):
+        """
+        Special treatment for rdf:type. We build a value set with an specific URI
+        :param target_element:
+        :param st_property:
+        :return:
+        """
+        if st_property == RDF_TYPE_STR:
+            return "[" + self._tune_token(target_element) + "]"
+        return target_element
+
+    def _tune_token(self, a_token):
+        for a_namespace in self._namespaces_dict:
+            if a_namespace in a_token:
+                return a_token.replace(a_namespace, self._namespaces_dict[a_namespace] + ":")
+        return "<" + a_token + ">"
 
     def _probability_representation(self, probability):
         return str(probability * 100) + " %"

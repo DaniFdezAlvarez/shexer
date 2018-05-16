@@ -1,8 +1,11 @@
+
+RDF_TYPE_STR = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+
+_ONE_TO_MANY = "+"
+
 _S = 0
 _P = 1
 _O = 2
-
-_ONE_TO_MANY = "+"
 
 
 class ClassProfiler(object):
@@ -32,12 +35,20 @@ class ClassProfiler(object):
         result = []
         for a_prop in self._instances_shape_dict[an_instance]:
             for a_type in self._instances_shape_dict[an_instance][a_prop]:
-                for a_valid_cardinality in self._infer_valid_cardinalities(self._instances_shape_dict[an_instance][a_prop][a_type]):
+                for a_valid_cardinality in self._infer_valid_cardinalities(a_prop,
+                                                                           self._instances_shape_dict[an_instance][a_prop][a_type]):
                     result.append( (a_prop, a_type, a_valid_cardinality) )
         return result
 
-    def _infer_valid_cardinalities(self, a_cardinality):
-        if a_cardinality == 1:
+    def _infer_valid_cardinalities(self, a_property, a_cardinality):
+        """
+        Special teratment for rdf:type. If thats the property, we are targetting specific URIs instead of the type IRI.
+        Cardinality will be always "1"
+        :param a_property:
+        :param a_cardinality:
+        :return:
+        """
+        if a_property == RDF_TYPE_STR:
             yield 1
         else:
             yield a_cardinality
@@ -85,7 +96,7 @@ class ClassProfiler(object):
     def _anotate_feature_of_target_instance(self, a_triple):
         str_subj = a_triple[_S].iri
         str_prop = a_triple[_P].iri
-        type_obj = a_triple[_O].elem_type
+        type_obj = self._decide_type_obj(a_triple[_O], str_prop)
 
         self._introduce_needed_elements_in_shape_instances_dict(str_subj=str_subj,
                                                                 str_prop=str_prop,
@@ -93,6 +104,18 @@ class ClassProfiler(object):
 
         self._instances_shape_dict[str_subj][str_prop][type_obj] += 1
 
+    @staticmethod
+    def _decide_type_obj(original_object, str_prop):
+        """
+        Special traetment for rdf:type property. We look for ValueSets instead of types when this property appears.
+
+        :param original_object:
+        :param str_prop:
+        :return:
+        """
+        if str_prop != RDF_TYPE_STR:
+            return original_object.elem_type
+        return original_object.iri
 
 
     def _introduce_needed_elements_in_shape_instances_dict(self, str_subj, str_prop, type_obj):
@@ -112,7 +135,7 @@ class ClassProfiler(object):
     def _is_a_relevant_triple(self, a_triple):
         """
         The subject of the triple must be an instance of at least one of the target classes.
-        If it it it returns True. False in the opposite case
+        If it is, it returns True. False in the opposite case
 
         :param a_triple:
         :return: bool
