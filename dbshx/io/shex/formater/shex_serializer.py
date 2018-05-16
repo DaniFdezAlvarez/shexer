@@ -19,6 +19,7 @@ class ShexSerializer(object):
 
     def serialize_shex(self):
 
+        self._reset_target_file()
         for a_shape in self._shapes_list:
             self._serialize_shape(a_shape)
         self._flush()
@@ -42,6 +43,9 @@ class ShexSerializer(object):
             self._write_lines_buffer()
             self._lines_buffer = []
 
+    def _reset_target_file(self):
+        with open(self._target_file, "w") as out_stream:
+            out_stream.write("")  # Is this necessary? maybe enough to open it in 'w' mode?
 
     def _write_lines_buffer(self):
         with open(self._target_file, "a") as out_stream:
@@ -57,9 +61,6 @@ class ShexSerializer(object):
 
 
     def _serialize_shape_rules(self, a_shape):
-        # statements = []
-        # for a_statement in a_shape.yield_statements():
-        #     statements.append(a_statement)
         statements = [a_statement for a_statement in a_shape.yield_statements()]
         if len(statements) == 0 or statements[0].probability < self._aceptance_theshold:
             return
