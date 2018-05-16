@@ -9,12 +9,12 @@ _SPACES_LEVEL_INDENTATION = "   "
 
 class ShexSerializer(object):
 
-    def __init__(self, target_file, shapes_list, aceptance_threshold=0.4, namespaces=None):
+    def __init__(self, target_file, shapes_list, aceptance_threshold=0.4, namespaces_dict=None):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._aceptance_theshold = aceptance_threshold
         self._lines_buffer = []
-        self._namespaces = namespaces if namespaces is not None else []
+        self._namespaces_dict = namespaces_dict if namespaces_dict is not None else []
 
 
     def serialize_shex(self):
@@ -95,7 +95,13 @@ class ShexSerializer(object):
         """
         if st_property == RDF_TYPE_STR:
             return "[" + self._tune_token(target_element) + "]"
-        return self._tune_token(target_element)
+        return target_element
+
+    def _tune_token(self, a_token):
+        for a_namespace in self._namespaces_dict:
+            if a_namespace in a_token:
+                return a_token.replace(a_namespace, self._namespaces_dict[a_namespace] + ":")
+        return "<" + a_token + ">"
 
     def _probability_representation(self, probability):
         return str(probability * 100) + " %"
