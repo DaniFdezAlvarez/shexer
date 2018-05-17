@@ -3,7 +3,7 @@ from dbshx.core.class_profiler import RDF_TYPE_STR
 
 _SPACES_GAP_FOR_FREQUENCY = "          "
 _SPACES_GAP_BETWEEN_TOKENS = "  "
-_TARGET_LINE_LENGHT = 80
+_TARGET_LINE_LENGHT = 60
 _SPACES_LEVEL_INDENTATION = "   "
 
 
@@ -87,25 +87,30 @@ class ShexSerializer(object):
         result = []
         already_evaluated = set()
         for i in range(0, len(candidate_statements)):
-            swapping_statements = []
-            for j in range(i+1, len(candidate_statements)):
-                if self._statements_have_similar_probability(candidate_statements[i],
-                                                            candidate_statements[j]):
-                    if self._statements_have_same_tokens(candidate_statements[i],
-                                                    candidate_statements[j]):
-                        swapping_statements.append(candidate_statements[j])
-                        already_evaluated.add(candidate_statements[i])
-                        already_evaluated.add(candidate_statements[j])
+            if candidate_statements[i] not in already_evaluated:
+                swapping_statements = []
+                for j in range(i+1, len(candidate_statements)):
+                    if self._statements_have_similar_probability(candidate_statements[i],
+                                                                candidate_statements[j]):
+                        if self._statements_have_same_tokens(candidate_statements[i],
+                                                        candidate_statements[j]):
+                            swapping_statements.append(candidate_statements[j])
+                            already_evaluated.add(candidate_statements[i])
+                            already_evaluated.add(candidate_statements[j])
+                    else:
+                        break
+                if len(swapping_statements) == 0:
+                    result.append(candidate_statements[i])
                 else:
-                    break
-            if len(swapping_statements) == 0:
-                result.append(candidate_statements[i])
-            else:
-                result.append(self._decide_best_statement(swapping_statements + [candidate_statements[i]]))
+                    result.append(self._decide_best_statement(swapping_statements + [candidate_statements[i]]))
         return result
 
     def _decide_best_statement(self, list_of_candidate_statements):
-        pass  # TODO
+        list_of_candidate_statements.sort(reverse=True, key=lambda x:x.probability)
+        for a_statement in list_of_candidate_statements:
+            if a_statement.cardinality != "+":
+                return a_statement
+        return list_of_candidate_statements[0]
 
     def _statements_have_similar_probability(self, more_probable_st, less_probable_st):
         if 1.0 - (less_probable_st.probability / more_probable_st.probability) <= self._tolerance:
