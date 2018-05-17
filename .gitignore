@@ -103,3 +103,7 @@ ENV/
 # pycharm
 
 .idea/
+
+# local tests
+
+dbshx/local_code/
