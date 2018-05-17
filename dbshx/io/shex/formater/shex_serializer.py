@@ -3,17 +3,18 @@ from dbshx.core.class_profiler import RDF_TYPE_STR
 
 _SPACES_GAP_FOR_FREQUENCY = "          "
 _SPACES_GAP_BETWEEN_TOKENS = "  "
-_TARGET_LINE_LENGHT = 80
+_TARGET_LINE_LENGHT = 60
 _SPACES_LEVEL_INDENTATION = "   "
 
 
 class ShexSerializer(object):
 
-    def __init__(self, target_file, shapes_list, aceptance_threshold=0.4, namespaces_dict=None):
+    def __init__(self, target_file, shapes_list, aceptance_threshold=0.4, namespaces_dict=None, tolerance_to_keep_similar_rules=0.15):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._aceptance_theshold = aceptance_threshold
         self._lines_buffer = []
+        self._tolerance = tolerance_to_keep_similar_rules
         self._namespaces_dict = namespaces_dict if namespaces_dict is not None else []
 
 
@@ -61,16 +62,66 @@ class ShexSerializer(object):
 
 
     def _serialize_shape_rules(self, a_shape):
-        statements = [a_statement for a_statement in a_shape.yield_statements()]
-        if len(statements) == 0 or statements[0].probability < self._aceptance_theshold:
+        statements = self._select_valid_statements_of_shape(a_shape)
+            # [a_statement for a_statement in a_shape.yield_statements()]
+        if len(statements) == 0:
             return
-        last_valid_statement = False
-        for i in range(0, len(statements)):
-            if last_valid_statement:
+        for i in range(0, len(statements) - 1 ):
+            self._serialize_statement(a_statement=statements[i],
+                                      is_last_statement_of_shape=False)
+        self._serialize_statement(a_statement=statements[len(statements) - 1],
+                                  is_last_statement_of_shape=True)
+
+    def _select_valid_statements_of_shape(self, a_shape):
+        original_statements = [a_statement for a_statement in a_shape.yield_statements()]
+        result = []
+        if len(original_statements) == 0 or original_statements[0].probability < self._aceptance_theshold:
+            return []
+        for i in range(0, len(original_statements)):
+            if original_statements[i].probability < self._aceptance_theshold:  # We assume that they are sorted
                 break
-            if i == len(statements) - 1 or statements[i + 1].probability < self._aceptance_theshold:
-                last_valid_statement = True
-            self._serialize_statement(statements[i], last_valid_statement)
+            result.append(original_statements[i])
+        return self._filter_too_similar_statements(result)
+
+    def _filter_too_similar_statements(self, candidate_statements):
+        result = []
+        already_evaluated = set()
+        for i in range(0, len(candidate_statements)):
+            if candidate_statements[i] not in already_evaluated:
+                swapping_statements = []
+                for j in range(i+1, len(candidate_statements)):
+                    if self._statements_have_similar_probability(candidate_statements[i],
+                                                                candidate_statements[j]):
+                        if self._statements_have_same_tokens(candidate_statements[i],
+                                                        candidate_statements[j]):
+                            swapping_statements.append(candidate_statements[j])
+                            already_evaluated.add(candidate_statements[i])
+                            already_evaluated.add(candidate_statements[j])
+                    else:
+                        break
+                if len(swapping_statements) == 0:
+                    result.append(candidate_statements[i])
+                else:
+                    result.append(self._decide_best_statement(swapping_statements + [candidate_statements[i]]))
+        return result
+
+    def _decide_best_statement(self, list_of_candidate_statements):
+        list_of_candidate_statements.sort(reverse=True, key=lambda x:x.probability)
+        for a_statement in list_of_candidate_statements:
+            if a_statement.cardinality != "+":
+                return a_statement
+        return list_of_candidate_statements[0]
+
+    def _statements_have_similar_probability(self, more_probable_st, less_probable_st):
+        if 1.0 - (less_probable_st.probability / more_probable_st.probability) <= self._tolerance:
+            return True
+        return False
+
+
+    def _statements_have_same_tokens(self, st1, st2):
+        if st1.st_property == st2.st_property and st1.st_type == st2.st_type:
+            return True
+        return False
 
 
     def _serialize_statement(self, a_statement, is_last_statement_of_shape):
