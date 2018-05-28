@@ -3,12 +3,16 @@
 
 class Statement(object):
 
-    def __init__(self, st_property, st_type, cardinality, probability):
+    def __init__(self, st_property, st_type, cardinality, probability, comments=None):
         self._st_property = st_property
         self._st_type = st_type
         self._cardinality = cardinality
         self._probability = probability
+        self._comments = [] if comments is None else comments
 
+
+    def add_comment(self, comment):
+        self._comments.append(comment)
 
     @property
     def st_property(self):
@@ -26,5 +30,8 @@ class Statement(object):
     def probability(self):
         return self._probability
 
+    @property
+    def comments(self):
+        return self._comments
 
 

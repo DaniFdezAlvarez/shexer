@@ -6,17 +6,19 @@ _SPACES_GAP_BETWEEN_TOKENS = "  "
 _TARGET_LINE_LENGHT = 60
 _SPACES_LEVEL_INDENTATION = "   "
 _COMMENT_INI = "# "
+# _WHOTES_POR_STANDALONE_COMMENT = "                                        "  # 40
 
 
 class ShexSerializer(object):
 
-    def __init__(self, target_file, shapes_list, aceptance_threshold=0.4, namespaces_dict=None, tolerance_to_keep_similar_rules=0.15):
+    def __init__(self, target_file, shapes_list, aceptance_threshold=0.4, namespaces_dict=None, tolerance_to_keep_similar_rules=0.15, keep_less_specific=True):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._aceptance_theshold = aceptance_threshold
         self._lines_buffer = []
         self._tolerance = tolerance_to_keep_similar_rules
         self._namespaces_dict = namespaces_dict if namespaces_dict is not None else []
+        self._keep_less_specific = keep_less_specific
 
 
     def serialize_shex(self):
@@ -66,6 +68,7 @@ class ShexSerializer(object):
         statements = self._select_valid_statements_of_shape(a_shape)
         if len(statements) == 0:
             return
+
         for i in range(0, len(statements) - 1 ):
             self._serialize_statement(a_statement=statements[i],
                                       is_last_statement_of_shape=False)
@@ -77,40 +80,84 @@ class ShexSerializer(object):
         result = []
         if len(original_statements) == 0 or original_statements[0].probability < self._aceptance_theshold:
             return []
-        for i in range(0, len(original_statements)):
-            if original_statements[i].probability < self._aceptance_theshold:  # We assume that they are sorted
+        target_statements = self._group_similar_sentences(original_statements)
+        for i in range(0, len(target_statements)):
+            if target_statements[i].probability < self._aceptance_theshold:  # We assume that they are sorted
                 break
-            result.append(original_statements[i])
-        return self._filter_too_similar_statements(result)
+            result.append(target_statements[i])
+        return result
+        # return self._filter_too_similar_statements(result)
 
-    def _filter_too_similar_statements(self, candidate_statements):
+    def _group_similar_sentences(self, candidate_statements):
         result = []
-        already_evaluated = set()
+        already_visited = set()
         for i in range(0, len(candidate_statements)):
-            if candidate_statements[i] not in already_evaluated:
-                swapping_statements = []
+            a_statement = candidate_statements[i]
+            if a_statement not in already_visited:
+                already_visited.add(a_statement)
+                group_to_decide = [a_statement]
                 for j in range(i+1, len(candidate_statements)):
-                    if self._statements_have_similar_probability(candidate_statements[i],
-                                                                candidate_statements[j]):
-                        if self._statements_have_same_tokens(candidate_statements[i],
-                                                        candidate_statements[j]):
-                            swapping_statements.append(candidate_statements[j])
-                            already_evaluated.add(candidate_statements[i])
-                            already_evaluated.add(candidate_statements[j])
-                    else:
-                        break
-                if len(swapping_statements) == 0:
-                    result.append(candidate_statements[i])
+                    if self._statements_have_same_tokens(a_statement,
+                                                         candidate_statements[j]):
+                        group_to_decide.append(candidate_statements[j])
+                        already_visited.add(candidate_statements[j])
+                if len(group_to_decide) == 1:
+                    result.append(a_statement)
                 else:
-                    result.append(self._decide_best_statement(swapping_statements + [candidate_statements[i]]))
+                    result.append(self._decide_best_statement(group_to_decide))
         return result
 
+
+    # def _filter_too_similar_statements(self, candidate_statements):
+    #     result = []
+    #     already_evaluated = set()
+    #     for i in range(0, len(candidate_statements)):
+    #         if candidate_statements[i] not in already_evaluated:
+    #             swapping_statements = []
+    #             for j in range(i+1, len(candidate_statements)):
+    #                 if self._statements_have_similar_probability(candidate_statements[i],
+    #                                                             candidate_statements[j]):
+    #                     if self._statements_have_same_tokens(candidate_statements[i],
+    #                                                     candidate_statements[j]):
+    #                         swapping_statements.append(candidate_statements[j])
+    #                         already_evaluated.add(candidate_statements[i])
+    #                         already_evaluated.add(candidate_statements[j])
+    #                 else:
+    #                     break
+    #             if len(swapping_statements) == 0:
+    #                 result.append(candidate_statements[i])
+    #             else:
+    #                 result.append(self._decide_best_statement(swapping_statements + [candidate_statements[i]]))
+    #     return result
+
     def _decide_best_statement(self, list_of_candidate_statements):
+
         list_of_candidate_statements.sort(reverse=True, key=lambda x:x.probability)
+        result = None
+        if self._keep_less_specific:
+            for a_statement in list_of_candidate_statements:
+                if a_statement.cardinality == "+":
+                    result = a_statement
+                    break
+            if result is None:
+                result = list_of_candidate_statements[0]
+        else:
+            for a_statement in list_of_candidate_statements:
+                if a_statement.cardinality != "+":
+                    result = a_statement
+                    break
+            if result is None:
+                result = list_of_candidate_statements[0]
+
         for a_statement in list_of_candidate_statements:
-            if a_statement.cardinality != "+":
-                return a_statement
-        return list_of_candidate_statements[0]
+            if a_statement.cardinality != result.cardinality:
+                result.add_comment(self._turn_statement_into_comment_cardinality(a_statement))
+        return result
+
+    def _turn_statement_into_comment_cardinality(self, a_statement):
+        return self._probability_representation(a_statement.probability) + \
+               " have cardinality " + self._cardinality_representation(a_statement.cardinality)
+
 
     def _statements_have_similar_probability(self, more_probable_st, less_probable_st):
         if 1.0 - (less_probable_st.probability / more_probable_st.probability) <= self._tolerance:
@@ -136,6 +183,8 @@ class ShexSerializer(object):
         result += self._adequate_amount_of_final_spaces(result)
         result += self._probability_representation(a_statement.probability)
         self._write_line(result, indent_level=1)
+        for a_comment in a_statement.comments:
+            self._write_line(a_comment, indent_level=4)
 
 
     def _str_of_target_element(self, target_element, st_property):
@@ -158,11 +207,17 @@ class ShexSerializer(object):
     def _probability_representation(self, probability):
         return _COMMENT_INI + str(probability * 100) + " %"
 
-
     def _cardinality_representation(self, cardinality):
-        if cardinality == "1" or cardinality == 1:
-            return ""
-        return str(cardinality)
+        if cardinality == "+":
+            return cardinality
+        else:
+            return "{" + str(cardinality) + "}"
+
+
+    # def _cardinality_representation(self, cardinality):
+    #     if cardinality == "1" or cardinality == 1:
+    #         return ""
+    #     return str(cardinality)
 
 
     def _closure_of_statement(self, is_last_statement):
