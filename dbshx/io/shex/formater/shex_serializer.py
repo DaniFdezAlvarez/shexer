@@ -5,6 +5,7 @@ _SPACES_GAP_FOR_FREQUENCY = "          "
 _SPACES_GAP_BETWEEN_TOKENS = "  "
 _TARGET_LINE_LENGHT = 60
 _SPACES_LEVEL_INDENTATION = "   "
+_COMMENT_INI = "# "
 
 
 class ShexSerializer(object):
@@ -63,7 +64,6 @@ class ShexSerializer(object):
 
     def _serialize_shape_rules(self, a_shape):
         statements = self._select_valid_statements_of_shape(a_shape)
-            # [a_statement for a_statement in a_shape.yield_statements()]
         if len(statements) == 0:
             return
         for i in range(0, len(statements) - 1 ):
@@ -156,7 +156,7 @@ class ShexSerializer(object):
         return "<" + a_token + ">"
 
     def _probability_representation(self, probability):
-        return str(probability * 100) + " %"
+        return _COMMENT_INI + str(probability * 100) + " %"
 
 
     def _cardinality_representation(self, cardinality):
