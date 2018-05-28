@@ -1,5 +1,6 @@
 
 from dbshx.core.class_profiler import RDF_TYPE_STR
+from dbshx.model.statement import Statement
 
 _SPACES_GAP_FOR_FREQUENCY = "          "
 _SPACES_GAP_BETWEEN_TOKENS = "  "
@@ -80,15 +81,39 @@ class ShexSerializer(object):
         result = []
         if len(original_statements) == 0 or original_statements[0].probability < self._aceptance_theshold:
             return []
-        target_statements = self._group_similar_sentences(original_statements)
+        target_statements = self._group_constraints_with_same_prop_and_obj(original_statements)
+        target_statements = self._group_constraints_with_same_prop_but_different_obj(target_statements)
         for i in range(0, len(target_statements)):
-            if target_statements[i].probability < self._aceptance_theshold:  # We assume that they are sorted
+            if target_statements[i].probability < self._aceptance_theshold:  # We assume that the threshold is still
+                                                                             # a valid boundary, despite possible
+                                                                             # elements not sorted
                 break
             result.append(target_statements[i])
+        target_statements.sort(reverse=True, key=lambda x:x.probability)  # Restoring order completly
         return result
-        # return self._filter_too_similar_statements(result)
 
-    def _group_similar_sentences(self, candidate_statements):
+
+    def _group_constraints_with_same_prop_but_different_obj(self, candidate_statements):
+        result = []
+        already_visited = set()
+        for i in range(0, len(candidate_statements)):
+            a_statement = candidate_statements[i]
+            if a_statement not in already_visited:
+                already_visited.add(a_statement)
+                group_to_decide = [a_statement]
+                for j in range(i + 1, len(candidate_statements)):
+                    if self._statements_have_same_prop(a_statement,
+                                                       candidate_statements[j]):
+                        group_to_decide.append(candidate_statements[j])
+                        already_visited.add(candidate_statements[j])
+                if len(group_to_decide) == 1:
+                    result.append(a_statement)
+                else:
+                    result.append(self._compose_statement_with_objects_in_or(group_to_decide))
+        return result
+
+
+    def _group_constraints_with_same_prop_and_obj(self, candidate_statements):
         result = []
         already_visited = set()
         for i in range(0, len(candidate_statements)):
@@ -104,7 +129,7 @@ class ShexSerializer(object):
                 if len(group_to_decide) == 1:
                     result.append(a_statement)
                 else:
-                    result.append(self._decide_best_statement(group_to_decide))
+                    result.append(self._decide_best_statement_with_cardinalities_in_comments(group_to_decide))
         return result
 
 
@@ -127,11 +152,36 @@ class ShexSerializer(object):
     #             if len(swapping_statements) == 0:
     #                 result.append(candidate_statements[i])
     #             else:
-    #                 result.append(self._decide_best_statement(swapping_statements + [candidate_statements[i]]))
+    #                 result.append(self._decide_best_statement_with_cardinalities_in_comments(swapping_statements + [candidate_statements[i]]))
     #     return result
 
-    def _decide_best_statement(self, list_of_candidate_statements):
 
+    def _compose_statement_with_objects_in_or(self, list_of_candidate_statements):
+        list_of_candidate_statements.sort(reverse=True, key=lambda x: x.probability)
+        composed_type = list_of_candidate_statements[0].st_type
+        composed_probability = list_of_candidate_statements[0].probability
+        for a_sentence in list_of_candidate_statements[1:]:
+            composed_type += " OR " + a_sentence.st_type
+            composed_probability += a_sentence.probability
+
+
+
+        result = Statement(st_property=list_of_candidate_statements[0].st_property,
+                           st_type=composed_type,
+                           probability=composed_probability,
+                           cardinality="+")
+
+        for a_sentence in list_of_candidate_statements:
+            for a_comment in a_sentence.comments:
+                result.add_comment(a_comment)
+                result.add_comment(self._turn_statement_into_comment(a_sentence))
+
+        return result
+
+
+
+
+    def _decide_best_statement_with_cardinalities_in_comments(self, list_of_candidate_statements):
         list_of_candidate_statements.sort(reverse=True, key=lambda x:x.probability)
         result = None
         if self._keep_less_specific:
@@ -151,12 +201,12 @@ class ShexSerializer(object):
 
         for a_statement in list_of_candidate_statements:
             if a_statement.cardinality != result.cardinality:
-                result.add_comment(self._turn_statement_into_comment_cardinality(a_statement))
+                result.add_comment(self._turn_statement_into_comment(a_statement))
         return result
 
-    def _turn_statement_into_comment_cardinality(self, a_statement):
+    def _turn_statement_into_comment(self, a_statement):
         return self._probability_representation(a_statement.probability) + \
-               " have cardinality " + self._cardinality_representation(a_statement.cardinality)
+               " obj: " + a_statement.st_type + ". Cardinality: " + self._cardinality_representation(a_statement.cardinality)
 
 
     def _statements_have_similar_probability(self, more_probable_st, less_probable_st):
@@ -164,6 +214,11 @@ class ShexSerializer(object):
             return True
         return False
 
+
+    def _statements_have_same_prop(self, st1, st2):
+        if st1.st_property == st2.st_property:
+            return True
+        return False
 
     def _statements_have_same_tokens(self, st1, st2):
         if st1.st_property == st2.st_property and st1.st_type == st2.st_type:
