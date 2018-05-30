@@ -81,15 +81,17 @@ class ShexSerializer(object):
         result = []
         if len(original_statements) == 0 or original_statements[0].probability < self._aceptance_theshold:
             return []
-        target_statements = self._group_constraints_with_same_prop_and_obj(original_statements)
-        target_statements = self._group_constraints_with_same_prop_but_different_obj(target_statements)
-        for i in range(0, len(target_statements)):
-            if target_statements[i].probability < self._aceptance_theshold:  # We assume that the threshold is still
-                                                                             # a valid boundary, despite possible
-                                                                             # elements not sorted
+
+        for i in range(0, len(original_statements)):
+            if original_statements[i].probability < self._aceptance_theshold:
+
                 break
-            result.append(target_statements[i])
-        target_statements.sort(reverse=True, key=lambda x:x.probability)  # Restoring order completly
+            result.append(original_statements[i])
+
+        result = self._group_constraints_with_same_prop_and_obj(result)
+        result = self._group_constraints_with_same_prop_but_different_obj(result)
+
+        result.sort(reverse=True, key=lambda x:x.probability)  # Restoring order completly
         return result
 
 
@@ -98,18 +100,21 @@ class ShexSerializer(object):
         already_visited = set()
         for i in range(0, len(candidate_statements)):
             a_statement = candidate_statements[i]
-            if a_statement not in already_visited:
-                already_visited.add(a_statement)
-                group_to_decide = [a_statement]
-                for j in range(i + 1, len(candidate_statements)):
-                    if self._statements_have_same_prop(a_statement,
-                                                       candidate_statements[j]):
-                        group_to_decide.append(candidate_statements[j])
-                        already_visited.add(candidate_statements[j])
-                if len(group_to_decide) == 1:
-                    result.append(a_statement)
-                else:
-                    result.append(self._compose_statement_with_objects_in_or(group_to_decide))
+            if a_statement.st_property != RDF_TYPE_STR:
+                if a_statement not in already_visited:
+                    already_visited.add(a_statement)
+                    group_to_decide = [a_statement]
+                    for j in range(i + 1, len(candidate_statements)):
+                        if self._statements_have_same_prop(a_statement,
+                                                           candidate_statements[j]):
+                            group_to_decide.append(candidate_statements[j])
+                            already_visited.add(candidate_statements[j])
+                    if len(group_to_decide) == 1:
+                        result.append(a_statement)
+                    else:
+                        result.append(self._compose_statement_with_objects_in_or(group_to_decide))
+            else:
+                result.append(a_statement)
         return result
 
 
