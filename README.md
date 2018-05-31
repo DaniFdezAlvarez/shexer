@@ -19,6 +19,11 @@ The profile will be serialized into a Shape associated to the class. The results
 * Cardinality management. Some of the triples of a given instance may fit in an infinite number of constraint triples with the same predicate and object but different cardinality. For example, if a given instance has a single label specified by rdfs:label, that makes it fit with infinite triple constraints with the schema {rdfs:label xsd:string C}, where C can be any cardinality that includes the posibility of a single occurrence: {1}, + , {1,2}, {1,3}, {1,4},... Currently, our prototype just keeps rules with exact cardinality or + closure. 
 * Configurable priority of cardinalities. our prototype can be configured to prioritize the less specific cardinality or the most specific one if its trustworthiness is high enough.
 
+## Experimental results
+
+In the folder [experiments](https://github.com/DaniFdezAlvarez/dbpedia-shexer/tree/develop/experiments) some results after using this prototype against the English chapter of DBpedia can be found
+
+
 ## Example code
 
 The following code is handy for analyzing a) a file containing class-instance relations and b) a set of files containing the whole content of an RDF graph. It serializes a profile of each class in JSON and the inferred shapes in ShEx.
@@ -126,4 +131,3 @@ shexer.serialize_shex()
 print "Shexed!"
 
 ```
-
