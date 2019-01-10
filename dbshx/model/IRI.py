@@ -1,5 +1,5 @@
 
-_IRI_ELEM_TYPE = "IRI"
+IRI_ELEM_TYPE = "IRI"
 
 class IRI(object):
 
@@ -11,7 +11,7 @@ class IRI(object):
 
     @property
     def elem_type(self):
-        return _IRI_ELEM_TYPE
+        return IRI_ELEM_TYPE
 
     @property
     def iri(self):

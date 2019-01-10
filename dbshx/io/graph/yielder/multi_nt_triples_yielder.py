@@ -2,7 +2,7 @@
 from dbshx.utils.log import log_to_error
 from dbshx.utils.uri import remove_corners, parse_literal, there_is_arroba_after_last_quotes
 from dbshx.model.IRI import IRI
-from dbshx.model.literal import Literal
+from dbshx.model.Literal import Literal
 from dbshx.model.bnode import BNode
 from dbshx.model.property import Property
 
