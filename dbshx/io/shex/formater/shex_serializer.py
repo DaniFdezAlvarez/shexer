@@ -1,5 +1,6 @@
 
 from dbshx.core.class_profiler import RDF_TYPE_STR
+from dbshx.model.IRI import IRI_ELEM_TYPE
 from dbshx.model.statement import Statement
 
 _SPACES_GAP_FOR_FREQUENCY = "          "
@@ -78,21 +79,45 @@ class ShexSerializer(object):
 
     def _select_valid_statements_of_shape(self, a_shape):
         original_statements = [a_statement for a_statement in a_shape.yield_statements()]
-        result = []
         if len(original_statements) == 0 or original_statements[0].probability < self._aceptance_theshold:
             return []
 
+        result = []
         for i in range(0, len(original_statements)):
             if original_statements[i].probability < self._aceptance_theshold:
-
-                break
+                break  # Here I am assuming order
             result.append(original_statements[i])
 
         result = self._group_constraints_with_same_prop_and_obj(result)
-        result = self._group_constraints_with_same_prop_but_different_obj(result)
+        result = self._group_IRI_constraints(result)
+        # result = self._group_constraints_with_same_prop_but_different_obj(result)
 
         result.sort(reverse=True, key=lambda x:x.probability)  # Restoring order completly
         return result
+
+    def _group_IRI_constraints(self, candidate_statements):
+        result = []
+        already_visited = set()
+        for i in range(0, len(candidate_statements)):
+            a_statement = candidate_statements[i]
+            if a_statement.st_property != RDF_TYPE_STR:
+                if a_statement not in already_visited:
+                    already_visited.add(a_statement)
+                    group_to_decide = [a_statement]
+
+                    for j in range(i + 1, len(candidate_statements)):
+                        if self._statements_have_same_prop(a_statement,
+                                                           candidate_statements[j]):
+                            group_to_decide.append(candidate_statements[j])
+                            already_visited.add(candidate_statements[j])
+                        if len(group_to_decide) == 1:
+                            result.append(a_statement)
+                        elif not self._group_contains_IRI_statements(group_to_decide):
+                            for a_statement in group_to_decide:
+                                result.append(a_statement)
+                        else:
+                            for a_new_statement in self._compose_statements_with_IRI_objects(group_to_decide):
+                                result.append(a_new_statement)
 
 
     def _group_constraints_with_same_prop_but_different_obj(self, candidate_statements):
@@ -113,6 +138,7 @@ class ShexSerializer(object):
                         result.append(a_statement)
                     else:
                         result.append(self._compose_statement_with_objects_in_or(group_to_decide))
+                # pass
             else:
                 result.append(a_statement)
         return result
@@ -160,6 +186,27 @@ class ShexSerializer(object):
     #                 result.append(self._decide_best_statement_with_cardinalities_in_comments(swapping_statements + [candidate_statements[i]]))
     #     return result
 
+
+
+    def _group_contains_IRI_statements(self, list_of_candidate_statements):
+        for a_statement in list_of_candidate_statements:
+            if a_statement.st_type == IRI_ELEM_TYPE:
+                return True
+        return False
+
+    def _is_an_IRI(self, statement_type):
+        return statement_type == IRI_ELEM_TYPE or statement_type.startswith("@")  # TODO careful here. Refactor
+
+    def _compose_statements_with_IRI_objects(self, list_of_candidate_statements):
+        result = []
+        to_compose = []
+        for a_statement in list_of_candidate_statements:
+            if self._is_an_IRI(a_statement.st_type):
+                to_compose.append(a_statement)
+            else:
+                result.append(a_statement)
+
+        # TODO CONTINUE HERE
 
     def _compose_statement_with_objects_in_or(self, list_of_candidate_statements):
         list_of_candidate_statements.sort(reverse=True, key=lambda x: x.probability)
