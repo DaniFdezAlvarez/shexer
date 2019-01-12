@@ -17,6 +17,12 @@ class Statement(object):
                                                   is_last_statement_of_shape= is_last_statement_of_shape,
                                                   namespaces_dict=namespaces_dict)
 
+    def probability_representation(self):
+        return self._static_ref_to_serialize.probability_representation(self._probability)
+
+    def cardinality_representation(self):
+        return self._static_ref_to_serialize.cardinality_representation(self._cardinality)
+
     def add_comment(self, comment):
         self._comments.append(comment)
 

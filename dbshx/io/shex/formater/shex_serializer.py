@@ -3,12 +3,8 @@ from dbshx.core.class_profiler import RDF_TYPE_STR
 from dbshx.model.IRI import IRI_ELEM_TYPE
 from dbshx.model.statement import Statement
 from dbshx.model.fixed_prop_choice_statement import FixedPropChoiceStatement
+from dbshx.io.shex.formater.consts import SPACES_LEVEL_INDENTATION
 
-SPACES_GAP_FOR_FREQUENCY = "          "
-SPACES_GAP_BETWEEN_TOKENS = "  "
-TARGET_LINE_LENGHT = 60
-SPACES_LEVEL_INDENTATION = "   "
-COMMENT_INI = "# "
 # _WHOTES_POR_STANDALONE_COMMENT = "                                        "  # 40
 
 
@@ -72,10 +68,14 @@ class ShexSerializer(object):
         if len(statements) == 0:
             return
 
-        for i in range(0, len(statements) - 1 ):
+        for i in range(0, len(statements) - 1):
+            print statements[i]. \
+                get_tuples_to_serialize_line_indent_level(is_last_statement_of_shape=False,
+                                                          namespaces_dict=self._namespaces_dict)
             for line_indent_tuple in statements[i].\
                     get_tuples_to_serialize_line_indent_level(is_last_statement_of_shape=False,
                                                               namespaces_dict=self._namespaces_dict):
+                print "Did once!", line_indent_tuple
                 self._write_line(a_line=line_indent_tuple[0],
                                  indent_level=line_indent_tuple[1])
         for line_indent_tuple in statements[len(statements) - 1].\
@@ -125,6 +125,7 @@ class ShexSerializer(object):
                         else:
                             for a_new_statement in self._compose_statements_with_IRI_objects(group_to_decide):
                                 result.append(a_new_statement)
+        return result
 
 
     def _group_constraints_with_same_prop_but_different_obj(self, candidate_statements):
@@ -232,7 +233,7 @@ class ShexSerializer(object):
 
     def _remove_IRI_statements_if_useles(self, group_of_statements):
         # I am assuming a group of statements sorted by probability as param
-        if len(group_of_statements <= 1):
+        if len(group_of_statements) <= 1:
             return
         index_of_IRI_statement = -1
         for i in range(0, len(group_of_statements)):
@@ -295,8 +296,8 @@ class ShexSerializer(object):
         return result
 
     def _turn_statement_into_comment(self, a_statement):
-        return self._probability_representation(a_statement.probability) + \
-               " obj: " + a_statement.st_type + ". Cardinality: " + self._cardinality_representation(a_statement.cardinality)
+        return a_statement.probability_representation() + \
+               " obj: " + a_statement.st_type + ". Cardinality: " + a_statement.cardinality_representation()
 
 
     def _statements_have_similar_probability(self, more_probable_st, less_probable_st):

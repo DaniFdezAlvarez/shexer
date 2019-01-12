@@ -1,4 +1,4 @@
-from dbshx.io.shex.formater.shex_serializer import SPACES_GAP_BETWEEN_TOKENS, \
+from dbshx.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, \
     COMMENT_INI, TARGET_LINE_LENGHT, SPACES_GAP_FOR_FREQUENCY
 from dbshx.core.class_profiler import RDF_TYPE_STR
 
