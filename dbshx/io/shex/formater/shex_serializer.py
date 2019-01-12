@@ -2,12 +2,13 @@
 from dbshx.core.class_profiler import RDF_TYPE_STR
 from dbshx.model.IRI import IRI_ELEM_TYPE
 from dbshx.model.statement import Statement
+from dbshx.model.fixed_prop_choice_statement import FixedPropChoiceStatement
 
-_SPACES_GAP_FOR_FREQUENCY = "          "
-_SPACES_GAP_BETWEEN_TOKENS = "  "
-_TARGET_LINE_LENGHT = 60
-_SPACES_LEVEL_INDENTATION = "   "
-_COMMENT_INI = "# "
+SPACES_GAP_FOR_FREQUENCY = "          "
+SPACES_GAP_BETWEEN_TOKENS = "  "
+TARGET_LINE_LENGHT = 60
+SPACES_LEVEL_INDENTATION = "   "
+COMMENT_INI = "# "
 # _WHOTES_POR_STANDALONE_COMMENT = "                                        "  # 40
 
 
@@ -62,7 +63,7 @@ class ShexSerializer(object):
     def _indentation_spaces(self, indent_level):
         result = ""
         for i in range(0, indent_level):
-            result += _SPACES_LEVEL_INDENTATION
+            result += SPACES_LEVEL_INDENTATION
         return result
 
 
@@ -72,10 +73,16 @@ class ShexSerializer(object):
             return
 
         for i in range(0, len(statements) - 1 ):
-            self._serialize_statement(a_statement=statements[i],
-                                      is_last_statement_of_shape=False)
-        self._serialize_statement(a_statement=statements[len(statements) - 1],
-                                  is_last_statement_of_shape=True)
+            for line_indent_tuple in statements[i].\
+                    get_tuples_to_serialize_line_indent_level(is_last_statement_of_shape=False,
+                                                              namespaces_dict=self._namespaces_dict):
+                self._write_line(a_line=line_indent_tuple[0],
+                                 indent_level=line_indent_tuple[1])
+        for line_indent_tuple in statements[len(statements) - 1].\
+                get_tuples_to_serialize_line_indent_level(is_last_statement_of_shape=True,
+                                                          namespaces_dict=self._namespaces_dict):
+            self._write_line(a_line=line_indent_tuple[0],
+                             indent_level=line_indent_tuple[1])
 
     def _select_valid_statements_of_shape(self, a_shape):
         original_statements = [a_statement for a_statement in a_shape.yield_statements()]
@@ -205,8 +212,39 @@ class ShexSerializer(object):
                 to_compose.append(a_statement)
             else:
                 result.append(a_statement)
+        to_compose.sort(reverse=True, key=lambda x: x.probability)
+        target_probability = self._get_probability_or_IRI_statement_in_group(to_compose)
+        self._remove_IRI_statements_if_useles(to_compose)
+        result.append(FixedPropChoiceStatement(st_property=to_compose[0].st_property,
+                                               st_types=[a_statement.st_type for a_statement in to_compose],
+                                               cardinality="+",
+                                               probability=target_probability))
 
-        # TODO CONTINUE HERE
+        return result
+
+
+    def _get_probability_or_IRI_statement_in_group(self, group_of_statements):
+        for a_statement in group_of_statements:
+            if a_statement.st_type == IRI_ELEM_TYPE:
+                return a_statement.cardinality
+        raise ValueError("There is no IRI statement within the received group")
+
+
+    def _remove_IRI_statements_if_useles(self, group_of_statements):
+        # I am assuming a group of statements sorted by probability as param
+        if len(group_of_statements <= 1):
+            return
+        index_of_IRI_statement = -1
+        for i in range(0, len(group_of_statements)):
+            if group_of_statements[i].st_type == IRI_ELEM_TYPE:
+                index_of_IRI_statement = i
+                break
+        if index_of_IRI_statement != -1:
+            if group_of_statements[1].probability == group_of_statements[index_of_IRI_statement].probability:
+                # the previous 'if' works, trust me, im engineer
+                del group_of_statements[index_of_IRI_statement]
+
+
 
     def _compose_statement_with_objects_in_or(self, list_of_candidate_statements):
         list_of_candidate_statements.sort(reverse=True, key=lambda x: x.probability)
@@ -277,69 +315,6 @@ class ShexSerializer(object):
             return True
         return False
 
-
-    def _serialize_statement(self, a_statement, is_last_statement_of_shape):
-        st_property = self._tune_token(a_statement.st_property)
-        st_target_element = self._str_of_target_element(a_statement.st_type,
-                                                        a_statement.st_property)
-        cardinality = self._cardinality_representation(
-            a_statement.cardinality)
-        result = st_property + _SPACES_GAP_BETWEEN_TOKENS + st_target_element + _SPACES_GAP_BETWEEN_TOKENS + \
-                 cardinality + self._closure_of_statement(is_last_statement_of_shape)
-
-        result += self._adequate_amount_of_final_spaces(result)
-        result += self._probability_representation(a_statement.probability)
-        self._write_line(result, indent_level=1)
-        for a_comment in a_statement.comments:
-            self._write_line(a_comment, indent_level=4)
-
-
-    def _str_of_target_element(self, target_element, st_property):
-        """
-        Special treatment for rdf:type. We build a value set with an specific URI
-        :param target_element:
-        :param st_property:
-        :return:
-        """
-        if st_property == RDF_TYPE_STR:
-            return "[" + self._tune_token(target_element) + "]"
-        return target_element
-
-    def _tune_token(self, a_token):
-        for a_namespace in self._namespaces_dict:
-            if a_namespace in a_token:
-                return a_token.replace(a_namespace, self._namespaces_dict[a_namespace] + ":")
-        return "<" + a_token + ">"
-
-    def _probability_representation(self, probability):
-        return _COMMENT_INI + str(probability * 100) + " %"
-
-    def _cardinality_representation(self, cardinality):
-        if cardinality == "+":
-            return cardinality
-        else:
-            return "{" + str(cardinality) + "}"
-
-
-    # def _cardinality_representation(self, cardinality):
-    #     if cardinality == "1" or cardinality == 1:
-    #         return ""
-    #     return str(cardinality)
-
-
-    def _closure_of_statement(self, is_last_statement):
-        if is_last_statement:
-            return ""
-        return ";"
-
-
-    def _adequate_amount_of_final_spaces(self, current_line):
-        if len(current_line) > _TARGET_LINE_LENGHT - 10:
-            return _SPACES_GAP_FOR_FREQUENCY
-        result = ""
-        for i in range(0, _TARGET_LINE_LENGHT - len(current_line)):
-            result += " "
-        return result
 
 
     def _serialize_shape_name(self, a_shape):
