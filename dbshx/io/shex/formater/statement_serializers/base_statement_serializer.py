@@ -21,6 +21,7 @@ class BaseStatementSerializer(object):
         result += BaseStatementSerializer.adequate_amount_of_final_spaces(result)
         result += BaseStatementSerializer.probability_representation(a_statement.probability)
         tuples_line_indent.append((result, 1))
+
         for a_comment in a_statement.comments:
             tuples_line_indent.append((a_comment, 4))
 

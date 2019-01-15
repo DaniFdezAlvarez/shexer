@@ -31,10 +31,9 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
         tuples_line_indent.append(FixedPropChoiceStatementSerializer._tuple_closing_choice(a_statement,
                                                                                            is_last_statement_of_shape))
 
-        # TODO CONTINUE HERE
-
         for a_comment in a_statement.comments:
             tuples_line_indent.append((a_comment, 4))
+        a = 3+1
 
         return tuples_line_indent
 
@@ -50,7 +49,7 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
 
     @staticmethod
     def _tuple_of_disjunction():
-        return "|", 1
+        return "|", 2
 
     @staticmethod
     def _opening_tuple_line_of_choice():
