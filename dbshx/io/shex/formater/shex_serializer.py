@@ -1,11 +1,8 @@
 from dbshx.core.class_profiler import RDF_TYPE_STR
 from dbshx.model.IRI import IRI_ELEM_TYPE
-from dbshx.model.statement import Statement
 from dbshx.model.fixed_prop_choice_statement import FixedPropChoiceStatement
 from dbshx.io.shex.formater.consts import SPACES_LEVEL_INDENTATION
-
-
-# _WHOTES_POR_STANDALONE_COMMENT = "                                        "  # 40
+from dbshx.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer  # TODO: REPFACTOR
 
 
 class ShexSerializer(object):
@@ -23,9 +20,23 @@ class ShexSerializer(object):
     def serialize_shex(self):
 
         self._reset_target_file()
+        self._serialize_namespaces()
         for a_shape in self._shapes_list:
             self._serialize_shape(a_shape)
         self._flush()
+
+
+    def _serialize_namespaces(self):
+        for a_namespace in self._namespaces_dict:
+            self._write_line(self._prefix_line(a_namespace), 0)
+        self._serialize_empty_namespace()
+        self._write_line("", 0)
+
+    def _prefix_line(self, namespace_key):
+        return "PREFIX " +  self._namespaces_dict[namespace_key] + ": <" + namespace_key + ">"
+
+    def _serialize_empty_namespace(self):
+        self._write_line("PREFIX : <http://weso.es/shapes/>")
 
     def _serialize_shape(self, a_shape):
         self._serialize_shape_name(a_shape)
@@ -64,13 +75,9 @@ class ShexSerializer(object):
             return
 
         for i in range(0, len(statements) - 1):
-            print statements[i]. \
-                get_tuples_to_serialize_line_indent_level(is_last_statement_of_shape=False,
-                                                          namespaces_dict=self._namespaces_dict)
             for line_indent_tuple in statements[i]. \
                     get_tuples_to_serialize_line_indent_level(is_last_statement_of_shape=False,
                                                               namespaces_dict=self._namespaces_dict):
-                print "Did once!", line_indent_tuple
                 self._write_line(a_line=line_indent_tuple[0],
                                  indent_level=line_indent_tuple[1])
         for line_indent_tuple in statements[len(statements) - 1]. \
@@ -102,7 +109,10 @@ class ShexSerializer(object):
         already_visited = set()
         for i in range(0, len(candidate_statements)):
             a_statement = candidate_statements[i]
-            if a_statement.st_property != RDF_TYPE_STR:
+            if a_statement.st_property == RDF_TYPE_STR:
+                result.append(a_statement)
+                already_visited.add(a_statement)
+            else:  # a_statement.st_property != RDF_TYPE_STR:
                 if a_statement not in already_visited:
                     already_visited.add(a_statement)
                     group_to_decide = [a_statement]
@@ -288,7 +298,9 @@ class ShexSerializer(object):
 
     def _turn_statement_into_comment(self, a_statement):
         return a_statement.probability_representation() + \
-               " obj: " + a_statement.st_type + ". Cardinality: " + a_statement.cardinality_representation()
+               " obj: " + BaseStatementSerializer.tune_token(a_statement.st_type,
+                                                             self._namespaces_dict) +\
+               ". Cardinality: " + a_statement.cardinality_representation()
 
     def _statements_have_similar_probability(self, more_probable_st, less_probable_st):
         if 1.0 - (less_probable_st.probability / more_probable_st.probability) <= self._tolerance:

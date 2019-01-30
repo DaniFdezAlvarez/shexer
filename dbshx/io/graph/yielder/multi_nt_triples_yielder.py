@@ -22,6 +22,7 @@ class MultiNtTriplesYielder(object):
             print "New file! --> ", a_source_file
             for a_triple in self._yield_triples_of_file(a_source_file):
                 yield a_triple
+        print "Final number of triples: ", self._triples_count
 
     def _yield_triples_of_file(self, a_source_file):
         with open(a_source_file, "r") as in_stream:

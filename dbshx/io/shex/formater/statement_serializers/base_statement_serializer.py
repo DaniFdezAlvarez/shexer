@@ -1,6 +1,8 @@
 from dbshx.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, \
     COMMENT_INI, TARGET_LINE_LENGHT, SPACES_GAP_FOR_FREQUENCY
 from dbshx.core.class_profiler import RDF_TYPE_STR
+from dbshx.model.IRI import IRI_ELEM_TYPE
+from dbshx.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 
 
 
@@ -43,10 +45,19 @@ class BaseStatementSerializer(object):
 
     @staticmethod
     def tune_token(a_token, namespaces_dict):
-        for a_namespace in namespaces_dict:
+        # TODO:  a lot to correct here for normal behaviour
+        if "xsd" in a_token:
+            print a_token, "uuuuuuu"
+        if a_token == IRI_ELEM_TYPE: # iri
+            return a_token
+        if a_token.startswith(STARTING_CHAR_FOR_SHAPE_NAME):  # Shape
+            return "@:" + a_token.replace(STARTING_CHAR_FOR_SHAPE_NAME, "")
+
+        for a_namespace in namespaces_dict:  # Prefixed element (all literals are prefixed elements)
             if a_namespace in a_token:
                 return a_token.replace(a_namespace, namespaces_dict[a_namespace] + ":")
-        return "<" + a_token + ">"
+
+        return "<" + a_token + ">"  # Complete URIs
 
 
     @staticmethod

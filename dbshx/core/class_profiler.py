@@ -20,12 +20,14 @@ class ClassProfiler(object):
         self._instances_shape_dict = {}
         self._classes_shape_dict = self._build_classes_shape_dict_with_just_classes()
         self._shape_names_dict = self._build_shape_names_dict()
+        self._relevant_triples = 0
 
 
 
 
     def profile_classes(self):
         self._build_shape_of_instances()
+        print "Number of relevant triples", self._relevant_triples
         # print "Profiler... shape of instances built!"
         self._build_class_profile()
         # print "Profiler... class profile built!"
@@ -104,6 +106,7 @@ class ClassProfiler(object):
 
     def _build_shape_of_instances(self):
         for a_triple in self._yield_relevant_triples():
+            self._relevant_triples += 1
             self._anotate_feature_of_target_instance(a_triple)
 
 
