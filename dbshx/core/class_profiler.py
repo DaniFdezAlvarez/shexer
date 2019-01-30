@@ -1,5 +1,9 @@
 
+from dbshx.model.IRI import IRI_ELEM_TYPE
+from dbshx.utils.shapes import build_shapes_name_for_class_uri
+
 RDF_TYPE_STR = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+
 
 _ONE_TO_MANY = "+"
 
@@ -15,20 +19,32 @@ class ClassProfiler(object):
         self._target_classes_dict = target_classes_dict
         self._instances_shape_dict = {}
         self._classes_shape_dict = self._build_classes_shape_dict_with_just_classes()
+        self._shape_names_dict = self._build_shape_names_dict()
+        self._relevant_triples = 0
 
+
+
+
+    def profile_classes(self):
+        self._build_shape_of_instances()
+        print "Number of relevant triples", self._relevant_triples
+        # print "Profiler... shape of instances built!"
+        self._build_class_profile()
+        # print "Profiler... class profile built!"
+        return self._classes_shape_dict
+
+    def _build_shape_names_dict(self):
+        result = {}
+        for a_class in self._target_classes_dict:
+            name = build_shapes_name_for_class_uri(a_class)
+            result[a_class] = name
+        return result
 
     def _build_classes_shape_dict_with_just_classes(self):
         result = {}
         for a_class_key in self._target_classes_dict:
             result[a_class_key] = {}
         return result
-
-    def profile_classes(self):
-        self._build_shape_of_instances()
-        print "Profiler... shape of instances built!"
-        self._build_class_profile()
-        print "Profiler... class profile built!"
-        return self._classes_shape_dict
 
 
     def _infer_3tuple_features(self, an_instance):
@@ -90,6 +106,7 @@ class ClassProfiler(object):
 
     def _build_shape_of_instances(self):
         for a_triple in self._yield_relevant_triples():
+            self._relevant_triples += 1
             self._anotate_feature_of_target_instance(a_triple)
 
 
@@ -98,11 +115,17 @@ class ClassProfiler(object):
         str_prop = a_triple[_P].iri
         type_obj = self._decide_type_obj(a_triple[_O], str_prop)
 
+        obj_shapes = [] if type_obj != IRI_ELEM_TYPE else self._decide_shapes_obj(a_triple[_O].iri)
+
         self._introduce_needed_elements_in_shape_instances_dict(str_subj=str_subj,
                                                                 str_prop=str_prop,
-                                                                type_obj=type_obj)
+                                                                type_obj=type_obj,
+                                                                obj_shapes=obj_shapes)
 
         self._instances_shape_dict[str_subj][str_prop][type_obj] += 1
+        for a_shape in obj_shapes:
+            self._instances_shape_dict[str_subj][str_prop][a_shape] += 1
+            # print "Cosas hice ademas", a_shape
 
     @staticmethod
     def _decide_type_obj(original_object, str_prop):
@@ -118,13 +141,23 @@ class ClassProfiler(object):
         return original_object.iri
 
 
-    def _introduce_needed_elements_in_shape_instances_dict(self, str_subj, str_prop, type_obj):
+    def _introduce_needed_elements_in_shape_instances_dict(self, str_subj, str_prop, type_obj, obj_shapes):
         if str_subj not in self._instances_shape_dict:
             self._instances_shape_dict[str_subj] = {}
         if str_prop not in self._instances_shape_dict[str_subj]:
             self._instances_shape_dict[str_subj][str_prop] = {}
         if type_obj not in self._instances_shape_dict[str_subj][str_prop]:
             self._instances_shape_dict[str_subj][str_prop][type_obj] = 0
+        for a_shape in obj_shapes:
+            if a_shape not in self._instances_shape_dict[str_subj][str_prop]:
+                self._instances_shape_dict[str_subj][str_prop][a_shape] = 0
+
+    def _decide_shapes_obj(self, str_obj):
+        result = []
+        for class_key in self._target_classes_dict:
+            if str_obj in self._target_classes_dict[class_key]:
+                result.append(self._shape_names_dict[class_key])
+        return result
 
 
     def _yield_relevant_triples(self):
