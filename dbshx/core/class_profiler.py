@@ -33,6 +33,9 @@ class ClassProfiler(object):
         # print "Profiler... class profile built!"
         return self._classes_shape_dict
 
+    def get_target_classes_dict(self):
+        return self._target_classes_dict
+
     def _build_shape_names_dict(self):
         result = {}
         for a_class in self._target_classes_dict:
