@@ -8,7 +8,7 @@ from dbshx.io.shex.formater.statement_serializers.base_statement_serializer impo
 class ShexSerializer(object):
 
     def __init__(self, target_file, shapes_list, aceptance_threshold=0.4, namespaces_dict=None,
-                 tolerance_to_keep_similar_rules=0.15, keep_less_specific=True):
+                 tolerance_to_keep_similar_rules=0.15, keep_less_specific=True, string_return=False):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._aceptance_theshold = aceptance_threshold
@@ -16,6 +16,8 @@ class ShexSerializer(object):
         self._tolerance = tolerance_to_keep_similar_rules
         self._namespaces_dict = namespaces_dict if namespaces_dict is not None else []
         self._keep_less_specific = keep_less_specific
+        self._string_return = string_return
+        self._string_result = ""
 
     def serialize_shex(self):
 
@@ -24,6 +26,9 @@ class ShexSerializer(object):
         for a_shape in self._shapes_list:
             self._serialize_shape(a_shape)
         self._flush()
+        if self._string_return:
+            return self._string_result
+
 
 
     def _serialize_namespaces(self):
@@ -55,13 +60,18 @@ class ShexSerializer(object):
             self._lines_buffer = []
 
     def _reset_target_file(self):
+        if self._string_return:
+            return
         with open(self._target_file, "w") as out_stream:
             out_stream.write("")  # Is this necessary? maybe enough to open it in 'w' mode?
 
     def _write_lines_buffer(self):
-        with open(self._target_file, "a") as out_stream:
-            for a_line in self._lines_buffer:
-                out_stream.write(a_line)
+        if self._string_return:
+            self._string_result += "".join(self._lines_buffer)
+        else:
+            with open(self._target_file, "a") as out_stream:
+                for a_line in self._lines_buffer:
+                    out_stream.write(a_line)
 
     def _indentation_spaces(self, indent_level):
         result = ""
