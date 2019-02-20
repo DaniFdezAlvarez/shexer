@@ -1,6 +1,7 @@
 
 from dbshx.model.IRI import IRI_ELEM_TYPE
 from dbshx.utils.shapes import build_shapes_name_for_class_uri
+from dbshx.model.bnode import BNode
 
 RDF_TYPE_STR = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 
@@ -27,7 +28,7 @@ class ClassProfiler(object):
 
     def profile_classes(self):
         self._build_shape_of_instances()
-        print "Number of relevant triples", self._relevant_triples
+        # print "Number of relevant triples", self._relevant_triples
         # print "Profiler... shape of instances built!"
         self._build_class_profile()
         # print "Profiler... class profile built!"
@@ -140,6 +141,8 @@ class ClassProfiler(object):
         :return:
         """
         if str_prop != RDF_TYPE_STR:
+            if type(original_object) == BNode:
+                print "EYYYYYYY", str(original_object)
             return original_object.elem_type
         return original_object.iri
 

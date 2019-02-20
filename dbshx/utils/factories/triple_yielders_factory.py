@@ -1,6 +1,7 @@
 from dbshx.io.graph.yielder.multi_nt_triples_yielder import MultiNtTriplesYielder
 from dbshx.io.graph.yielder.nt_triples_yielder import NtTriplesYielder
-from dbshx.consts import NT
+from dbshx.io.graph.yielder.tsv_nt_triples_yielder import TsvNtTriplesYielder
+from dbshx.consts import NT, TSV_SPO
 
 
 def get_triple_yielder(source_file=None, list_of_source_files=None, input_format=NT):
@@ -9,4 +10,10 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
             return NtTriplesYielder(source_file=source_file)
         else:
             return MultiNtTriplesYielder(list_of_files=list_of_source_files)
+    if input_format == TSV_SPO:
+        if source_file is not None:
+            return TsvNtTriplesYielder(source_file=source_file)
+        else:
+            raise ValueError("Currently, multi-file parser for TSV format is not supported")
+
     raise ValueError("Not supported format: " + NT)

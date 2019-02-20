@@ -13,14 +13,18 @@ RDF_PREFIX = "rdf"
 DT_NAMESPACE = "http://dbpedia.org/datatype/"
 DT_PREFIX = "dt"
 
+OPENGIS_NAMESPACE = "http://www.opengis.net/ont/geosparql#"
+OPENGIS_PREFIX = "geo"
+
 STRING_TYPE = "http://www.w3.org/2001/XMLSchema#string"
+FLOAT_TYPE = "http://www.w3.org/2001/XMLSchema#float"
 
 
 def remove_corners(a_uri, raise_error_if_no_corners=True):
     if a_uri.startswith("<") and a_uri.endswith(">"):
         return a_uri[1:-1]
     if raise_error_if_no_corners:
-        raise RuntimeError("Wrong parameter of function: '" + a_uri + "'")
+        raise ValueError("Wrong parameter of function: '" + a_uri + "'")
     else:
         return a_uri
 
@@ -38,7 +42,10 @@ def decide_literal_type(a_literal):
         return RDF_SYNTAX_NAMESPACE + a_literal[a_literal.find("rdf:")+ 4:]
     elif "dt:" in a_literal:
         return DT_NAMESPACE + a_literal[a_literal.find("dt:")+ 3:]
-    elif XSD_NAMESPACE in a_literal or RDF_SYNTAX_NAMESPACE in a_literal or DT_NAMESPACE in a_literal:
+    elif "geo:" in a_literal:
+        return OPENGIS_NAMESPACE + a_literal[a_literal.find("geo:") + 4:]
+    elif XSD_NAMESPACE in a_literal or RDF_SYNTAX_NAMESPACE in a_literal \
+            or DT_NAMESPACE in a_literal or OPENGIS_NAMESPACE in a_literal:
         # substring = a_literal[a_literal.find("\"^^"):]
         # return _add_prefix(substring[substring.rfind("#")+1:-1], XSD_PREFIX)
         return a_literal[a_literal.find("\"^^")+4:-1]
