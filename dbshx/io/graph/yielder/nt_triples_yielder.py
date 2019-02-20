@@ -1,11 +1,7 @@
 
 from dbshx.utils.log import log_to_error
-from dbshx.utils.uri import remove_corners, parse_literal, there_is_arroba_after_last_quotes
-from dbshx.model.IRI import IRI
-from dbshx.model.Literal import Literal
-from dbshx.model.bnode import BNode
-from dbshx.model.property import Property
-
+from dbshx.utils.uri import there_is_arroba_after_last_quotes
+from dbshx.utils.triple_yielders import tune_prop, tune_token
 
 class NtTriplesYielder(object):
     def __init__(self, source_file):
@@ -24,7 +20,7 @@ class NtTriplesYielder(object):
                     log_to_error(msg="This line caused error: " + a_line,
                                  source=self._source_file)
                 else:
-                    yield (self._tune_token(tokens[0]), self._tune_prop(tokens[1]), self._tune_token(tokens[2]))
+                    yield (tune_token(tokens[0]), tune_prop(tokens[1]), tune_token(tokens[2]))
                     self._triples_count += 1
                     # if self._triples_count % 100000 == 0:
                     #     print "Reading...", self._triples_count
@@ -72,21 +68,6 @@ class NtTriplesYielder(object):
             return index_of_quotes + (len(target_str) - len(target_substring))
         else:  # Typed
             return target_substring[target_substring.find("^^"):].find(" ") - 1 + target_str.find("^^")
-
-
-    def _tune_token(self, a_token):
-        if a_token.startswith("<"):
-            return IRI(remove_corners(a_token))
-        elif a_token.startswith('"'):
-            content, elem_type = parse_literal(a_token)
-            return Literal(content=content,
-                           elem_type=elem_type)
-        else:  # a BNode
-            return BNode(identifier=a_token)
-
-
-    def _tune_prop(self, a_token):
-        return Property(remove_corners(a_token))
 
 
     @property
