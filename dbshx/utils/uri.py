@@ -16,11 +16,15 @@ DT_PREFIX = "dt"
 STRING_TYPE = "http://www.w3.org/2001/XMLSchema#string"
 
 
-def remove_corners(a_uri):
+def remove_corners(a_uri, raise_error_if_no_corners=True):
     if a_uri.startswith("<") and a_uri.endswith(">"):
         return a_uri[1:-1]
-    else:
+    if raise_error_if_no_corners:
         raise RuntimeError("Wrong parameter of function: '" + a_uri + "'")
+    else:
+        return a_uri
+
+
 
 
 def decide_literal_type(a_literal):

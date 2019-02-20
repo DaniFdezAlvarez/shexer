@@ -13,7 +13,8 @@ class Shaper(object):
     def __init__(self, target_classes=None, file_target_classes=None,
                  input_format=NT, instances_file_input=None,
                  graph_file_input=None, graph_list_of_files_input=None,
-                 namespaces_dict=None, namespaces_dict_file=None):
+                 namespaces_dict=None, namespaces_dict_file=None,
+                 instantiation_property=None):
 
         check_just_one_not_none(target_classes, file_target_classes,
                                 "target_classes", "file_target_classes")
@@ -31,6 +32,7 @@ class Shaper(object):
         self._graph_list_of_files_input = graph_list_of_files_input
         self._namespaces_dict = namespaces_dict
         self._namespaces_dict_file = namespaces_dict_file
+        self._instantiation_property = instantiation_property
 
         self._instance_tracker = None
         self._target_classes_dict = None
@@ -102,7 +104,8 @@ class Shaper(object):
                                     graph_list_of_files_input=self._graph_list_of_files_input,
                                     target_classes=self._target_classes,
                                     file_target_classes=self._file_target_classes,
-                                    input_format=self._input_format)
+                                    input_format=self._input_format,
+                                    instantiation_property=self._instantiation_property)
 
     def _build_class_shexer(self):
         return get_class_shexer(class_instances_target_dict=self._target_classes_dict,
