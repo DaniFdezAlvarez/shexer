@@ -1,14 +1,18 @@
 from dbshx.core.class_profiler import RDF_TYPE_STR
 from dbshx.model.IRI import IRI_ELEM_TYPE
+from dbshx.model.property import Property
+from dbshx.utils.uri import remove_corners
 from dbshx.model.fixed_prop_choice_statement import FixedPropChoiceStatement
 from dbshx.io.shex.formater.consts import SPACES_LEVEL_INDENTATION
 from dbshx.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer  # TODO: REPFACTOR
+from dbshx.io.shex.formater.statement_serializers.fixed_prop_choice_statement_serializer import FixedPropChoiceStatementSerializer  # TODO: REPFACTOR
 
 
 class ShexSerializer(object):
 
     def __init__(self, target_file, shapes_list, aceptance_threshold=0.4, namespaces_dict=None,
-                 tolerance_to_keep_similar_rules=0.15, keep_less_specific=True, string_return=False):
+                 tolerance_to_keep_similar_rules=0.15, keep_less_specific=True, string_return=False,
+                 instantiation_property_str=RDF_TYPE_STR):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._aceptance_theshold = aceptance_threshold
@@ -18,6 +22,7 @@ class ShexSerializer(object):
         self._keep_less_specific = keep_less_specific
         self._string_return = string_return
         self._string_result = ""
+        self._instantiation_property_str = self._decide_instantiation_property(instantiation_property_str)
 
     def serialize_shex(self):
 
@@ -29,7 +34,16 @@ class ShexSerializer(object):
         if self._string_return:
             return self._string_result
 
-
+    @staticmethod
+    def _decide_instantiation_property(instantiation_property_str):
+        if instantiation_property_str == None:
+            return RDF_TYPE_STR
+        if type(instantiation_property_str) == Property:
+            return str(instantiation_property_str)
+        if type(instantiation_property_str) == str:
+            return remove_corners(a_uri=instantiation_property_str,
+                                  raise_error_if_no_corners=False)
+        raise ValueError("Unrecognized param type to define instantiation property")
 
     def _serialize_namespaces(self):
         for a_namespace in self._namespaces_dict:
@@ -101,6 +115,9 @@ class ShexSerializer(object):
         if len(original_statements) == 0 or original_statements[0].probability < self._aceptance_theshold:
             return []
 
+        for a_statement in original_statements:  # TODO Refactor!!! This is not the place to set the serializer
+            self._set_serializer_object_for_statements(a_statement)
+
         result = []
         for i in range(0, len(original_statements)):
             if original_statements[i].probability < self._aceptance_theshold:
@@ -114,15 +131,20 @@ class ShexSerializer(object):
         result.sort(reverse=True, key=lambda x: x.probability)  # Restoring order completly
         return result
 
+    def _set_serializer_object_for_statements(self, statement):
+        statement.serializer_object = BaseStatementSerializer(
+            instantiation_property_str=self._instantiation_property_str)
+
+
     def _group_IRI_constraints(self, candidate_statements):
         result = []
         already_visited = set()
         for i in range(0, len(candidate_statements)):
             a_statement = candidate_statements[i]
-            if a_statement.st_property == RDF_TYPE_STR:
+            if a_statement.st_property == self._instantiation_property_str:
                 result.append(a_statement)
                 already_visited.add(a_statement)
-            else:  # a_statement.st_property != RDF_TYPE_STR:
+            else:  # a_statement.st_property != self._instantiation_property_str:
                 if a_statement not in already_visited:
                     already_visited.add(a_statement)
                     group_to_decide = [a_statement]
@@ -230,8 +252,10 @@ class ShexSerializer(object):
         composed_statement = FixedPropChoiceStatement(st_property=to_compose[0].st_property,
                                                       st_types=[a_statement.st_type for a_statement in to_compose],
                                                       cardinality="+",
-                                                      probability=target_probability)
-
+                                                      probability=target_probability,
+                                                      serializer_object=FixedPropChoiceStatementSerializer(
+                                                          instantiation_property_str=self._instantiation_property_str)
+                                                      )
         for a_statement in to_compose:
             if a_statement.st_type != IRI_ELEM_TYPE:
                 composed_statement.add_comment(self._turn_statement_into_comment(a_statement))

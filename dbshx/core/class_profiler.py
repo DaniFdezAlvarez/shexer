@@ -1,7 +1,8 @@
 
 from dbshx.model.IRI import IRI_ELEM_TYPE
 from dbshx.utils.shapes import build_shapes_name_for_class_uri
-from dbshx.model.bnode import BNode
+from dbshx.model.property import Property
+from dbshx.utils.uri import remove_corners
 
 RDF_TYPE_STR = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 
@@ -15,13 +16,14 @@ _O = 2
 
 class ClassProfiler(object):
 
-    def __init__(self, triples_yielder, target_classes_dict):
+    def __init__(self, triples_yielder, target_classes_dict, instantiation_property_str=RDF_TYPE_STR):
         self._triples_yielder = triples_yielder
         self._target_classes_dict = target_classes_dict
         self._instances_shape_dict = {}
         self._classes_shape_dict = self._build_classes_shape_dict_with_just_classes()
         self._shape_names_dict = self._build_shape_names_dict()
         self._relevant_triples = 0
+        self._instantiation_property_str = self._decide_instantiation_property(instantiation_property_str)
 
 
 
@@ -36,6 +38,18 @@ class ClassProfiler(object):
 
     def get_target_classes_dict(self):
         return self._target_classes_dict
+
+    @staticmethod
+    def _decide_instantiation_property(instantiation_property_str):
+        if instantiation_property_str == None:
+            return RDF_TYPE_STR
+        if type(instantiation_property_str) == Property:
+            return str(instantiation_property_str)
+        if type(instantiation_property_str) == str:
+            return remove_corners(a_uri=instantiation_property_str,
+                                  raise_error_if_no_corners=False)
+        raise ValueError("Unrecognized param type to define instantiation property")
+
 
     def _build_shape_names_dict(self):
         result = {}
@@ -62,13 +76,13 @@ class ClassProfiler(object):
 
     def _infer_valid_cardinalities(self, a_property, a_cardinality):
         """
-        Special teratment for rdf:type. If thats the property, we are targetting specific URIs instead of the type IRI.
+        Special teratment for self._instantiation_property_str. If thats the property, we are targetting specific URIs instead of the type IRI.
         Cardinality will be always "1"
         :param a_property:
         :param a_cardinality:
         :return:
         """
-        if a_property == RDF_TYPE_STR:
+        if a_property == self._instantiation_property_str:
             yield 1
         else:
             yield a_cardinality
@@ -131,18 +145,15 @@ class ClassProfiler(object):
             self._instances_shape_dict[str_subj][str_prop][a_shape] += 1
             # print "Cosas hice ademas", a_shape
 
-    @staticmethod
-    def _decide_type_obj(original_object, str_prop):
+    def _decide_type_obj(self, original_object, str_prop):
         """
-        Special traetment for rdf:type property. We look for ValueSets instead of types when this property appears.
+        Special traetment for self._instantiation_property_str property. We look for ValueSets instead of types when this property appears.
 
         :param original_object:
         :param str_prop:
         :return:
         """
-        if str_prop != RDF_TYPE_STR:
-            if type(original_object) == BNode:
-                print "EYYYYYYY", str(original_object)
+        if str_prop != self._instantiation_property_str:
             return original_object.elem_type
         return original_object.iri
 

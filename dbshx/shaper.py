@@ -89,13 +89,15 @@ class Shaper(object):
                                     string_return=string_return,
                                     namespaces_dict=self._namespaces_dict,
                                     output_format=output_format,
-                                    aceptance_threshold=aceptance_threshold)
+                                    aceptance_threshold=aceptance_threshold,
+                                    instantiation_property=self._instantiation_property)
 
     def _build_class_profiler(self):
         return get_class_profiler(target_classes_dict=self._target_classes_dict,
                                   source_file=self._graph_file_input,
                                   list_of_source_files=self._graph_list_of_files_input,
-                                  input_format=self._input_format)
+                                  input_format=self._input_format,
+                                  instantiation_property_str=self._instantiation_property)
 
 
     def _build_instance_tracker(self):
