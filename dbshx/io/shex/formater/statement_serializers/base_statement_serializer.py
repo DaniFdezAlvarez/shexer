@@ -1,6 +1,5 @@
 from dbshx.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, \
     COMMENT_INI, TARGET_LINE_LENGHT, SPACES_GAP_FOR_FREQUENCY
-from dbshx.core.class_profiler import RDF_TYPE_STR
 from dbshx.model.IRI import IRI_ELEM_TYPE
 from dbshx.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 
@@ -8,13 +7,16 @@ from dbshx.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 
 class BaseStatementSerializer(object):
 
-    @staticmethod
-    def serialize_statement_with_indent_level(a_statement, is_last_statement_of_shape, namespaces_dict):
+    def __init__(self, instantiation_property_str):
+        self._instantiation_property_str = instantiation_property_str
+
+
+    def serialize_statement_with_indent_level(self, a_statement, is_last_statement_of_shape, namespaces_dict):
         tuples_line_indent = []
         st_property = BaseStatementSerializer.tune_token(a_statement.st_property, namespaces_dict)
-        st_target_element = BaseStatementSerializer.str_of_target_element(target_element=a_statement.st_type,
-                                                                          st_property=a_statement.st_property,
-                                                                          namespaces_dict=namespaces_dict)
+        st_target_element = self.str_of_target_element(target_element=a_statement.st_type,
+                                                       st_property=a_statement.st_property,
+                                                       namespaces_dict=namespaces_dict)
         cardinality = BaseStatementSerializer.cardinality_representation(
             a_statement.cardinality)
         result = st_property + SPACES_GAP_BETWEEN_TOKENS + st_target_element + SPACES_GAP_BETWEEN_TOKENS + \
@@ -30,15 +32,18 @@ class BaseStatementSerializer(object):
         return tuples_line_indent
 
 
-    @staticmethod
-    def str_of_target_element(target_element, st_property, namespaces_dict):
+    def str_of_target_element(self, target_element, st_property, namespaces_dict):
         """
-        Special treatment for rdf:type. We build a value set with an specific URI
+        Special treatment for instantiation_property. We build a value set with an specific URI
         :param target_element:
         :param st_property:
         :return:
         """
-        if st_property == RDF_TYPE_STR:
+
+        if "P31" in st_property:
+            print st_property, self._instantiation_property_str
+        if st_property == self._instantiation_property_str:
+
             return "[" + BaseStatementSerializer.tune_token(target_element, namespaces_dict) + "]"
         return BaseStatementSerializer.tune_token(target_element, namespaces_dict)
 
@@ -46,8 +51,6 @@ class BaseStatementSerializer(object):
     @staticmethod
     def tune_token(a_token, namespaces_dict):
         # TODO:  a lot to correct here for normal behaviour
-        if "xsd" in a_token:
-            print a_token, "uuuuuuu"
         if a_token == IRI_ELEM_TYPE: # iri
             return a_token
         if a_token.startswith(STARTING_CHAR_FOR_SHAPE_NAME):  # Shape
