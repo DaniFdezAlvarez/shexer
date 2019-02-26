@@ -2,12 +2,15 @@ from dbshx.io.graph.yielder.nt_triples_yielder import NtTriplesYielder
 
 
 class MultiNtTriplesYielder(object):
-    def __init__(self, list_of_files, namespaces_to_ignore=None):
+    def __init__(self, list_of_files, namespaces_to_ignore=None, allow_untyped_numbers=False):
         self._list_of_files = list_of_files
         self._triples_yielded_from_used_yielders = 0
         self._error_triples_from_used_yielders = 0
-        self._last_yielder = None
         self._namespaces_to_ignore = namespaces_to_ignore
+        self._allow_untyped_numbers = allow_untyped_numbers
+
+        self._last_yielder = None
+
 
 
     def yield_triples(self):
@@ -22,7 +25,8 @@ class MultiNtTriplesYielder(object):
         if self._last_yielder is not None:
             self._triples_yielded_from_used_yielders += self._last_yielder.yielded_triples()
             self._error_triples_from_used_yielders += self._last_yielder.error_triples()
-        self._last_yielder = NtTriplesYielder(source_file=a_source_file)
+        self._last_yielder = NtTriplesYielder(source_file=a_source_file,
+                                              allow_untyped_numbers=self._allow_untyped_numbers)
         for a_triple in self._last_yielder.yield_triples():
             yield a_triple
 

@@ -18,6 +18,7 @@ OPENGIS_PREFIX = "geo"
 
 STRING_TYPE = "http://www.w3.org/2001/XMLSchema#string"
 FLOAT_TYPE = "http://www.w3.org/2001/XMLSchema#float"
+INTEGER_TYPE = "http://www.w3.org/2001/XMLSchema#int"
 
 
 def remove_corners(a_uri, raise_error_if_no_corners=True):
