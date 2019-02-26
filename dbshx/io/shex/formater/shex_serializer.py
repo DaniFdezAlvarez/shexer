@@ -249,18 +249,21 @@ class ShexSerializer(object):
         to_compose.sort(reverse=True, key=lambda x: x.probability)
         target_probability = self._get_probability_or_IRI_statement_in_group(to_compose)
         self._remove_IRI_statements_if_useles(to_compose)
-        composed_statement = FixedPropChoiceStatement(st_property=to_compose[0].st_property,
-                                                      st_types=[a_statement.st_type for a_statement in to_compose],
-                                                      cardinality="+",
-                                                      probability=target_probability,
-                                                      serializer_object=FixedPropChoiceStatementSerializer(
-                                                          instantiation_property_str=self._instantiation_property_str)
-                                                      )
-        for a_statement in to_compose:
-            if a_statement.st_type != IRI_ELEM_TYPE:
-                composed_statement.add_comment(self._turn_statement_into_comment(a_statement))
-
-        result.append(composed_statement)
+        if len(to_compose) > 1:  # There are som sentences to join in an OR
+            composed_statement = FixedPropChoiceStatement(st_property=to_compose[0].st_property,
+                                                          st_types=[a_statement.st_type for a_statement in to_compose],
+                                                          cardinality="+",
+                                                          probability=target_probability,
+                                                          serializer_object=FixedPropChoiceStatementSerializer(
+                                                              instantiation_property_str=self._instantiation_property_str)
+                                                          )
+            for a_statement in to_compose:
+                if a_statement.st_type != IRI_ELEM_TYPE:
+                    composed_statement.add_comment(self._turn_statement_into_comment(a_statement))
+            result.append(composed_statement)
+        elif len(to_compose) == 1:  # There is just one sentence in the group to join with OR
+            result.append(to_compose[0])
+        # else  # No sentences to join
 
         return result
 
