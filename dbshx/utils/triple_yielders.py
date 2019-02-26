@@ -5,6 +5,24 @@ from dbshx.model.bnode import BNode
 from dbshx.utils.uri import remove_corners, parse_literal, FLOAT_TYPE
 
 
+def check_if_property_belongs_to_namespace_list(str_prop, namespaces):
+    """
+    It return True if the property balongs to some namespace directly, i.e.,
+    without adding any hierarchical element before reaching the name of the property itself.
+    Example:
+    Property http:example.org/prop, namespace http:example.org/ ---> True
+    Property http:example.org/properties/prop, namespace http:example.org/ ---> False
+    :param str_prop:
+    :param namespaces:
+    :return:
+    """
+    for a_namespace in namespaces:
+        if str_prop.startswith(a_namespace):
+            if "/" not in str_prop[len(a_namespace):] and "#" not in str_prop[len(a_namespace):]:
+                return True
+    return False
+
+
 def tune_subj(a_token):
     if a_token.startswith("<"):
         return IRI(remove_corners(a_token))
