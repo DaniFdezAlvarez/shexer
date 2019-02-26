@@ -15,7 +15,8 @@ class Shaper(object):
                  graph_file_input=None, graph_list_of_files_input=None,
                  namespaces_dict=None, namespaces_dict_file=None,
                  instantiation_property=None,
-                 namespaces_to_ignore=None):
+                 namespaces_to_ignore=None,
+                 infer_numeric_types_for_untyped_literals=False):
 
         check_just_one_not_none(target_classes, file_target_classes,
                                 "target_classes", "file_target_classes")
@@ -35,6 +36,7 @@ class Shaper(object):
         self._namespaces_dict_file = namespaces_dict_file
         self._instantiation_property = instantiation_property
         self._namespaces_to_ignore = namespaces_to_ignore
+        self._infer_numeric_types_for_untyped_literals = infer_numeric_types_for_untyped_literals
 
         self._instance_tracker = None
         self._target_classes_dict = None
