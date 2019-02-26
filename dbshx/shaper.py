@@ -14,7 +14,8 @@ class Shaper(object):
                  input_format=NT, instances_file_input=None,
                  graph_file_input=None, graph_list_of_files_input=None,
                  namespaces_dict=None, namespaces_dict_file=None,
-                 instantiation_property=None):
+                 instantiation_property=None,
+                 namespaces_to_ignore=None):
 
         check_just_one_not_none(target_classes, file_target_classes,
                                 "target_classes", "file_target_classes")
@@ -33,6 +34,7 @@ class Shaper(object):
         self._namespaces_dict = namespaces_dict
         self._namespaces_dict_file = namespaces_dict_file
         self._instantiation_property = instantiation_property
+        self._namespaces_to_ignore = namespaces_to_ignore
 
         self._instance_tracker = None
         self._target_classes_dict = None
@@ -97,7 +99,8 @@ class Shaper(object):
                                   source_file=self._graph_file_input,
                                   list_of_source_files=self._graph_list_of_files_input,
                                   input_format=self._input_format,
-                                  instantiation_property_str=self._instantiation_property)
+                                  instantiation_property_str=self._instantiation_property,
+                                  namespaces_to_ignore=self._namespaces_to_ignore)
 
 
     def _build_instance_tracker(self):
