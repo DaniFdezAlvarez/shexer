@@ -4,11 +4,12 @@ from dbshx.utils.triple_yielders import tune_token, tune_prop, check_if_property
 
 
 class TsvNtTriplesYielder(object):
-    def __init__(self, source_file, namespaces_to_ignore=None):
+    def __init__(self, source_file, namespaces_to_ignore=None, allow_untyped_numbers=False):
         self._source_file = source_file
         self._triples_count = 0
         self._error_triples = 0
         self._namespaces_to_ignore = None # TODO
+        self._allow_untyped_numbers= allow_untyped_numbers
         self._namespaces_to_ignore = namespaces_to_ignore
         self.yield_triples = self._yield_triples_not_excluding_namespaces if namespaces_to_ignore is None\
             else self._yield_triples_excluding_namespaces
@@ -24,7 +25,9 @@ class TsvNtTriplesYielder(object):
                                  source=self._source_file)
                 else:
                     try:
-                        yield (tune_token(tokens[0]), tune_prop(tokens[1]), tune_token(tokens[2], allow_untyped_numbers=True))
+                        yield (tune_token(tokens[0]),
+                               tune_prop(tokens[1]),
+                               tune_token(tokens[2], allow_untyped_numbers=self._allow_untyped_numbers))
                         self._triples_count += 1
                     except ValueError as ve:
                         log_to_error(msg=ve.message + "This line caused error: " + a_line,

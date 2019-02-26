@@ -8,7 +8,8 @@ def get_class_profiler(target_classes_dict, source_file, list_of_source_files, i
     yielder = get_triple_yielder(source_file=source_file,
                                  list_of_source_files=list_of_source_files,
                                  input_format=input_format,
-                                 namespaces_to_ignore=namespaces_to_ignore)
+                                 namespaces_to_ignore=namespaces_to_ignore,
+                                 )
 
     return ClassProfiler(triples_yielder=yielder,
                          target_classes_dict=target_classes_dict,

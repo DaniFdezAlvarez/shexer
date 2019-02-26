@@ -4,11 +4,12 @@ from dbshx.utils.uri import there_is_arroba_after_last_quotes
 from dbshx.utils.triple_yielders import tune_prop, tune_token, check_if_property_belongs_to_namespace_list
 
 class NtTriplesYielder(object):
-    def __init__(self, source_file, namespaces_to_ignore=None):
+    def __init__(self, source_file, namespaces_to_ignore=None, allow_untyped_numbers=False):
         self._source_file = source_file
         self._triples_count = 0
         self._error_triples = 0
         self._namespaces_to_ignore = namespaces_to_ignore
+        self._allow_untyped_numbers = allow_untyped_numbers
         # The following ones are refs to functions. Im avoiding some comparison here.
         self.yield_triples = self._yield_triples_not_excluding_namespaces if namespaces_to_ignore is None \
             else self._yield_triples_excluding_namespaces
@@ -42,7 +43,9 @@ class NtTriplesYielder(object):
                     log_to_error(msg="This line caused error: " + a_line,
                                  source=self._source_file)
                 else:
-                    candidate_triple = (tune_token(tokens[0]), tune_prop(tokens[1]), tune_token(tokens[2]))
+                    candidate_triple = (tune_token(tokens[0]),
+                                        tune_prop(tokens[1]),
+                                        tune_token(tokens[2], allow_untyped_numbers=self._allow_untyped_numbers))
                     if not check_if_property_belongs_to_namespace_list(str(candidate_triple[1]), self._namespaces_to_ignore):
                         yield candidate_triple
                     self._triples_count += 1
