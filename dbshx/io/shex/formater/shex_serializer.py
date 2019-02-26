@@ -3,7 +3,7 @@ from dbshx.model.IRI import IRI_ELEM_TYPE
 from dbshx.model.property import Property
 from dbshx.utils.uri import remove_corners
 from dbshx.model.fixed_prop_choice_statement import FixedPropChoiceStatement
-from dbshx.io.shex.formater.consts import SPACES_LEVEL_INDENTATION
+from dbshx.io.shex.formater.consts import SPACES_LEVEL_INDENTATION, POSITIVE_CLOSURE
 from dbshx.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer  # TODO: REPFACTOR
 from dbshx.io.shex.formater.statement_serializers.fixed_prop_choice_statement_serializer import FixedPropChoiceStatementSerializer  # TODO: REPFACTOR
 
@@ -11,8 +11,8 @@ from dbshx.io.shex.formater.statement_serializers.fixed_prop_choice_statement_se
 class ShexSerializer(object):
 
     def __init__(self, target_file, shapes_list, aceptance_threshold=0.4, namespaces_dict=None,
-                 tolerance_to_keep_similar_rules=0.15, keep_less_specific=True, string_return=False,
-                 instantiation_property_str=RDF_TYPE_STR):
+                 tolerance_to_keep_similar_rules=0.01, keep_less_specific=True, string_return=False,
+                 instantiation_property_str=RDF_TYPE_STR, discard_useless_positive_closures=True):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._aceptance_theshold = aceptance_threshold
@@ -23,6 +23,7 @@ class ShexSerializer(object):
         self._string_return = string_return
         self._string_result = ""
         self._instantiation_property_str = self._decide_instantiation_property(instantiation_property_str)
+        self._discard_useless_positive_closures = discard_useless_positive_closures
 
     def serialize_shex(self):
 
@@ -113,7 +114,7 @@ class ShexSerializer(object):
     def _select_valid_statements_of_shape(self, a_shape):
         original_statements = [a_statement for a_statement in a_shape.yield_statements()]
         if len(original_statements) == 0 or original_statements[0].probability < self._aceptance_theshold:
-            return []
+            return []  # Here I am assuming order
 
         for a_statement in original_statements:  # TODO Refactor!!! This is not the place to set the serializer
             self._set_serializer_object_for_statements(a_statement)
@@ -252,7 +253,7 @@ class ShexSerializer(object):
         if len(to_compose) > 1:  # There are som sentences to join in an OR
             composed_statement = FixedPropChoiceStatement(st_property=to_compose[0].st_property,
                                                           st_types=[a_statement.st_type for a_statement in to_compose],
-                                                          cardinality="+",
+                                                          cardinality=POSITIVE_CLOSURE,
                                                           probability=target_probability,
                                                           serializer_object=FixedPropChoiceStatementSerializer(
                                                               instantiation_property_str=self._instantiation_property_str)
@@ -301,7 +302,7 @@ class ShexSerializer(object):
     #     result = Statement(st_property=list_of_candidate_statements[0].st_property,
     #                        st_type=composed_type,
     #                        probability=composed_probability,
-    #                        cardinality="+")
+    #                        cardinality=POSITIVE_CLOSURE)
     #
     #     for a_sentence in list_of_candidate_statements:
     #         for a_comment in a_sentence.comments:
@@ -311,18 +312,21 @@ class ShexSerializer(object):
     #     return result
 
     def _decide_best_statement_with_cardinalities_in_comments(self, list_of_candidate_statements):
+        if self._discard_useless_positive_closures:
+            if self._is_a_group_of_statements_with_useless_positive_closure(list_of_candidate_statements):
+                return self._statement_for_a_group_with_a_useless_positive_closure(list_of_candidate_statements)
         list_of_candidate_statements.sort(reverse=True, key=lambda x: x.probability)
         result = None
         if self._keep_less_specific:
             for a_statement in list_of_candidate_statements:
-                if a_statement.cardinality == "+":
+                if a_statement.cardinality == POSITIVE_CLOSURE:
                     result = a_statement
                     break
             if result is None:
                 result = list_of_candidate_statements[0]
         else:
             for a_statement in list_of_candidate_statements:
-                if a_statement.cardinality != "+":
+                if a_statement.cardinality != POSITIVE_CLOSURE:
                     result = a_statement
                     break
             if result is None:
@@ -332,6 +336,27 @@ class ShexSerializer(object):
             if a_statement.cardinality != result.cardinality:
                 result.add_comment(self._turn_statement_into_comment(a_statement))
         return result
+
+    def _is_a_group_of_statements_with_useless_positive_closure(self, list_of_candidate_sentences):
+        if len(list_of_candidate_sentences) != 2:
+            return False
+        if abs(list_of_candidate_sentences[0].probability - list_of_candidate_sentences[1].probability) > self._tolerance:
+            return False
+        one_if_there_is_a_single_positive_closure = -1
+        for a_statement in list_of_candidate_sentences:
+            if POSITIVE_CLOSURE == a_statement.cardinality:
+                one_if_there_is_a_single_positive_closure *= -1
+        if one_if_there_is_a_single_positive_closure == 1:
+            return True
+        return False
+
+    def _statement_for_a_group_with_a_useless_positive_closure(self, group_of_candidate_statements):
+        for a_statement in group_of_candidate_statements:
+            if a_statement.cardinality != POSITIVE_CLOSURE:
+                return a_statement
+        raise ValueError("The received gouo does not contain any statement with positive closure")
+
+
 
     def _turn_statement_into_comment(self, a_statement):
         return a_statement.probability_representation() + \
