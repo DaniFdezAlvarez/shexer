@@ -191,29 +191,6 @@ class ShexSerializer(object):
                             result.append(a_new_statement)
         return result
 
-    # def _group_constraints_with_same_prop_but_different_obj(self, candidate_statements):
-    #     result = []
-    #     already_visited = set()
-    #     for i in range(0, len(candidate_statements)):
-    #         a_statement = candidate_statements[i]
-    #         if a_statement.st_property != RDF_TYPE_STR:
-    #             if a_statement not in already_visited:
-    #                 already_visited.add(a_statement)
-    #                 group_to_decide = [a_statement]
-    #                 for j in range(i + 1, len(candidate_statements)):
-    #                     if self._statements_have_same_prop(a_statement,
-    #                                                        candidate_statements[j]):
-    #                         group_to_decide.append(candidate_statements[j])
-    #                         already_visited.add(candidate_statements[j])
-    #                 if len(group_to_decide) == 1:
-    #                     result.append(a_statement)
-    #                 else:
-    #                     result.append(self._compose_statement_with_objects_in_or(group_to_decide))
-    #             # pass
-    #         else:
-    #             result.append(a_statement)
-    #     return result
-
     def _group_constraints_with_same_prop_and_obj(self, candidate_statements):
         result = []
         already_visited = set()

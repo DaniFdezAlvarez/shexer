@@ -42,11 +42,7 @@ class BaseStatementSerializer(object):
         :param st_property:
         :return:
         """
-
-        if "P31" in st_property:
-            print st_property, self._instantiation_property_str
         if st_property == self._instantiation_property_str:
-
             return "[" + BaseStatementSerializer.tune_token(target_element, namespaces_dict) + "]"
         return BaseStatementSerializer.tune_token(target_element, namespaces_dict)
 
