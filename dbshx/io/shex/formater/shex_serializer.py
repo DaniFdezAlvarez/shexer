@@ -3,7 +3,7 @@ from dbshx.model.IRI import IRI_ELEM_TYPE
 from dbshx.model.property import Property
 from dbshx.utils.uri import remove_corners
 from dbshx.model.fixed_prop_choice_statement import FixedPropChoiceStatement
-from dbshx.io.shex.formater.consts import SPACES_LEVEL_INDENTATION, POSITIVE_CLOSURE
+from dbshx.io.shex.formater.consts import SPACES_LEVEL_INDENTATION, POSITIVE_CLOSURE, KLEENE_CLOSURE
 from dbshx.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer  # TODO: REPFACTOR
 from dbshx.io.shex.formater.statement_serializers.fixed_prop_choice_statement_serializer import FixedPropChoiceStatementSerializer  # TODO: REPFACTOR
 
@@ -12,7 +12,8 @@ class ShexSerializer(object):
 
     def __init__(self, target_file, shapes_list, aceptance_threshold=0.4, namespaces_dict=None,
                  tolerance_to_keep_similar_rules=0.01, keep_less_specific=True, string_return=False,
-                 instantiation_property_str=RDF_TYPE_STR, discard_useless_positive_closures=True):
+                 instantiation_property_str=RDF_TYPE_STR, discard_useless_positive_closures=True,
+                 all_compliant_mode=True):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._aceptance_theshold = aceptance_threshold
@@ -24,6 +25,7 @@ class ShexSerializer(object):
         self._string_result = ""
         self._instantiation_property_str = self._decide_instantiation_property(instantiation_property_str)
         self._discard_useless_positive_closures = discard_useless_positive_closures
+        self._all_compliant_mode = all_compliant_mode
 
     def serialize_shex(self):
 
@@ -95,10 +97,32 @@ class ShexSerializer(object):
         return result
 
     def _serialize_shape_rules(self, a_shape):
-        statements = self._select_valid_statements_of_shape(a_shape)
-        if len(statements) == 0:
+        valid_statements = self._select_valid_statements_of_shape(a_shape)
+        if len(valid_statements) == 0:
             return
 
+        if self._all_compliant_mode:
+            self._modify_cardinalities_of_statements_non_compliant_with_all_instances(valid_statements)
+
+        self._write_valid_statements_of_a_shape(valid_statements)
+
+
+    def _modify_cardinalities_of_statements_non_compliant_with_all_instances(self, statements):
+        for a_statement in statements:
+            if a_statement.cardinality != 1:
+                self._change_statement_cardinality_to_kleene_closure(a_statement)
+
+
+    def _change_statement_cardinality_to_kleene_closure(self, statement):
+        comment_for_current_sentence = self._turn_statement_into_comment(statement)
+        statement.add_comment(comment=comment_for_current_sentence,
+                              insert_first=True)
+        statement.cardinality = KLEENE_CLOSURE
+        statement.probability = 1
+
+
+
+    def _write_valid_statements_of_a_shape(self, statements):
         for i in range(0, len(statements) - 1):
             for line_indent_tuple in statements[i]. \
                     get_tuples_to_serialize_line_indent_level(is_last_statement_of_shape=False,
@@ -110,6 +134,7 @@ class ShexSerializer(object):
                                                           namespaces_dict=self._namespaces_dict):
             self._write_line(a_line=line_indent_tuple[0],
                              indent_level=line_indent_tuple[1])
+
 
     def _select_valid_statements_of_shape(self, a_shape):
         original_statements = [a_statement for a_statement in a_shape.yield_statements()]
@@ -354,15 +379,12 @@ class ShexSerializer(object):
         for a_statement in group_of_candidate_statements:
             if a_statement.cardinality != POSITIVE_CLOSURE:
                 return a_statement
-        raise ValueError("The received gouo does not contain any statement with positive closure")
+        raise ValueError("The received group does not contain any statement with positive closure")
 
 
 
     def _turn_statement_into_comment(self, a_statement):
-        return a_statement.probability_representation() + \
-               " obj: " + BaseStatementSerializer.tune_token(a_statement.st_type,
-                                                             self._namespaces_dict) +\
-               ". Cardinality: " + a_statement.cardinality_representation()
+        return a_statement.comment_representation(namespaces_dict=self._namespaces_dict)
 
     def _statements_have_similar_probability(self, more_probable_st, less_probable_st):
         if 1.0 - (less_probable_st.probability / more_probable_st.probability) <= self._tolerance:

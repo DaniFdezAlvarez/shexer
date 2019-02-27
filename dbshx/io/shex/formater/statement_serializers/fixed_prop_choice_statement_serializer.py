@@ -1,5 +1,5 @@
 from dbshx.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer
-from dbshx.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS
+from dbshx.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, KLEENE_CLOSURE
 
 
 class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
@@ -40,10 +40,14 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
     @staticmethod
     def _tuple_closing_choice(a_statement, is_last_statement_of_shape):
         str_res = ")" + SPACES_GAP_BETWEEN_TOKENS + \
-                  BaseStatementSerializer.cardinality_representation(a_statement.cardinality) + \
+                  BaseStatementSerializer.cardinality_representation(cardinality=a_statement.cardinality,
+                                                                     statement=a_statement,
+                                                                     out_of_comment=True) + \
                   BaseStatementSerializer.closure_of_statement(is_last_statement_of_shape)
-        str_res += BaseStatementSerializer.adequate_amount_of_final_spaces(str_res) + \
-                   BaseStatementSerializer.probability_representation(a_statement.probability)
+
+        if a_statement.cardinality != KLEENE_CLOSURE:
+            str_res += BaseStatementSerializer.adequate_amount_of_final_spaces(str_res) + \
+                       BaseStatementSerializer.probability_representation(a_statement.probability)
         return str_res, 1
 
     @staticmethod
@@ -57,3 +61,8 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
     @staticmethod
     def _statement_in_choice_no_cardinality(st_property, st_type):
         return (st_property + SPACES_GAP_BETWEEN_TOKENS + st_type, 1)
+
+    @staticmethod
+    def turn_statement_into_comment(statement, namespaces_dict):
+        return statement.probability_representation() + \
+               " with cardinality " + statement.cardinality_representation()

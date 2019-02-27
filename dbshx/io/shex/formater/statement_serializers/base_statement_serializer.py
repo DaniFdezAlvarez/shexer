@@ -1,5 +1,5 @@
 from dbshx.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, \
-    COMMENT_INI, TARGET_LINE_LENGHT, SPACES_GAP_FOR_FREQUENCY
+    COMMENT_INI, TARGET_LINE_LENGHT, SPACES_GAP_FOR_FREQUENCY, KLEENE_CLOSURE, POSITIVE_CLOSURE
 from dbshx.model.IRI import IRI_ELEM_TYPE
 from dbshx.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 
@@ -18,12 +18,15 @@ class BaseStatementSerializer(object):
                                                        st_property=a_statement.st_property,
                                                        namespaces_dict=namespaces_dict)
         cardinality = BaseStatementSerializer.cardinality_representation(
-            a_statement.cardinality)
+            cardinality=a_statement.cardinality,
+            statement=a_statement,
+            out_of_comment=True)
         result = st_property + SPACES_GAP_BETWEEN_TOKENS + st_target_element + SPACES_GAP_BETWEEN_TOKENS + \
                  cardinality + BaseStatementSerializer.closure_of_statement(is_last_statement_of_shape)
 
-        result += BaseStatementSerializer.adequate_amount_of_final_spaces(result)
-        result += BaseStatementSerializer.probability_representation(a_statement.probability)
+        if a_statement.cardinality != KLEENE_CLOSURE:
+            result += BaseStatementSerializer.adequate_amount_of_final_spaces(result)
+            result += BaseStatementSerializer.probability_representation(a_statement.probability)
         tuples_line_indent.append((result, 1))
 
         for a_comment in a_statement.comments:
@@ -69,8 +72,10 @@ class BaseStatementSerializer(object):
 
 
     @staticmethod
-    def cardinality_representation(cardinality):
-        if cardinality == "+":
+    def cardinality_representation(cardinality, statement, out_of_comment=False):
+        if out_of_comment and statement.cardinality == 1:
+            return ""
+        if cardinality in [POSITIVE_CLOSURE, KLEENE_CLOSURE]:
             return cardinality
         else:
             return "{" + str(cardinality) + "}"
@@ -91,3 +96,10 @@ class BaseStatementSerializer(object):
         for i in range(0, TARGET_LINE_LENGHT - len(current_line)):
             result += " "
         return result
+
+    @staticmethod
+    def turn_statement_into_comment(statement, namespaces_dict):
+        return statement.probability_representation() + \
+               " obj: " + BaseStatementSerializer.tune_token(statement.st_type,
+                                                             namespaces_dict) + \
+               ". Cardinality: " + statement.cardinality_representation()
