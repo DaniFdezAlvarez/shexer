@@ -1,4 +1,4 @@
-# dbpedia-shexer
+# Shexer
 
 Language: Python 2.7
 
@@ -7,8 +7,6 @@ This repository contains a software prototype to perform induction of Shapes in 
 ## Features
 The user must provide a list of classes (URIs). The prototype will track all their instances, explore the triples in which they appear, and build with that information a profile of the each class.
 The profile will be serialized into a Shape associated to the class. The results are serialized using Shape Expressions (ShEx).
-
-### Features
 
 * Free input. The prototype has been thought to be used against DBpedia, but the process of tracking the information is independent of the process of class profiling. Currently, some parsers to work with local file sin n-triples format are provided, but any other parser (or API consumer, DAO...) can be implemented to feed the class profiler.
 * ShEx. Each class produce a Shape composed by a set of triple constrainst. The Shape in compilant with the current expecification of ShEx2.
