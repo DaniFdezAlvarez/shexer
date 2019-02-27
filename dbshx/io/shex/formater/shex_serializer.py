@@ -109,7 +109,7 @@ class ShexSerializer(object):
 
     def _modify_cardinalities_of_statements_non_compliant_with_all_instances(self, statements):
         for a_statement in statements:
-            if a_statement.cardinality != 1:
+            if a_statement.probability != 1:
                 self._change_statement_cardinality_to_kleene_closure(a_statement)
 
 
