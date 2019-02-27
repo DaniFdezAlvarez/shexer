@@ -17,7 +17,8 @@ class Shaper(object):
                  instantiation_property=None,
                  namespaces_to_ignore=None,
                  infer_numeric_types_for_untyped_literals=False,
-                 discard_useles_constraints_with_positive_closure=True):
+                 discard_useles_constraints_with_positive_closure=True,
+                 all_instances_are_compliant_mode=True):
 
         check_just_one_not_none(target_classes, file_target_classes,
                                 "target_classes", "file_target_classes")
@@ -39,6 +40,7 @@ class Shaper(object):
         self._namespaces_to_ignore = namespaces_to_ignore
         self._infer_numeric_types_for_untyped_literals = infer_numeric_types_for_untyped_literals
         self._discard_useles_constraints_with_positive_closure = discard_useles_constraints_with_positive_closure
+        self._all_compliant_mode = all_instances_are_compliant_mode
 
         self._instance_tracker = None
         self._target_classes_dict = None
@@ -97,7 +99,9 @@ class Shaper(object):
                                     output_format=output_format,
                                     aceptance_threshold=aceptance_threshold,
                                     instantiation_property=self._instantiation_property,
-                                    discard_useles_constraints_with_positive_closure=discard_useles_constraints_with_positive_closure)
+                                    all_compliant_mode=self._all_compliant_mode,
+                                    discard_useles_constraints_with_positive_closure=
+                                    self._discard_useles_constraints_with_positive_closure)
 
     def _build_class_profiler(self):
         return get_class_profiler(target_classes_dict=self._target_classes_dict,

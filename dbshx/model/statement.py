@@ -19,10 +19,17 @@ class Statement(object):
         return self._serializer_object.probability_representation(self._probability)
 
     def cardinality_representation(self):
-        return self._serializer_object.cardinality_representation(self._cardinality)
+        return self._serializer_object.cardinality_representation(self._cardinality, self)
 
-    def add_comment(self, comment):
-        self._comments.append(comment)
+    def comment_representation(self, namespaces_dict):
+        return self._serializer_object.turn_statement_into_comment(self, namespaces_dict=namespaces_dict)
+
+    def add_comment(self, comment, insert_first=False):
+        if not insert_first:
+            self._comments.append(comment)
+        else:
+            self._comments.insert(0, comment)
+
 
 
     @property
@@ -37,9 +44,17 @@ class Statement(object):
     def cardinality(self):
         return self._cardinality
 
+    @cardinality.setter
+    def cardinality(self, value):
+        self._cardinality = value
+
     @property
     def probability(self):
         return self._probability
+
+    @probability.setter
+    def probability(self, value):
+        self._probability = value
 
     @property
     def comments(self):
