@@ -1,6 +1,8 @@
 from dbshx.io.graph.yielder.multi_nt_triples_yielder import MultiNtTriplesYielder
 from dbshx.io.graph.yielder.nt_triples_yielder import NtTriplesYielder
 from dbshx.io.graph.yielder.tsv_nt_triples_yielder import TsvNtTriplesYielder
+from dbshx.io.graph.yielder.multi_tsv_nt_triples_yielder import MultiTsvNtTriplesYielder
+
 from dbshx.consts import NT, TSV_SPO
 
 
@@ -21,6 +23,8 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
                                        namespaces_to_ignore=namespaces_to_ignore,
                                        allow_untyped_numbers=allow_untyped_numbers)
         else:
-            raise ValueError("Currently, multi-file parser for TSV format is not supported")
+            return MultiTsvNtTriplesYielder(list_of_files=list_of_source_files,
+                                            namespaces_to_ignore=namespaces_to_ignore,
+                                            allow_untyped_numbers=allow_untyped_numbers)
 
-    raise ValueError("Not supported format: " + NT)
+    raise ValueError("Not supported format: " + input_format)
