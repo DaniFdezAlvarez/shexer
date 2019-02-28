@@ -2,6 +2,7 @@ from dbshx.consts import NT
 from dbshx.utils.factories.triple_yielders_factory import get_triple_yielder
 from dbshx.core.instance_tracker import InstanceTracker
 from dbshx.utils.factories.iri_factory import create_IRIs_from_string_list
+from dbshx.utils.uri import remove_corners
 
 
 def get_instance_tracker(instances_file_input=None, graph_file_input=None,
@@ -35,5 +36,6 @@ def _read_target_classes_from_file(file_target_classes):
         for a_line in in_stream:
             candidate = a_line.strip()
             if candidate != "":
-                result.append(candidate)
+                result.append(remove_corners(a_uri=candidate,
+                                             raise_error_if_no_corners=False))
     return result
