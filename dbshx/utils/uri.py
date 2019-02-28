@@ -50,6 +50,8 @@ def decide_literal_type(a_literal):
         # substring = a_literal[a_literal.find("\"^^"):]
         # return _add_prefix(substring[substring.rfind("#")+1:-1], XSD_PREFIX)
         return a_literal[a_literal.find("\"^^")+4:-1]
+    elif a_literal.strip().endswith(">"):
+        return a_literal[a_literal.find("\"^^") + 4:-1]
     else:
         raise RuntimeError("Unrecognized literal type:" + a_literal)
 

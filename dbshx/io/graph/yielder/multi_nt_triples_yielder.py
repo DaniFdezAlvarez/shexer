@@ -23,10 +23,11 @@ class MultiNtTriplesYielder(object):
 
     def _yield_triples_of_file(self, a_source_file):
         if self._last_yielder is not None:
-            self._triples_yielded_from_used_yielders += self._last_yielder.yielded_triples()
-            self._error_triples_from_used_yielders += self._last_yielder.error_triples()
+            self._triples_yielded_from_used_yielders += self._last_yielder.yielded_triples
+            self._error_triples_from_used_yielders += self._last_yielder.error_triples
         self._last_yielder = NtTriplesYielder(source_file=a_source_file,
-                                              allow_untyped_numbers=self._allow_untyped_numbers)
+                                              allow_untyped_numbers=self._allow_untyped_numbers,
+                                              namespaces_to_ignore=self._namespaces_to_ignore)
         for a_triple in self._last_yielder.yield_triples():
             yield a_triple
 
