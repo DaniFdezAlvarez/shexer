@@ -20,6 +20,23 @@ class Shaper(object):
                  discard_useles_constraints_with_positive_closure=True,
                  all_instances_are_compliant_mode=True,
                  keep_less_specific=True):
+        """
+
+        :param target_classes:
+        :param file_target_classes:
+        :param input_format:
+        :param instances_file_input:
+        :param graph_file_input:
+        :param graph_list_of_files_input:
+        :param namespaces_dict:
+        :param namespaces_dict_file:
+        :param instantiation_property:
+        :param namespaces_to_ignore:
+        :param infer_numeric_types_for_untyped_literals:
+        :param discard_useles_constraints_with_positive_closure:
+        :param all_instances_are_compliant_mode:
+        :param keep_less_specific:
+        """
 
         check_just_one_not_none(target_classes, file_target_classes,
                                 "target_classes", "file_target_classes")
@@ -62,6 +79,13 @@ class Shaper(object):
         return AbstractProfileSerializer(self._profile).write_profile_to_file(target_file=output_file)
 
     def shex_graph(self, string_output=False, output_file=None, output_format=SHEX, aceptance_threshold=0.4):
+        """
+        :param string_output:
+        :param output_file:
+        :param output_format:
+        :param aceptance_threshold:
+        :return:
+        """
         self._check_correct_output_params(string_output, output_file)
         self._check_output_format(output_format)
         self._check_aceptance_threshold(aceptance_threshold)
