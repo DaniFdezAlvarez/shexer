@@ -1,0 +1,302 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX schema: <http://schema.org/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX xml: <http://www.w3.org/XML/1998/namespace>
+PREFIX wikiba: <http://wikiba.se/ontology#>
+PREFIX : <http://weso.es/shapes/>
+
+:Q6256
+{
+   schema:description  xsd:string  +;                          # 100.0 %
+   wdt:P421  IRI  +;                                           # 100.0 %
+            # 75.7961783439 % obj: IRI. Cardinality: {1}
+   skos:altLabel  xsd:string  +;                               # 100.0 %
+   wikiba:sitelinks  xsd:int  ;                                # 100.0 %
+   wdt:P31  [wd:Q6256]  ;                                      # 100.0 %
+   wdt:P625  geo:wktLiteral  ;                                 # 100.0 %
+   wdt:P910  IRI  ;                                            # 100.0 %
+   rdfs:label  xsd:string  +;                                  # 100.0 %
+   schema:version  xsd:int  ;                                  # 100.0 %
+   schema:dateModified  xsd:dateTime  ;                        # 100.0 %
+   wdt:P373  xsd:string  ;                                     # 100.0 %
+   wikiba:identifiers  xsd:int  ;                              # 100.0 %
+   wikiba:timestamp  xsd:dateTime  ;                           # 100.0 %
+   wikiba:statements  xsd:int  ;                               # 100.0 %
+   wdt:P1549  xsd:string  *;
+            # 99.3630573248 % obj: xsd:string. Cardinality: +
+   wdt:P41  IRI  *;
+            # 99.3630573248 % obj: IRI. Cardinality: {1}
+   wdt:P1082  xsd:int  *;
+            # 99.3630573248 % obj: xsd:int. Cardinality: {1}
+   wdt:P242  IRI  *;
+            # 99.3630573248 % obj: IRI. Cardinality: +
+   wdt:P646  xsd:string  *;
+            # 99.3630573248 % obj: xsd:string. Cardinality: {1}
+   wdt:P194  IRI  *;
+            # 98.7261146497 % obj: IRI. Cardinality: {1}
+   wdt:P17  @:Q6256  *;
+            # 98.7261146497 % obj: @:Q6256. Cardinality: {1}
+   wdt:P163  IRI  *;
+            # 98.7261146497 % obj: IRI. Cardinality: {1}
+   wdt:P37  IRI  *;
+            # 98.7261146497 % obj: IRI. Cardinality: +
+   wdt:P1813  xsd:string  *;
+            # 98.7261146497 % obj: xsd:string. Cardinality: +
+            # 82.8025477707 % obj: xsd:string. Cardinality: {1}
+   wdt:P1313  IRI  *;
+            # 98.7261146497 % obj: IRI. Cardinality: {1}
+   wdt:P6  IRI  *;
+            # 98.0891719745 % obj: IRI. Cardinality: {1}
+   wdt:P948  IRI  *;
+            # 98.0891719745 % obj: IRI. Cardinality: {1}
+   wdt:P474  xsd:string  *;
+            # 98.0891719745 % obj: xsd:string. Cardinality: {1}
+   wdt:P1566  xsd:string  *;
+            # 98.0891719745 % obj: xsd:string. Cardinality: {1}
+   wdt:P227  xsd:string  *;
+            # 97.4522292994 % obj: xsd:string. Cardinality: {1}
+   wdt:P402  xsd:string  *;
+            # 97.4522292994 % obj: xsd:string. Cardinality: {1}
+   wdt:P299  xsd:string  *;
+            # 97.4522292994 % obj: xsd:string. Cardinality: {1}
+   wdt:P298  xsd:string  *;
+            # 97.4522292994 % obj: xsd:string. Cardinality: {1}
+   wdt:P297  xsd:string  *;
+            # 97.4522292994 % obj: xsd:string. Cardinality: {1}
+   wdt:P463  IRI  *;
+            # 97.4522292994 % obj: IRI. Cardinality: +
+   (
+   wdt:P530  IRI
+      |
+   wdt:P530  @:Q6256
+   )  *;
+            # 97.4522292994 % with cardinality +
+            # 96.178343949 % obj: @:Q6256. Cardinality: +
+   wdt:P1151  IRI  *;
+            # 97.4522292994 % obj: IRI. Cardinality: {1}
+   wdt:P2633  IRI  *;
+            # 97.4522292994 % obj: IRI. Cardinality: {1}
+   wdt:P1906  IRI  *;
+            # 97.4522292994 % obj: IRI. Cardinality: {1}
+   wdt:P1464  IRI  *;
+            # 97.4522292994 % obj: IRI. Cardinality: {1}
+   wdt:P5125  IRI  *;
+            # 97.4522292994 % obj: IRI. Cardinality: {1}
+   wdt:P85  IRI  *;
+            # 96.8152866242 % obj: IRI. Cardinality: {1}
+   wdt:P1792  IRI  *;
+            # 96.8152866242 % obj: IRI. Cardinality: {1}
+   wdt:P3896  IRI  *;
+            # 96.8152866242 % obj: IRI. Cardinality: {1}
+   wdt:P982  xsd:string  *;
+            # 96.8152866242 % obj: xsd:string. Cardinality: {1}
+   wdt:P2924  xsd:string  *;
+            # 96.8152866242 % obj: xsd:string. Cardinality: {1}
+   wdt:P4427  xsd:string  *;
+            # 96.8152866242 % obj: xsd:string. Cardinality: {1}
+   wdt:P30  IRI  *;
+            # 96.178343949 % obj: IRI. Cardinality: {1}
+   wdt:P94  IRI  *;
+            # 96.178343949 % obj: IRI. Cardinality: {1}
+   wdt:P3422  xsd:string  *;
+            # 96.178343949 % obj: xsd:string. Cardinality: {1}
+   wdt:P1667  xsd:string  *;
+            # 96.178343949 % obj: xsd:string. Cardinality: {1}
+   wdt:P2852  IRI  *;
+            # 96.178343949 % obj: IRI. Cardinality: +
+   wdt:P237  IRI  *;
+            # 96.178343949 % obj: IRI. Cardinality: {1}
+   wdt:P5573  xsd:string  *;
+            # 96.178343949 % obj: xsd:string. Cardinality: {1}
+   wdt:P901  xsd:string  *;
+            # 96.178343949 % obj: xsd:string. Cardinality: {1}
+   wdt:P935  xsd:string  *;
+            # 96.178343949 % obj: xsd:string. Cardinality: {1}
+   wdt:P1465  IRI  *;
+            # 96.178343949 % obj: IRI. Cardinality: {1}
+   wdt:P984  xsd:string  *;
+            # 96.178343949 % obj: xsd:string. Cardinality: {1}
+   (
+   wdt:P36  IRI
+      |
+   wdt:P36  @:Q5119
+   )  *;
+            # 95.5414012739 % with cardinality +
+            # 92.9936305732 % obj: @:Q5119. Cardinality: {1}
+   wdt:P3417  xsd:string  *;
+            # 95.5414012739 % obj: xsd:string. Cardinality: {1}
+   wdt:P3175  xsd:string  *;
+            # 95.5414012739 % obj: xsd:string. Cardinality: {1}
+   wdt:P31  [wd:Q3624078]  *;
+            # 95.5414012739 % obj: wd:Q3624078. Cardinality: {1}
+   wdt:P3911  xsd:string  *;
+            # 95.5414012739 % obj: xsd:string. Cardinality: {1}
+   wdt:P35  IRI  *;
+            # 94.9044585987 % obj: IRI. Cardinality: {1}
+   wdt:P610  IRI  *;
+            # 94.9044585987 % obj: IRI. Cardinality: {1}
+   wdt:P1589  IRI  *;
+            # 94.9044585987 % obj: IRI. Cardinality: {1}
+   wdt:P150  IRI  *;
+            # 94.9044585987 % obj: IRI. Cardinality: +
+   wdt:P3743  xsd:string  *;
+            # 94.9044585987 % obj: xsd:string. Cardinality: {1}
+   wdt:P487  xsd:string  *;
+            # 94.9044585987 % obj: xsd:string. Cardinality: {1}
+   wdt:P3068  xsd:string  *;
+            # 94.2675159236 % obj: xsd:string. Cardinality: {1}
+   wdt:P691  xsd:string  *;
+            # 94.2675159236 % obj: xsd:string. Cardinality: {1}
+   wdt:P2853  IRI  *;
+            # 94.2675159236 % obj: IRI. Cardinality: +
+   wdt:P571  xsd:dateTime  *;
+            # 93.6305732484 % obj: xsd:dateTime. Cardinality: {1}
+   wdt:P1622  IRI  *;
+            # 93.6305732484 % obj: IRI. Cardinality: {1}
+   wdt:P349  xsd:string  *;
+            # 93.6305732484 % obj: xsd:string. Cardinality: {1}
+   wdt:P2250  xsd:float  *;
+            # 93.6305732484 % obj: xsd:float. Cardinality: {1}
+   wdt:P4841  xsd:float  *;
+            # 93.6305732484 % obj: xsd:float. Cardinality: {1}
+   wdt:P3916  xsd:string  *;
+            # 93.6305732484 % obj: xsd:string. Cardinality: {1}
+   wdt:P5019  xsd:string  *;
+            # 93.6305732484 % obj: xsd:string. Cardinality: {1}
+   wdt:P38  IRI  *;
+            # 92.9936305732 % obj: IRI. Cardinality: {1}
+   wdt:P1552  IRI  *;
+            # 92.9936305732 % obj: IRI. Cardinality: {1}
+   wdt:P1332  geo:wktLiteral  *;
+            # 92.3566878981 % obj: geo:wktLiteral. Cardinality: {1}
+   wdt:P1225  xsd:string  *;
+            # 92.3566878981 % obj: xsd:string. Cardinality: {1}
+   wdt:P5180  xsd:string  *;
+            # 91.7197452229 % obj: xsd:string. Cardinality: {1}
+   wdt:P3024  xsd:string  *;
+            # 91.7197452229 % obj: xsd:string. Cardinality: {1}
+   wdt:P2347  xsd:string  *;
+            # 91.0828025478 % obj: xsd:string. Cardinality: {1}
+   wdt:P3612  xsd:string  *;
+            # 91.0828025478 % obj: xsd:string. Cardinality: {1}
+   wdt:P486  xsd:string  *;
+            # 91.0828025478 % obj: xsd:string. Cardinality: {1}
+   wdt:P1081  xsd:float  *;
+            # 91.0828025478 % obj: xsd:float. Cardinality: +
+   wdt:P214  xsd:string  *;
+            # 90.4458598726 % obj: xsd:string. Cardinality: {1}
+   wdt:P1279  xsd:float  *;
+            # 90.4458598726 % obj: xsd:float. Cardinality: +
+   wdt:P78  IRI  *;
+            # 89.1719745223 % obj: IRI. Cardinality: {1}
+   wdt:P998  xsd:string  *;
+            # 89.1719745223 % obj: xsd:string. Cardinality: {1}
+   wdt:P2884  xsd:int  *;
+            # 88.5350318471 % obj: xsd:int. Cardinality: {1}
+   wdt:P244  xsd:string  *;
+            # 88.5350318471 % obj: xsd:string. Cardinality: {1}
+   wdt:P1417  xsd:string  *;
+            # 87.898089172 % obj: xsd:string. Cardinality: {1}
+   wdt:P2132  xsd:float  *;
+            # 87.2611464968 % obj: xsd:float. Cardinality: {1}
+   wdt:P2131  xsd:float  *;
+            # 87.2611464968 % obj: xsd:float. Cardinality: {1}
+   wdt:P2258  xsd:string  *;
+            # 86.6242038217 % obj: xsd:string. Cardinality: {1}
+   (
+   wdt:P47  IRI
+      |
+   wdt:P47  @:Q6256
+   )  *;
+            # 86.6242038217 % with cardinality +
+            # 81.5286624204 % obj: @:Q6256. Cardinality: +
+   wdt:P3221  xsd:string  *;
+            # 85.9872611465 % obj: xsd:string. Cardinality: {1}
+   wdt:P4010  xsd:float  *;
+            # 85.9872611465 % obj: xsd:float. Cardinality: {1}
+   wdt:P2979  xsd:string  *;
+            # 84.7133757962 % obj: xsd:string. Cardinality: {1}
+   wdt:P268  xsd:string  *;
+            # 83.4394904459 % obj: xsd:string. Cardinality: +
+   wdt:P3000  xsd:int  *;
+            # 83.4394904459 % obj: xsd:int. Cardinality: +
+   wdt:P2046  xsd:int  *;
+            # 82.8025477707 % obj: xsd:int. Cardinality: {1}
+   wdt:P1036  xsd:string  *;
+            # 82.1656050955 % obj: xsd:string. Cardinality: {1}
+   wdt:P3219  xsd:string  *;
+            # 81.5286624204 % obj: xsd:string. Cardinality: {1}
+   wdt:P2581  xsd:string  *;
+            # 80.2547770701 % obj: xsd:string. Cardinality: {1}
+   wdt:P1740  IRI  *;
+            # 79.6178343949 % obj: IRI. Cardinality: {1}
+   wdt:P898  xsd:string  *;
+            # 78.9808917197 % obj: xsd:string. Cardinality: {1}
+   wdt:P395  xsd:string  *;
+            # 78.3439490446 % obj: xsd:string. Cardinality: {1}
+   wdt:P949  xsd:string  *;
+            # 77.7070063694 % obj: xsd:string. Cardinality: {1}
+   wdt:P2573  xsd:int  *;
+            # 77.7070063694 % obj: xsd:int. Cardinality: {1}
+   wdt:P213  xsd:string  *;
+            # 75.7961783439 % obj: xsd:string. Cardinality: +
+   wdt:P2299  xsd:int  *;
+            # 73.8853503185 % obj: xsd:int. Cardinality: {1}
+   wdt:P1279  xsd:int  *;
+            # 72.6114649682 % obj: xsd:int. Cardinality: +
+   wdt:P2219  xsd:float  *;
+            # 72.6114649682 % obj: xsd:float. Cardinality: {1}
+   wdt:P902  xsd:string  *;
+            # 71.974522293 % obj: xsd:string. Cardinality: {1}
+   wdt:P2184  IRI  *
+            # 71.3375796178 % obj: IRI. Cardinality: {1}
+}
+
+
+:Q5119
+{
+   rdfs:label  xsd:string  +;                                  # 100.0 %
+   wikiba:sitelinks  xsd:int  ;                                # 100.0 %
+   wdt:P31  [wd:Q5119]  ;                                      # 100.0 %
+   schema:version  xsd:int  ;                                  # 100.0 %
+   schema:dateModified  xsd:dateTime  ;                        # 100.0 %
+   wikiba:identifiers  xsd:int  ;                              # 100.0 %
+   wikiba:statements  xsd:int  ;                               # 100.0 %
+   schema:description  xsd:string  *;
+            # 98.727735369 % obj: xsd:string. Cardinality: +
+   wdt:P17  IRI  *;
+            # 95.6743002545 % obj: IRI. Cardinality: {1}
+   wikiba:timestamp  xsd:dateTime  *;
+            # 94.6564885496 % obj: xsd:dateTime. Cardinality: {1}
+   wdt:P1376  IRI  *;
+            # 91.3486005089 % obj: IRI. Cardinality: +
+   wdt:P625  geo:wktLiteral  *;
+            # 91.0941475827 % obj: geo:wktLiteral. Cardinality: {1}
+   skos:altLabel  xsd:string  *;
+            # 85.4961832061 % obj: xsd:string. Cardinality: +
+   wdt:P646  xsd:string  *;
+            # 80.4071246819 % obj: xsd:string. Cardinality: {1}
+   wdt:P1566  xsd:string  *;
+            # 79.3893129771 % obj: xsd:string. Cardinality: {1}
+   wdt:P131  IRI  *;
+            # 79.3893129771 % obj: IRI. Cardinality: {1}
+   wdt:P373  xsd:string  *;
+            # 79.1348600509 % obj: xsd:string. Cardinality: {1}
+   wdt:P910  IRI  *;
+            # 76.3358778626 % obj: IRI. Cardinality: {1}
+   wdt:P2044  xsd:int  *;
+            # 71.2468193384 % obj: xsd:int. Cardinality: {1}
+   wdt:P1082  xsd:int  *;
+            # 70.9923664122 % obj: xsd:int. Cardinality: {1}
+   wdt:P18  IRI  *
+            # 70.737913486 % obj: IRI. Cardinality: {1}
+}
+
+
