@@ -17,7 +17,7 @@ class Shaper(object):
                  instantiation_property=None,
                  namespaces_to_ignore=None,
                  infer_numeric_types_for_untyped_literals=False,
-                 discard_useles_constraints_with_positive_closure=True,
+                 discard_useless_constraints_with_positive_closure=True,
                  all_instances_are_compliant_mode=True,
                  keep_less_specific=True):
         """
@@ -33,7 +33,7 @@ class Shaper(object):
         :param instantiation_property:
         :param namespaces_to_ignore:
         :param infer_numeric_types_for_untyped_literals:
-        :param discard_useles_constraints_with_positive_closure:
+        :param discard_useless_constraints_with_positive_closure:
         :param all_instances_are_compliant_mode:
         :param keep_less_specific:
         """
@@ -57,7 +57,7 @@ class Shaper(object):
         self._instantiation_property = instantiation_property
         self._namespaces_to_ignore = namespaces_to_ignore
         self._infer_numeric_types_for_untyped_literals = infer_numeric_types_for_untyped_literals
-        self._discard_useles_constraints_with_positive_closure = discard_useles_constraints_with_positive_closure
+        self._discard_useles_constraints_with_positive_closure = discard_useless_constraints_with_positive_closure
         self._all_compliant_mode = all_instances_are_compliant_mode
         self._keep_less_specific = keep_less_specific
 
