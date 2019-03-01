@@ -20,7 +20,7 @@ The profile will be serialized into a Shape associated to the class. The results
 
 ## Experimental results
 
-In the folder [experiments](https://github.com/DaniFdezAlvarez/dbpedia-shexer/tree/develop/experiments) some results after using this prototype against the English chapter of DBpedia can be found
+In the folder [experiments](https://github.com/DaniFdezAlvarez/dbpedia-shexer/tree/develop/experiments) some results of applying this tool over different graphs with different configurations are available.
 
 
 ## Example code
