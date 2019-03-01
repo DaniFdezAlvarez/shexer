@@ -1,5 +1,5 @@
 Shapes of Country and Capital
-These shapes have been produced using all he triples in Wikidata which sucject is an instance of country (Q6256) or capital (Q5119) using the following configuration:
+These shapes have been produced using all the triples in Wikidata which sucject is an instance of country (Q6256) or capital (Q5119) using the following configuration:
 
 * Target classes: <http://www.wikidata.org/entity/Q6256> and <http://www.wikidata.org/entity/Q5119>.
 * Aceptance threshold: 0.7
