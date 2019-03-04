@@ -13,6 +13,7 @@ class Shaper(object):
     def __init__(self, target_classes=None, file_target_classes=None,
                  input_format=NT, instances_file_input=None,
                  graph_file_input=None, graph_list_of_files_input=None,
+                 raw_graph=None,
                  namespaces_dict=None, namespaces_dict_file=None,
                  instantiation_property=None,
                  namespaces_to_ignore=None,
@@ -38,14 +39,18 @@ class Shaper(object):
         :param keep_less_specific:
         """
 
-        check_just_one_not_none(target_classes, file_target_classes,
-                                "target_classes", "file_target_classes")
-        check_just_one_not_none(graph_file_input, graph_list_of_files_input,
-                                "graph_file_input", "graph_list_of_files_input")
-        check_just_one_not_none(namespaces_dict, namespaces_dict_file,
-                                "namespaces_dict", "namespaces_dict_file")
-        self._check_input_format(input_format)
+        check_just_one_not_none((target_classes, "target_classes"),
+                                 (file_target_classes, "file_target_classes"),
+                                 (raw_graph, "raw_graph"))
 
+        check_just_one_not_none((graph_file_input, "graph_file_input"),
+                                (graph_list_of_files_input, "graph_list_of_files_input"))
+
+        check_just_one_not_none((namespaces_dict, "namespaces_dict"),
+                                (namespaces_dict_file, "namespaces_dict_file"))
+
+        self._check_input_format(input_format)
+        
         self._target_classes = target_classes
         self._file_target_classes = file_target_classes
         self._input_format = input_format
