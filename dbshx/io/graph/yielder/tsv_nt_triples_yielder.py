@@ -5,7 +5,9 @@ from dbshx.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
 
 
 class TsvNtTriplesYielder(BaseTriplesYielder):
+
     def __init__(self, source_file, namespaces_to_ignore=None, allow_untyped_numbers=False):
+        super(TsvNtTriplesYielder, self).__init__()
         self._source_file = source_file
         self._triples_count = 0
         self._error_triples = 0

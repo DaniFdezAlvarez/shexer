@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from dbshx.shaper import NT
 from dbshx.shaper import Shaper
+import json
 
 ################ CONFIG
 
@@ -18,7 +19,7 @@ INPUT_FORMAT_PARAM = "input_format"
 INSTANTIATION_PROPERTY_PARAM = "instantiation_prop"
 NAMESPACES_TO_IGNORE_PARAM = "ignore"
 INFER_NUMERIC_TYPES_PARAM = "infer_untyped_nums"
-DISCARD_USELESS_CONSTRAINTS_PARAM = "discard_useles_constraints"
+DISCARD_USELESS_CONSTRAINTS_PARAM = "discard_useless_constraints"
 ALL_INSTANCES_COMPLIANT_PARAM = "all_compliant"
 KEEP_LESS_SPECIFIC_PARAM = "keep_less_specific"
 ACEPTANCE_THRESHOLD_PARAM = "threshold"
@@ -28,8 +29,9 @@ ACEPTANCE_THRESHOLD_PARAM = "threshold"
 ################ SUPPORT FUNCTIONS
 
 def _return_json_error_pool(error_pool):
+    print error_pool
     result = '{"Errors" : ['
-    result += '"' + error_pool[1] + '"'
+    result += '"' + error_pool[0] + '"'
     for i in range(1, len(error_pool)):
         result += ', "' + error_pool[i] + '"'
     result += "]}"
@@ -41,35 +43,40 @@ def _missing_param_error(param):
 
 
 def _parse_target_classes(data, error_pool):
+    print data[TARGET_CLASSES_PARAM], len(data[TARGET_CLASSES_PARAM])
+    print "yol"
     if TARGET_CLASSES_PARAM not in data:
+        print "uh"
         error_pool.append(_missing_param_error(TARGET_CLASSES_PARAM))
         return
     if type(data[TARGET_CLASSES_PARAM]) != list:
+        print "ah"
         error_pool.append("You must provide a non-empty list of URIs (string) in " + TARGET_CLASSES_PARAM)
         return
-    if len(data[TARGET_CLASSES_PARAM] == 0) or type(data[TARGET_CLASSES_PARAM][0]) != str:
+    if len(data[TARGET_CLASSES_PARAM]) == 0 or type(data[TARGET_CLASSES_PARAM][0]) != unicode:
+        print "eh"
         error_pool.append("You must provide a non-empty list of URIs (string) in " + TARGET_CLASSES_PARAM)
         return
-    return data[TARGET_CLASSES_PARAM]
+    return [str(a_uri) for a_uri in data[TARGET_CLASSES_PARAM]]
 
 def _parse_graph(data, error_pool):
     if TARGET_GRAPH_PARAM not in data:
         error_pool.append(_missing_param_error(TARGET_CLASSES_PARAM))
         return
-    if type(data[TARGET_GRAPH_PARAM]) != str:
+    if type(data[TARGET_GRAPH_PARAM]) != unicode:
         error_pool.append("You must provide a str containing an RDF graph ")
         return
     if len(data[TARGET_GRAPH_PARAM]) > MAX_LEN:
         error_pool.append("The size of the graph is too big for this deployment. Introduce a graph using less than "
                           + str(MAX_LEN) + " chars")
         return
-    return data[TARGET_GRAPH_PARAM]
+    return str(data[TARGET_GRAPH_PARAM])
 
 def _parse_str_param(data, error_pool, key, default_value, opt_message=""):
     result = default_value
     if key in data:
-        if type(data[key]) == str:
-            result = data[key]
+        if type(data[key]) == unicode:
+            result = str(data[key])
         else:
             error_pool.append(key + " must be a str. " + opt_message)
             return
@@ -79,7 +86,7 @@ def _parse_str_param(data, error_pool, key, default_value, opt_message=""):
 def _parse_bool_param(data, error_pool, key, default_value, opt_message=""):
     result = default_value
     if key in data:
-        if type(data[key]) == str:
+        if type(data[key]) == unicode:
             if data[key] in ["True", "False"]:
                 result = bool(data[key])
             else:
@@ -131,13 +138,16 @@ def _parse_threshold(data, error_pool):
 
 
 def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
-                 infer_untyped_num, discard_useles_constraints, all_compliant, keep_less_specific, threshold):
+                 infer_untyped_num, discard_useles_constraints, all_compliant,
+                 keep_less_specific, threshold):
+    print "Aqui vengo yo, a llamar"
     shaper = Shaper(target_classes=target_classes,input_format=input_fotmat, instantiation_property=instantiation_prop,
                     infer_numeric_types_for_untyped_literals=infer_untyped_num,
                     discard_useless_constraints_with_positive_closure=discard_useles_constraints,
                     all_instances_are_compliant_mode=all_compliant,
                     keep_less_specific=keep_less_specific,
                     raw_graph=graph)
+    return shaper.shex_graph(threshold)
 
 
 
@@ -145,20 +155,31 @@ def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
 
 app = Flask(__name__)
 
-@app.route('shexer', methods=['POST'])
+@app.route('/shexer', methods=['POST'])
 def shexer():
     error_pool = []
     try:
-        data = request.json
+        data = json.loads(request.json)
+        print data, "eyy"
+        print "Aqui vengo yo, a llamar1"
         target_classes = _parse_target_classes(data, error_pool)
+        print "Aqui vengo yo, a llamar2"
         graph = _parse_graph(data, error_pool)
+        print "Aqui vengo yo, a llamar3"
         input_fotmat = _parse_input_format(data, error_pool)
+        print "Aqui vengo yo, a llamar4"
         instantiation_prop = _parse_instantiation_prop(data, error_pool)
+        print "Aqui vengo yo, a llamar5"
         infer_untyped_num = _parse_infer_untyped_num(data, error_pool)
+        print "Aqui vengo yo, a llamar6"
         discard_useles_constraints = _parse_discard_useless(data, error_pool)
+        print "Aqui vengo yo, a llamar7"
         all_compliant = _parse_all_compliant(data, error_pool)
+        print "Aqui vengo yo, a llamar8"
         keep_less_specific = _parse_keep_less_specific(data, error_pool)
+        print "Aqui vengo yo, a llamar9"
         threshold = _parse_threshold(data, error_pool)
+        print "Aqui vengo yo, a llamar10"
 
         if len(error_pool) == 0:
             return _call_shaper(target_classes,
