@@ -50,7 +50,7 @@ class Shaper(object):
                                 (namespaces_dict_file, "namespaces_dict_file"))
 
         self._check_input_format(input_format)
-        
+
         self._target_classes = target_classes
         self._file_target_classes = file_target_classes
         self._input_format = input_format
