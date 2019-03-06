@@ -9,18 +9,21 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                          graph_list_of_files_input=None,target_classes=None,
                          file_target_classes=None, input_format=NT,
                          instantiation_property=None,
-                         namespaces_to_ignore=None):
+                         namespaces_to_ignore=None,
+                         raw_graph=None):
         instance_yielder = None
         if instances_file_input is not None:
             instance_yielder = get_triple_yielder(source_file=instances_file_input,
                                                   input_format=input_format,
-                                                  namespaces_to_ignore=namespaces_to_ignore)
+                                                  namespaces_to_ignore=namespaces_to_ignore,
+                                                  raw_graph=raw_graph)
         else:
             instance_yielder = get_triple_yielder(source_file=graph_file_input,
                                                   list_of_source_files=graph_list_of_files_input,
                                                   input_format=input_format,
-                                                  namespaces_to_ignore=namespaces_to_ignore)
-        list_of_str_target_classes = target_classes if target_classes is not None else _read_target_classes_from_file(file_target_classes)
+                                                  namespaces_to_ignore=namespaces_to_ignore,
+                                                  raw_graph=raw_graph)
+        list_of_str_target_classes = _tune_target_classes_if_needed(target_classes) if target_classes is not None else _read_target_classes_from_file(file_target_classes)
 
         return InstanceTracker(target_classes=get_list_of_model_classes(list_of_str_target_classes),
                                triples_yielder=instance_yielder,
@@ -29,6 +32,13 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
 def get_list_of_model_classes(list_of_str_target_classes):
     return create_IRIs_from_string_list(list_of_str_target_classes)
 
+
+def _tune_target_classes_if_needed(list_target_classes):
+    result = []
+    for a_original_class in list_target_classes:
+        result.append(remove_corners(a_uri=a_original_class,
+                                     raise_error_if_no_corners=False))
+    return result
 
 def _read_target_classes_from_file(file_target_classes):
     result = []

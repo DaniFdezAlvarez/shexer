@@ -15,7 +15,8 @@ class NtTriplesYielder(BaseTriplesYielder):
         self._error_triples = 0
         self._namespaces_to_ignore = namespaces_to_ignore
         self._allow_untyped_numbers = allow_untyped_numbers
-        self._line_reader = self._decide_line_reader()
+        self._line_reader = self._decide_line_reader(source_file=source_file,
+                                                     raw_graph=raw_graph)
         # The following ones are refs to functions. Im avoiding some comparison here.
         self.yield_triples = self._yield_triples_not_excluding_namespaces if namespaces_to_ignore is None \
             else self._yield_triples_excluding_namespaces

@@ -6,6 +6,6 @@ class RawStringLineReader():
 
 
     def read_lines(self):
-        for a_line in self._raw_graph.split("\n"):
+        for a_line in self._raw_string.split("\n"):
             if a_line.strip() != "":
                 yield a_line

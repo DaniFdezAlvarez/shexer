@@ -6,7 +6,7 @@ from dbshx.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
 
 class TsvNtTriplesYielder(BaseTriplesYielder):
 
-    def __init__(self, source_file, namespaces_to_ignore=None, allow_untyped_numbers=False):
+    def __init__(self, source_file, namespaces_to_ignore=None, allow_untyped_numbers=False, raw_graph=None):
         super(TsvNtTriplesYielder, self).__init__()
         self._source_file = source_file
         self._triples_count = 0
@@ -14,7 +14,8 @@ class TsvNtTriplesYielder(BaseTriplesYielder):
         self._namespaces_to_ignore = None # TODO
         self._allow_untyped_numbers= allow_untyped_numbers
         self._namespaces_to_ignore = namespaces_to_ignore
-        self._line_reader = self._decide_line_reader()
+        self._line_reader = self._decide_line_reader(source_file=source_file,
+                                                     raw_graph=raw_graph)
         self.yield_triples = self._yield_triples_not_excluding_namespaces if namespaces_to_ignore is None\
             else self._yield_triples_excluding_namespaces
 
