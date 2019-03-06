@@ -1,10 +1,27 @@
 
-def check_just_one_not_none(value1, value2, ref_name_1, ref_name_2):
-    if None in [value1, value2] and value1 != value2:
-        return
-    raise ValueError(error_message_for_non_compatible_references(ref_name_1, ref_name_2))
+def check_just_one_not_none(*value_refname):
+    nones=0
+    for a_tuple in value_refname:
+        if a_tuple[0] is not None:
+            nones += 1
+    if nones != 1:
+        raise ValueError(error_message_for_non_compatible_references([a_tuple[1] for a_tuple in value_refname]))
 
 
-def error_message_for_non_compatible_references(name_ref_1, name_ref_2):
-    return "You must provide one and only one of the following params: " + name_ref_1 + " or " + name_ref_2
+def check_one_or_zero_not_none(*value_refname):
+    nones=0
+    for a_tuple in value_refname:
+        if a_tuple[0] is not None:
+            nones += 1
+    if nones > 1:
+        raise ValueError(error_message_for_non_compatible_references(
+            list_of_ref_names=[a_tuple[1] for a_tuple in value_refname],
+            one_mandatory=False))
+
+
+def error_message_for_non_compatible_references(list_of_ref_names, one_mandatory=True):
+    if one_mandatory:
+        return "You must provide one and only one of the following params: " + str(list_of_ref_names)
+    return "You must provide one as most of the following params: " + str(list_of_ref_names)
+
 

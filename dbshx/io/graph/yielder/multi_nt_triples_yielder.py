@@ -1,8 +1,11 @@
 from dbshx.io.graph.yielder.nt_triples_yielder import NtTriplesYielder
+from dbshx.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
 
 
-class MultiNtTriplesYielder(object):
+class MultiNtTriplesYielder(BaseTriplesYielder):
+
     def __init__(self, list_of_files, namespaces_to_ignore=None, allow_untyped_numbers=False):
+        super(MultiNtTriplesYielder, self).__init__()
         self._list_of_files = list_of_files
         self._triples_yielded_from_used_yielders = 0
         self._error_triples_from_used_yielders = 0

@@ -19,7 +19,7 @@ class ShexSerializer(object):
         self._aceptance_theshold = aceptance_threshold
         self._lines_buffer = []
         self._tolerance = tolerance_to_keep_similar_rules
-        self._namespaces_dict = namespaces_dict if namespaces_dict is not None else []
+        self._namespaces_dict = namespaces_dict if namespaces_dict is not None else {}
         self._keep_less_specific = keep_less_specific
         self._string_return = string_return
         self._string_result = ""

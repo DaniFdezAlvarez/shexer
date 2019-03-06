@@ -1,8 +1,11 @@
 from dbshx.io.graph.yielder.tsv_nt_triples_yielder import TsvNtTriplesYielder
+from dbshx.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
 
 
-class MultiTsvNtTriplesYielder(object):
+class MultiTsvNtTriplesYielder(BaseTriplesYielder):
+
     def __init__(self, list_of_files, namespaces_to_ignore=None, allow_untyped_numbers=False):
+        super(MultiTsvNtTriplesYielder, self).__init__()
         self._list_of_files = list_of_files
         self._triples_yielded_from_used_yielders = 0
         self._error_triples_from_used_yielders = 0
@@ -10,7 +13,6 @@ class MultiTsvNtTriplesYielder(object):
         self._allow_untyped_numbers = allow_untyped_numbers
 
         self._last_yielder = None
-
 
 
     def yield_triples(self):

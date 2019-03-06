@@ -1,4 +1,4 @@
-from utils.obj_references import check_just_one_not_none
+from utils.obj_references import check_just_one_not_none, check_one_or_zero_not_none
 
 from dbshx.consts import SHEX, NT, TSV_SPO
 from dbshx.utils.factories.class_profiler_factory import get_class_profiler
@@ -13,6 +13,7 @@ class Shaper(object):
     def __init__(self, target_classes=None, file_target_classes=None,
                  input_format=NT, instances_file_input=None,
                  graph_file_input=None, graph_list_of_files_input=None,
+                 raw_graph=None,
                  namespaces_dict=None, namespaces_dict_file=None,
                  instantiation_property=None,
                  namespaces_to_ignore=None,
@@ -38,12 +39,16 @@ class Shaper(object):
         :param keep_less_specific:
         """
 
-        check_just_one_not_none(target_classes, file_target_classes,
-                                "target_classes", "file_target_classes")
-        check_just_one_not_none(graph_file_input, graph_list_of_files_input,
-                                "graph_file_input", "graph_list_of_files_input")
-        check_just_one_not_none(namespaces_dict, namespaces_dict_file,
-                                "namespaces_dict", "namespaces_dict_file")
+        check_just_one_not_none((target_classes, "target_classes"),
+                                 (file_target_classes, "file_target_classes"))
+
+        check_just_one_not_none((graph_file_input, "graph_file_input"),
+                                (graph_list_of_files_input, "graph_list_of_files_input"),
+                                 (raw_graph, "raw_graph"))
+
+        check_one_or_zero_not_none((namespaces_dict, "namespaces_dict"),
+                                   (namespaces_dict_file, "namespaces_dict_file"))
+
         self._check_input_format(input_format)
 
         self._target_classes = target_classes
@@ -53,13 +58,14 @@ class Shaper(object):
         self._graph_file_input = graph_file_input
         self._graph_list_of_files_input = graph_list_of_files_input
         self._namespaces_dict = namespaces_dict
-        self._namespaces_dict_file = namespaces_dict_file
+        self._namespaces_dict_file = namespaces_dict_file  # TODO Need to parse this
         self._instantiation_property = instantiation_property
         self._namespaces_to_ignore = namespaces_to_ignore
         self._infer_numeric_types_for_untyped_literals = infer_numeric_types_for_untyped_literals
         self._discard_useles_constraints_with_positive_closure = discard_useless_constraints_with_positive_closure
         self._all_compliant_mode = all_instances_are_compliant_mode
         self._keep_less_specific = keep_less_specific
+        self._raw_graph = raw_graph
 
         self._instance_tracker = None
         self._target_classes_dict = None
@@ -137,7 +143,8 @@ class Shaper(object):
                                   input_format=self._input_format,
                                   instantiation_property_str=self._instantiation_property,
                                   namespaces_to_ignore=self._namespaces_to_ignore,
-                                  infer_numeric_types_for_untyped_literals=self._infer_numeric_types_for_untyped_literals)
+                                  infer_numeric_types_for_untyped_literals=self._infer_numeric_types_for_untyped_literals,
+                                  raw_graph=self._raw_graph)
 
 
     def _build_instance_tracker(self):
@@ -147,7 +154,8 @@ class Shaper(object):
                                     target_classes=self._target_classes,
                                     file_target_classes=self._file_target_classes,
                                     input_format=self._input_format,
-                                    instantiation_property=self._instantiation_property)
+                                    instantiation_property=self._instantiation_property,
+                                    raw_graph=self._raw_graph)
 
     def _build_class_shexer(self):
         return get_class_shexer(class_instances_target_dict=self._target_classes_dict,
@@ -171,4 +179,4 @@ class Shaper(object):
     @staticmethod
     def _check_aceptance_threshold(aceptance_threshold):
         if aceptance_threshold < 0 or aceptance_threshold > 1:
-            raise ValueError("The aceptance threshold must be a value in [0,1]")
+            raise ValueError("The acceptance threshold must be a value in [0,1]")
