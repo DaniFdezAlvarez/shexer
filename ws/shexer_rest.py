@@ -29,6 +29,10 @@ ACEPTANCE_THRESHOLD_PARAM = "threshold"
 
 ################ SUPPORT FUNCTIONS
 
+def _jsonize_response(response):
+    result = {'result' : response}
+
+
 def _return_json_error_pool(error_pool):
     print error_pool
     result = '{"Errors" : ['
@@ -36,7 +40,7 @@ def _return_json_error_pool(error_pool):
     for i in range(1, len(error_pool)):
         result += ', "' + error_pool[i] + '"'
     result += "]}"
-    return result
+    return _jsonize_response(result)
 
 
 def _missing_param_error(param):
@@ -134,6 +138,7 @@ def _parse_threshold(data, error_pool):
     return 0.0
 
 
+
 def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                  infer_untyped_num, discard_useles_constraints, all_compliant,
                  keep_less_specific, threshold):
@@ -148,7 +153,7 @@ def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                     raw_graph=graph)
     result = shaper.shex_graph(aceptance_threshold=threshold, string_output=True)
     print result
-    return result
+    return _jsonize_response(result)
 
 
 
