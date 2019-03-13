@@ -30,7 +30,7 @@ ACEPTANCE_THRESHOLD_PARAM = "threshold"
 ################ SUPPORT FUNCTIONS
 
 def _jsonize_response(response):
-    result = {'result' : response}
+    return {'result' : response}
 
 
 def _return_json_error_pool(error_pool):
