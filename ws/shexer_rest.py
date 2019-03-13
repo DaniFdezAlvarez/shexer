@@ -146,7 +146,7 @@ def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                     all_instances_are_compliant_mode=all_compliant,
                     keep_less_specific=keep_less_specific,
                     raw_graph=graph)
-    result = shaper.shex_graph(threshold)
+    result = shaper.shex_graph(aceptance_threshold=threshold, string_output=True)
     print result
     return result
 
@@ -160,7 +160,7 @@ app = Flask(__name__)
 def shexer():
     error_pool = []
     try:
-        data = json.loads(request.json)
+        data = request.json
         target_classes = _parse_target_classes(data, error_pool)
         graph = _parse_graph(data, error_pool)
         input_fotmat = _parse_input_format(data, error_pool)
