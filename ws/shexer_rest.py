@@ -7,7 +7,7 @@ import json
 
 ################ CONFIG
 
-PORT = 5002
+PORT = 5008
 HOST = "0.0.0.0"
 MAX_LEN = 100000
 
@@ -30,11 +30,14 @@ ACEPTANCE_THRESHOLD_PARAM = "threshold"
 ################ SUPPORT FUNCTIONS
 
 def _jsonize_response(response):
-    return {'result' : response}
+    result = json.dumps({'result' : response})
+    return result
+    # result = {'result' : response}
+    # return json.dumps(result)
+    # return response
 
 
 def _return_json_error_pool(error_pool):
-    print error_pool
     result = '{"Errors" : ['
     result += '"' + error_pool[0] + '"'
     for i in range(1, len(error_pool)):
@@ -48,7 +51,6 @@ def _missing_param_error(param):
 
 
 def _parse_target_classes(data, error_pool):
-    print data[TARGET_CLASSES_PARAM], len(data[TARGET_CLASSES_PARAM])
     if TARGET_CLASSES_PARAM not in data:
         error_pool.append(_missing_param_error(TARGET_CLASSES_PARAM))
         return
@@ -62,7 +64,7 @@ def _parse_target_classes(data, error_pool):
 
 def _parse_graph(data, error_pool):
     if TARGET_GRAPH_PARAM not in data:
-        error_pool.append(_missing_param_error(TARGET_CLASSES_PARAM))
+        error_pool.append(_missing_param_error(TARGET_GRAPH_PARAM))
         return
     if type(data[TARGET_GRAPH_PARAM]) != unicode:
         error_pool.append("You must provide a str containing an RDF graph ")
@@ -142,7 +144,6 @@ def _parse_threshold(data, error_pool):
 def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                  infer_untyped_num, discard_useles_constraints, all_compliant,
                  keep_less_specific, threshold):
-    print "Aqui vengo yo, a llamar"
     shaper = Shaper(target_classes=target_classes,
                     input_format=input_fotmat,
                     instantiation_property=instantiation_prop,
@@ -152,7 +153,6 @@ def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                     keep_less_specific=keep_less_specific,
                     raw_graph=graph)
     result = shaper.shex_graph(aceptance_threshold=threshold, string_output=True)
-    print result
     return _jsonize_response(result)
 
 
@@ -177,7 +177,7 @@ def shexer():
         threshold = _parse_threshold(data, error_pool)
 
         if len(error_pool) == 0:
-            return _call_shaper(target_classes,
+            return _call_shaper(target_classes=target_classes,
                                 graph=graph,
                                 input_fotmat=input_fotmat,
                                 instantiation_prop=instantiation_prop,
