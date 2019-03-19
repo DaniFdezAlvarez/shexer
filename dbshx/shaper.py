@@ -20,7 +20,8 @@ class Shaper(object):
                  infer_numeric_types_for_untyped_literals=False,
                  discard_useless_constraints_with_positive_closure=True,
                  all_instances_are_compliant_mode=True,
-                 keep_less_specific=True):
+                 keep_less_specific=True,
+                 all_classes_mode=False):
         """
 
         :param target_classes:
@@ -39,15 +40,17 @@ class Shaper(object):
         :param keep_less_specific:
         """
 
-        check_just_one_not_none((target_classes, "target_classes"),
-                                 (file_target_classes, "file_target_classes"))
-
         check_just_one_not_none((graph_file_input, "graph_file_input"),
                                 (graph_list_of_files_input, "graph_list_of_files_input"),
                                  (raw_graph, "raw_graph"))
 
         check_one_or_zero_not_none((namespaces_dict, "namespaces_dict"),
                                    (namespaces_dict_file, "namespaces_dict_file"))
+
+        self._check_target_classes(target_classes=target_classes,
+                                   file_target_classes=file_target_classes,
+                                   all_classes_mode=all_classes_mode)
+
 
         self._check_input_format(input_format)
 
@@ -66,6 +69,7 @@ class Shaper(object):
         self._all_compliant_mode = all_instances_are_compliant_mode
         self._keep_less_specific = keep_less_specific
         self._raw_graph = raw_graph
+        self._all_classes_mode = all_classes_mode
 
         self._instance_tracker = None
         self._target_classes_dict = None
@@ -155,7 +159,8 @@ class Shaper(object):
                                     file_target_classes=self._file_target_classes,
                                     input_format=self._input_format,
                                     instantiation_property=self._instantiation_property,
-                                    raw_graph=self._raw_graph)
+                                    raw_graph=self._raw_graph,
+                                    all_classes_mode=self._all_classes_mode)
 
     def _build_class_shexer(self):
         return get_class_shexer(class_instances_target_dict=self._target_classes_dict,
@@ -170,6 +175,15 @@ class Shaper(object):
     def _check_input_format(input_format):
         if input_format not in [NT, TSV_SPO]:
             raise ValueError("Currently unsupported input format: " + input_format)
+
+    @staticmethod
+    def _check_target_classes(target_classes, file_target_classes, all_classes_mode):
+        if not all_classes_mode:
+            check_just_one_not_none((target_classes, "target_classes"),
+                                    (file_target_classes, "file_target_classes"))
+        else:
+            if target_classes is not None or file_target_classes is not None:
+                raise ValueError("You must provide a list of target classes XOR set all_classes_mode to True")
 
     @staticmethod
     def _check_output_format(output_format):
