@@ -24,6 +24,7 @@ DISCARD_USELESS_CONSTRAINTS_PARAM = "discard_useless_constraints"
 ALL_INSTANCES_COMPLIANT_PARAM = "all_compliant"
 KEEP_LESS_SPECIFIC_PARAM = "keep_less_specific"
 ACEPTANCE_THRESHOLD_PARAM = "threshold"
+ALL_CLASSES_MODE_PARAM = "all_classes"
 
 
 
@@ -62,6 +63,7 @@ def _parse_target_classes(data, error_pool):
         return
     return [str(a_uri) for a_uri in data[TARGET_CLASSES_PARAM]]
 
+
 def _parse_graph(data, error_pool):
     if TARGET_GRAPH_PARAM not in data:
         error_pool.append(_missing_param_error(TARGET_GRAPH_PARAM))
@@ -74,6 +76,7 @@ def _parse_graph(data, error_pool):
                           + str(MAX_LEN) + " chars")
         return
     return str(data[TARGET_GRAPH_PARAM])
+
 
 def _parse_str_param(data, error_pool, key, default_value, opt_message=""):
     result = default_value
@@ -124,6 +127,12 @@ def _parse_all_compliant(data, error_pool):
                              opt_message="The default value is True")
 
 
+def _parse_all_classes_mode(data, error_pool):
+    return _parse_bool_param(data=data, error_pool=error_pool, key=ALL_CLASSES_MODE_PARAM,
+                             default_value=False,
+                             opt_message="The default value is False")
+
+
 def _parse_keep_less_specific(data, error_pool):
     return _parse_bool_param(data=data, error_pool=error_pool, key=ALL_INSTANCES_COMPLIANT_PARAM,
                              default_value=True,
@@ -143,7 +152,7 @@ def _parse_threshold(data, error_pool):
 
 def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                  infer_untyped_num, discard_useles_constraints, all_compliant,
-                 keep_less_specific, threshold):
+                 keep_less_specific, threshold, all_classes_mode):
     shaper = Shaper(target_classes=target_classes,
                     input_format=input_fotmat,
                     instantiation_property=instantiation_prop,
@@ -151,7 +160,8 @@ def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                     discard_useless_constraints_with_positive_closure=discard_useles_constraints,
                     all_instances_are_compliant_mode=all_compliant,
                     keep_less_specific=keep_less_specific,
-                    raw_graph=graph)
+                    raw_graph=graph,
+                    all_classes_mode=all_classes_mode)
     result = shaper.shex_graph(aceptance_threshold=threshold, string_output=True)
     return _jsonize_response(result)
 
@@ -175,6 +185,7 @@ def shexer():
         all_compliant = _parse_all_compliant(data, error_pool)
         keep_less_specific = _parse_keep_less_specific(data, error_pool)
         threshold = _parse_threshold(data, error_pool)
+        all_classes_mode = _parse_all_classes_mode(data, error_pool)
 
         if len(error_pool) == 0:
             return _call_shaper(target_classes=target_classes,
@@ -185,7 +196,8 @@ def shexer():
                                 discard_useles_constraints=discard_useles_constraints,
                                 all_compliant=all_compliant,
                                 keep_less_specific=keep_less_specific,
-                                threshold=threshold)
+                                threshold=threshold,
+                                all_classes_mode=all_classes_mode)
         else:
            return _return_json_error_pool(error_pool)
 
