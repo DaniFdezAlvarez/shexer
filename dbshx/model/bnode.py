@@ -1,3 +1,5 @@
+BNODE_ELEM_TYPE = "BNode"
+
 
 class BNode(object):
 
@@ -11,3 +13,7 @@ class BNode(object):
         if type(other) != type(self):
             return False
         return str(self) == str(other)
+
+    @property
+    def elem_type(self):
+        return BNODE_ELEM_TYPE

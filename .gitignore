@@ -107,3 +107,6 @@ ENV/
 # local tests
 
 dbshx/local_code/
+
+# data
+files/

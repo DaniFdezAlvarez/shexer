@@ -1,13 +1,35 @@
-
-
-
 class Statement(object):
 
-    def __init__(self, st_property, st_type, cardinality, probability):
+    def __init__(self, st_property, st_type, cardinality, probability,
+                 comments=None, serializer_object=None):
         self._st_property = st_property
         self._st_type = st_type
         self._cardinality = cardinality
         self._probability = probability
+        self._serializer_object = serializer_object
+        self._comments = [] if comments is None else comments
+
+    def get_tuples_to_serialize_line_indent_level(self, is_last_statement_of_shape, namespaces_dict):
+        return self._serializer_object.\
+            serialize_statement_with_indent_level(a_statement=self,
+                                                  is_last_statement_of_shape= is_last_statement_of_shape,
+                                                  namespaces_dict=namespaces_dict)
+
+    def probability_representation(self):
+        return self._serializer_object.probability_representation(self._probability)
+
+    def cardinality_representation(self):
+        return self._serializer_object.cardinality_representation(self._cardinality, self)
+
+    def comment_representation(self, namespaces_dict):
+        return self._serializer_object.turn_statement_into_comment(self, namespaces_dict=namespaces_dict)
+
+    def add_comment(self, comment, insert_first=False):
+        if not insert_first:
+            self._comments.append(comment)
+        else:
+            self._comments.insert(0, comment)
+
 
 
     @property
@@ -22,9 +44,26 @@ class Statement(object):
     def cardinality(self):
         return self._cardinality
 
+    @cardinality.setter
+    def cardinality(self, value):
+        self._cardinality = value
+
     @property
     def probability(self):
         return self._probability
 
+    @probability.setter
+    def probability(self, value):
+        self._probability = value
 
+    @property
+    def comments(self):
+        return self._comments
 
+    @property
+    def serializer_object(self):
+        return self._serializer_object
+
+    @serializer_object.setter
+    def serializer_object(self, value):
+        self._serializer_object = value

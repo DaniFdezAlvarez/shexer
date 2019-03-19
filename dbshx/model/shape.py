@@ -1,3 +1,5 @@
+STARTING_CHAR_FOR_SHAPE_NAME = "@"
+
 
 class Shape(object):
 

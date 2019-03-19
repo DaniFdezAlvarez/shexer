@@ -1,6 +1,7 @@
 import json
 from dbshx.model.statement import Statement
 from dbshx.model.shape import Shape
+from dbshx.utils.shapes import build_shapes_name_for_class_uri
 
 
 class ClassShexer (object):
@@ -18,7 +19,7 @@ class ClassShexer (object):
 
     def _build_shapes(self):
         for a_class_key in self._class_profile_dict:
-            name = self._build_authomatic_name_for_class_uri(a_class_key)
+            name = build_shapes_name_for_class_uri(a_class_key)
             number_of_instances = float(self._class_counts_dict[a_class_key])
             # TODO Ojo cuidao aqui. Metemos shapes o que metemos en el resultado
             statements = []
@@ -52,17 +53,6 @@ class ClassShexer (object):
     def _compute_frequency(self, number_of_instances, n_ocurrences_statement):
         return float(n_ocurrences_statement) / number_of_instances
 
-
-    def _build_authomatic_name_for_class_uri(self, class_uri):
-        if "#" in class_uri and class_uri[-1] != "#":
-            return "@" + class_uri[class_uri.rfind("#")+1:]
-        if "/" in class_uri:
-            if class_uri[-1] != "/":
-                return "@" + class_uri[class_uri.rfind("/")+1:]
-            else:
-                return "@" + class_uri[class_uri[:-1].rfind("/") + 1:]
-        else:
-            return "@" + class_uri
 
     @staticmethod
     def _load_class_profile_dict_from_file(source_file):
