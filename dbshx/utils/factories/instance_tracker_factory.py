@@ -10,24 +10,45 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                          file_target_classes=None, input_format=NT,
                          instantiation_property=None,
                          namespaces_to_ignore=None,
-                         raw_graph=None):
-        instance_yielder = None
-        if instances_file_input is not None:
-            instance_yielder = get_triple_yielder(source_file=instances_file_input,
-                                                  input_format=input_format,
-                                                  namespaces_to_ignore=namespaces_to_ignore,
-                                                  raw_graph=raw_graph)
-        else:
-            instance_yielder = get_triple_yielder(source_file=graph_file_input,
-                                                  list_of_source_files=graph_list_of_files_input,
-                                                  input_format=input_format,
-                                                  namespaces_to_ignore=namespaces_to_ignore,
-                                                  raw_graph=raw_graph)
-        list_of_str_target_classes = _tune_target_classes_if_needed(target_classes) if target_classes is not None else _read_target_classes_from_file(file_target_classes)
+                         raw_graph=None,
+                         all_classes_mode=False):
+    """
+    Here I am assuming a correct combination of params. We check that when building a Shaper.
+    If you come to dig here, behave properly ;)
 
-        return InstanceTracker(target_classes=get_list_of_model_classes(list_of_str_target_classes),
-                               triples_yielder=instance_yielder,
-                               instantiation_property=instantiation_property)
+    :param instances_file_input:
+    :param graph_file_input:
+    :param graph_list_of_files_input:
+    :param target_classes:
+    :param file_target_classes:
+    :param input_format:
+    :param instantiation_property:
+    :param namespaces_to_ignore:
+    :param raw_graph:
+    :param all_classes_mode:
+    :return:
+    """
+    instance_yielder = None
+    if instances_file_input is not None:
+        instance_yielder = get_triple_yielder(source_file=instances_file_input,
+                                              input_format=input_format,
+                                              namespaces_to_ignore=namespaces_to_ignore,
+                                              raw_graph=raw_graph)
+    else:
+        instance_yielder = get_triple_yielder(source_file=graph_file_input,
+                                              list_of_source_files=graph_list_of_files_input,
+                                              input_format=input_format,
+                                              namespaces_to_ignore=namespaces_to_ignore,
+                                              raw_graph=raw_graph)
+    model_classes = None
+    if not all_classes_mode:
+        list_of_str_target_classes = _tune_target_classes_if_needed(target_classes) if target_classes is not None else _read_target_classes_from_file(file_target_classes)
+        model_classes = get_list_of_model_classes(list_of_str_target_classes)
+
+    return InstanceTracker(target_classes=model_classes,
+                           triples_yielder=instance_yielder,
+                           instantiation_property=instantiation_property,
+                           all_classes_mode=all_classes_mode)
 
 def get_list_of_model_classes(list_of_str_target_classes):
     return create_IRIs_from_string_list(list_of_str_target_classes)
