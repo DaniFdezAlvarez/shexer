@@ -92,12 +92,12 @@ def _parse_str_param(data, error_pool, key, default_value, opt_message=""):
 def _parse_bool_param(data, error_pool, key, default_value, opt_message=""):
     result = default_value
     if key in data:
-        if type(data[key]) == unicode:
-            if data[key] in ["True", "False"]:
-                result = bool(data[key])
-            else:
-                error_pool.append(key + " must be 'True' or 'False'. " + opt_message)
-                return
+        if type(data[key]) == bool:
+            result = data[key]
+        else:
+            error_pool.append(key + " must be 'true' or 'false'. " + opt_message)
+            return
+
     return result
 
 
@@ -176,7 +176,6 @@ def shexer():
     error_pool = []
     try:
         data = request.json
-        target_classes = _parse_target_classes(data, error_pool)
         graph = _parse_graph(data, error_pool)
         input_fotmat = _parse_input_format(data, error_pool)
         instantiation_prop = _parse_instantiation_prop(data, error_pool)
@@ -186,6 +185,7 @@ def shexer():
         keep_less_specific = _parse_keep_less_specific(data, error_pool)
         threshold = _parse_threshold(data, error_pool)
         all_classes_mode = _parse_all_classes_mode(data, error_pool)
+        target_classes = None if all_classes_mode else _parse_target_classes(data, error_pool)
 
         if len(error_pool) == 0:
             return _call_shaper(target_classes=target_classes,
