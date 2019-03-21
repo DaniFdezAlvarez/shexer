@@ -11,7 +11,8 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                          instantiation_property=None,
                          namespaces_to_ignore=None,
                          raw_graph=None,
-                         all_classes_mode=False):
+                         all_classes_mode=False,
+                         namespaces_dict=None):
     """
     Here I am assuming a correct combination of params. We check that when building a Shaper.
     If you come to dig here, behave properly ;)
@@ -33,13 +34,15 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
         instance_yielder = get_triple_yielder(source_file=instances_file_input,
                                               input_format=input_format,
                                               namespaces_to_ignore=namespaces_to_ignore,
-                                              raw_graph=raw_graph)
+                                              raw_graph=raw_graph,
+                                              namespaces_dict=namespaces_dict)
     else:
         instance_yielder = get_triple_yielder(source_file=graph_file_input,
                                               list_of_source_files=graph_list_of_files_input,
                                               input_format=input_format,
                                               namespaces_to_ignore=namespaces_to_ignore,
-                                              raw_graph=raw_graph)
+                                              raw_graph=raw_graph,
+                                              namespaces_dict=namespaces_dict)
     model_classes = None
     if not all_classes_mode:
         list_of_str_target_classes = _tune_target_classes_if_needed(target_classes) if target_classes is not None else _read_target_classes_from_file(file_target_classes)

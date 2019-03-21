@@ -148,7 +148,8 @@ class Shaper(object):
                                   instantiation_property_str=self._instantiation_property,
                                   namespaces_to_ignore=self._namespaces_to_ignore,
                                   infer_numeric_types_for_untyped_literals=self._infer_numeric_types_for_untyped_literals,
-                                  raw_graph=self._raw_graph)
+                                  raw_graph=self._raw_graph,
+                                  namespaces_dict=self._namespaces_dict)
 
 
     def _build_instance_tracker(self):
@@ -160,7 +161,8 @@ class Shaper(object):
                                     input_format=self._input_format,
                                     instantiation_property=self._instantiation_property,
                                     raw_graph=self._raw_graph,
-                                    all_classes_mode=self._all_classes_mode)
+                                    all_classes_mode=self._all_classes_mode,
+                                    namespaces_dict=self._namespaces_dict)
 
     def _build_class_shexer(self):
         return get_class_shexer(class_instances_target_dict=self._target_classes_dict,
