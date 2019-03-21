@@ -1,5 +1,7 @@
 # Shexer
 
+Try an online demo: [http://shexer.weso.es/](http://shexer.weso.es/)
+
 Language: Python 2.7
 
 This repository contains a software prototype to perform induction of Shapes in an RDF Graph. 
