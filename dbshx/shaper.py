@@ -1,6 +1,6 @@
 from utils.obj_references import check_just_one_not_none, check_one_or_zero_not_none
 
-from dbshx.consts import SHEX, NT, TSV_SPO
+from dbshx.consts import SHEX, NT, TSV_SPO, N3, TURTLE, RDF_XML
 from dbshx.utils.factories.class_profiler_factory import get_class_profiler
 from dbshx.utils.factories.instance_tracker_factory import get_instance_tracker
 from dbshx.utils.factories.class_shexer_factory import get_class_shexer
@@ -173,7 +173,7 @@ class Shaper(object):
 
     @staticmethod
     def _check_input_format(input_format):
-        if input_format not in [NT, TSV_SPO]:
+        if input_format not in [NT, TSV_SPO, N3, TURTLE, RDF_XML]:
             raise ValueError("Currently unsupported input format: " + input_format)
 
     @staticmethod
