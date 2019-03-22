@@ -13,7 +13,7 @@ class MultiRdfLibTripleYielder(BaseTriplesYielder):
         self._namespaces_to_ignore = namespaces_to_ignore
         self._allow_untyped_numbers = allow_untyped_numbers
         self._input_format = input_format
-        self._namespaces_dict = namespaces_dict if namespaces_dict is not None else None
+        self._namespaces_dict = namespaces_dict if namespaces_dict is not None else {}
 
         self._last_yielder = None
 

@@ -11,6 +11,8 @@ from dbshx.utils.uri import decide_literal_type
 
 _SUPPORTED_FORMATS = [N3, TURTLE, RDF_XML]
 
+_XML_WRONG_URI = "http://www.w3.org/XML/1998/namespace"
+
 class RdflibTripleYielder(BaseTriplesYielder):
 
     def __init__(self, input_format=TURTLE, source_file=None, namespaces_to_ignore=None, allow_untyped_numbers=False,
@@ -23,7 +25,8 @@ class RdflibTripleYielder(BaseTriplesYielder):
         self._namespaces_to_ignore = namespaces_to_ignore
         self._allow_untyped_numbers = allow_untyped_numbers
         self._raw_graph = raw_graph
-        self._namespaces_dict = namespaces_dict  # This object can be modified (and will be consumed externaly)
+        self._namespaces_dict = namespaces_dict if namespaces_dict is not None else {}
+                                              # This object can be modified (and will be consumed externaly)
                                               # when parse_namespaces in yiled_triples() is set to True
 
         self._triples_count = 0
@@ -65,7 +68,11 @@ class RdflibTripleYielder(BaseTriplesYielder):
                              "supposed to be a property: " + type(rdflib_obj) + " ( " + str(rdflib_obj) + " )")
 
     def _get_tmp_graph(self):
+        print "----"
         result = Graph()
+        for a_prefix_namespace_tuple in result.namespaces():
+            print a_prefix_namespace_tuple
+        print "----"
         if self._source_file is not None:
             result.parse(source=self._source_file, format=self._input_format)
         else:
@@ -78,6 +85,8 @@ class RdflibTripleYielder(BaseTriplesYielder):
         for a_prefix_namespace_tuple in a_graph.namespaces():
             candidate_uri = str(a_prefix_namespace_tuple[1])
             if candidate_uri not in namespaces_dict:
+                if candidate_uri == _XML_WRONG_URI:  # XML fix...
+                    candidate_uri += "/"             # XML fix...
                 namespaces_dict[candidate_uri] = str(a_prefix_namespace_tuple[0])
             # There is no else here. In case of conflict between the parsed content and the dict provided by the user,
             # the user's one have priority
