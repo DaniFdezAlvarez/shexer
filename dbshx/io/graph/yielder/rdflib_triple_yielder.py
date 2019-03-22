@@ -68,11 +68,7 @@ class RdflibTripleYielder(BaseTriplesYielder):
                              "supposed to be a property: " + type(rdflib_obj) + " ( " + str(rdflib_obj) + " )")
 
     def _get_tmp_graph(self):
-        print "----"
         result = Graph()
-        for a_prefix_namespace_tuple in result.namespaces():
-            print a_prefix_namespace_tuple
-        print "----"
         if self._source_file is not None:
             result.parse(source=self._source_file, format=self._input_format)
         else:
