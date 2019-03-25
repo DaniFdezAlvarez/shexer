@@ -1,5 +1,5 @@
+from dbshx.model.const_elem_types import IRI_ELEM_TYPE
 
-IRI_ELEM_TYPE = "IRI"
 
 class IRI(object):
 
@@ -21,3 +21,6 @@ class IRI(object):
         if type(other) != type(self):
             return False
         return str(self) == str(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
