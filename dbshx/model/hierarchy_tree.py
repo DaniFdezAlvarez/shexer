@@ -7,6 +7,19 @@ class HTree(object):
         str_value = hcontent.str_value
         if str_value not in self._node_index:
             self._node_index[str_value] = hcontent
+
+    def create_node_literal(self, literal_obj):
+        return HNode(hcontent=HLiteral(value=literal_obj),
+                     htree=self)
+
+    def create_node_IRI(self, iri_obj):
+        return HNode(hcontent=HIri(value=iri_obj),
+                     htree=self)
+
+    def create_node_macro(self, macro_obj):
+        return HNode(hcontent=HMacro(value=macro_obj),
+                     htree=self)
+
     @property
     def root(self):
         return self._root
