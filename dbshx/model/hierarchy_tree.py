@@ -1,12 +1,19 @@
 class HTree(object):
-    def __init__(self, root):
-        self._root = root  # HNode
+    def __init__(self):
+        self._root = None  # HNode
         self._node_index = {}
 
     def _subscribe_element(self, hcontent):
         str_value = hcontent.str_value
         if str_value not in self._node_index:
             self._node_index[str_value] = hcontent
+    @property
+    def root(self):
+        return self._root
+
+    @root.setter
+    def root(self, value):
+        self._root = value
 
     def contains_element(self, str_type):
         return str_type in self._node_index
@@ -28,8 +35,7 @@ class HNode(object):
         if str_child not in self._children:
             self._children[str_child] = child
             child._parents[self.str_value] = self  # Lets assume consistence
-        self._children.append(child)
-        child._parents.append(self)
+
 
     def add_parent(self, parent):
         str_parent = parent.str_value
