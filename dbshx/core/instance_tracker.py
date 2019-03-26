@@ -13,7 +13,7 @@ _RDFS_SUBCLASS_OF = Property(content="http://www.w3.org/2000/01/rdf-schema#subCl
 class InstanceTracker(object):
 
     def __init__(self, target_classes, triples_yielder, instantiation_property=_RDF_TYPE,
-                 all_classes_mode=False, subclass_property=_RDFS_SUBCLASS_OF):
+                 all_classes_mode=False, subclass_property=_RDFS_SUBCLASS_OF, track_hierarchies=True):
         self._instances_dict = self._build_instances_dict(target_classes, all_classes_mode)
         self._triples_yielder = triples_yielder
         self._instantiation_property = self._decide_instantiation_property(instantiation_property)
@@ -21,9 +21,10 @@ class InstanceTracker(object):
         self._not_relevant_triples = 0
         self._all_classes_mode = all_classes_mode
         self._subclass_property = subclass_property
+        self._track_hierarchies = track_hierarchies
 
-        self._htree = get_basic_h_tree()
-        self._classes_considered_in_htree = set()
+        self._htree = get_basic_h_tree() if track_hierarchies else None
+        self._classes_considered_in_htree = set() if track_hierarchies else None
 
     @property
     def relevant_triples(self):
@@ -39,13 +40,13 @@ class InstanceTracker(object):
 
     def track_instances(self):
         self._reset_count()
-        for a_revelant_triple in self._yield_instantiation_and_subclass_triples():
+        for a_revelant_triple in self._yield_relevant_triples():
             if self._is_an_instantiation_prop(a_revelant_triple[_P]):
                 self._anotate_instance(a_revelant_triple)
-            else:  # It is a subclass property
+            elif self._track_hierarchies :  # And it is a subclass property, for sure
                 self._anotate_subclass(a_revelant_triple)
-
-        self._anotate_direct_children_of_IRI()
+        if self._track_hierarchies:
+            self._anotate_direct_children_of_IRI()
 
         return self._instances_dict
 
@@ -82,7 +83,7 @@ class InstanceTracker(object):
         return self._htree.get_node_of_element(str_iri) if self._htree.contains_element(str_iri) \
             else self._htree.create_node_IRI(str_iri)
 
-    def _yield_instantiation_and_subclass_triples(self):
+    def _yield_relevant_triples(self):
         for a_triple in self._triples_yielder.yield_triples():
             if self._is_a_relevant_triple(a_triple):
                 self._relevant_triples += 1
@@ -96,7 +97,7 @@ class InstanceTracker(object):
 
         :return: bool
         """
-        if a_triple[_P] == self._subclass_property:
+        if self._track_hierarchies and a_triple[_P] == self._subclass_property:
             return True
         elif a_triple[_P] != self._instantiation_property:
             return False
