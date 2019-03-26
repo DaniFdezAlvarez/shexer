@@ -1,3 +1,5 @@
+from dbshx.model.const_elem_types import IRI_ELEM_TYPE, LITERAL_ELEM_TYPE, BNODE_ELEM_TYPE
+
 class HTree(object):
     def __init__(self):
         self._root = None  # HNode
@@ -28,12 +30,25 @@ class HTree(object):
     def root(self, value):
         self._root = value
 
+    @property
+    def iri_node(self):
+        return None if not self.contains_element(IRI_ELEM_TYPE) else self.get_node_of_element(IRI_ELEM_TYPE)
+
+    @property
+    def literal_node(self):
+        return None if not self.contains_element(LITERAL_ELEM_TYPE) else self.get_node_of_element(LITERAL_ELEM_TYPE)
+
+    @property
+    def bnode_node(self):
+        return None if not self.contains_element(BNODE_ELEM_TYPE) else self.get_node_of_element(BNODE_ELEM_TYPE)
+
     def contains_element(self, str_type):
         return str_type in self._node_index
 
     def get_node_of_element(self, str_type):
         return self._node_index[str_type]  # We could get a key violation error here. I decide to risk that
         # assuming that whoever calls this has checked contains_element()
+
 
 
 class HNode(object):
@@ -55,6 +70,12 @@ class HNode(object):
         if str_parent not in self._parents:
             self._parents[str_parent] = parent
             parent._children[self.str_value] = self  # Lets assume consistence
+
+    def has_parents(self):
+        if self._parents:
+            return True
+        return False
+
 
     @property
     def value(self):

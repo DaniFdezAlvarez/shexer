@@ -21,10 +21,9 @@ class InstanceTracker(object):
         self._not_relevant_triples = 0
         self._all_classes_mode = all_classes_mode
         self._subclass_property = subclass_property
-        self._target_properties = [instantiation_property, subclass_property]
 
         self._htree = get_basic_h_tree()
-
+        self._classes_considered_in_htree = set()
 
     @property
     def relevant_triples(self):
@@ -34,6 +33,10 @@ class InstanceTracker(object):
     def not_relevant_triples(self):
         return self._not_relevant_triples
 
+    @property
+    def htree(self):
+        return self._htree
+
     def track_instances(self):
         self._reset_count()
         for a_revelant_triple in self._yield_instantiation_and_subclass_triples():
@@ -41,21 +44,43 @@ class InstanceTracker(object):
                 self._anotate_instance(a_revelant_triple)
             else:  # It is a subclass property
                 self._anotate_subclass(a_revelant_triple)
+
+        self._anotate_direct_children_of_IRI()
+
         return self._instances_dict
+
+    def _anotate_direct_children_of_IRI(self):
+        for a_key_class in self._instances_dict:
+            self._classes_considered_in_htree.add(a_key_class)
+        iri_node = self._htree.iri_node
+        for a_key_class in self._classes_considered_in_htree:
+            a_class_node = self._get_appropiate_iri_node_and_add_to_htree_if_needed(a_key_class)
+            if not a_class_node.has_parents():
+                a_class_node.add_parent(iri_node)
+
 
     def _reset_count(self):
         self._relevant_triples = 0
         self._not_relevant_triples = 0
+        self._htree = get_basic_h_tree()
 
     def _anotate_instance(self, a_triple):
         self._instances_dict[a_triple[_O].iri].add(a_triple[_S].iri)
 
     def _anotate_subclass(self, a_triple):
-        str_subj = str(a_triple[_S])
-        str_obj = str(a_triple[_O])
-        if self._all_classes_mode:
-            pass  # TODO CONTINUE HERE! METHOD TO CREATE IRIS IN THE TREE IMPLEMENTED
+        str_s = str(a_triple[_S])
+        str_o = str(a_triple[_O])
 
+        subj_node = self._get_appropiate_iri_node_and_add_to_htree_if_needed(str_s)
+        obj_node = self._get_appropiate_iri_node_and_add_to_htree_if_needed(str_o)
+        subj_node.add_parent(obj_node)
+
+        self._classes_considered_in_htree.add(str_s)
+        self._classes_considered_in_htree.add(str_o)
+
+    def _get_appropiate_iri_node_and_add_to_htree_if_needed(self, str_iri):
+        return self._htree.get_node_of_element(str_iri) if self._htree.contains_element(str_iri) \
+            else self._htree.create_node_IRI(str_iri)
 
     def _yield_instantiation_and_subclass_triples(self):
         for a_triple in self._triples_yielder.yield_triples():
@@ -71,9 +96,11 @@ class InstanceTracker(object):
 
         :return: bool
         """
-        if a_triple[_P] not in self._target_properties:
+        if a_triple[_P] == self._subclass_property:
+            return True
+        elif a_triple[_P] != self._instantiation_property:
             return False
-        if self._all_classes_mode:
+        elif self._all_classes_mode:
             if a_triple[_O].iri not in self._instances_dict:
                 self._add_new_class_to_instances_dict(a_triple[_O].iri)
                 return True
