@@ -1,5 +1,4 @@
-BNODE_ELEM_TYPE = "BNode"
-
+from dbshx.model.const_elem_types import BNODE_ELEM_TYPE
 
 class BNode(object):
 

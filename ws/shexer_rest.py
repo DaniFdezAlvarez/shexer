@@ -152,7 +152,7 @@ def _parse_threshold(data, error_pool):
 
 def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                  infer_untyped_num, discard_useles_constraints, all_compliant,
-                 keep_less_specific, threshold, all_classes_mode):
+                 keep_less_specific, threshold, all_classes_mode, namespaces_dict):
     shaper = Shaper(target_classes=target_classes,
                     input_format=input_fotmat,
                     instantiation_property=instantiation_prop,
@@ -161,10 +161,19 @@ def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                     all_instances_are_compliant_mode=all_compliant,
                     keep_less_specific=keep_less_specific,
                     raw_graph=graph,
-                    all_classes_mode=all_classes_mode)
+                    all_classes_mode=all_classes_mode,
+                    namespaces_dict=namespaces_dict)
     result = shaper.shex_graph(aceptance_threshold=threshold, string_output=True)
     return _jsonize_response(result)
 
+################ Default namespace
+
+default_namespaces = {"http://www.w3.org/1999/02/22-rdf-syntax-ns#": "rdf",
+                      "http://www.w3.org/2000/01/rdf-schema#": "rdfs",
+                      "http://www.w3.org/2001/XMLSchema#": "xml",
+                      "http://www.w3.org/XML/1998/namespace/": "xml",
+                      "http://www.w3.org/2002/07/owl#" : "owl"
+                      }
 
 
 ################ WS
@@ -197,7 +206,8 @@ def shexer():
                                 all_compliant=all_compliant,
                                 keep_less_specific=keep_less_specific,
                                 threshold=threshold,
-                                all_classes_mode=all_classes_mode)
+                                all_classes_mode=all_classes_mode,
+                                namespaces_dict=default_namespaces)
         else:
            return _return_json_error_pool(error_pool)
 
