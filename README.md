@@ -6,6 +6,18 @@ Language: Python 2.7
 
 This repository contains a software prototype to perform induction of Shapes in an RDF Graph. 
 
+## Installation
+
+Shexer has some external dependencies listed in the files requirements.txt. You can install them all using pip:
+
+    $ pip install -r requirements.txt
+
+In case you are not planning to use the web service feature of this repo, you do not need to install the dependencies related to Flask.
+
+Shexer itself can be installed using pip as well:
+    
+    $ pip install rdflib
+
 ## Features
 The user must provide a list of classes (URIs). The prototype will track all their instances, explore the triples in which they appear, and build with that information a profile of the each class.
 The profile will be serialized into a Shape associated to the class. The results are serialized using Shape Expressions (ShEx).
