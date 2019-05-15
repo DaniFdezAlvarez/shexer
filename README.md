@@ -1,6 +1,6 @@
 # Shexer
 
-Try an online demo: [http://shexer.weso.es/](http://shexer.weso.es/)
+Try an online demo: [http://shexer.weso.es/](http://shexer.weso.es/) (and ping if you find this service down or you have any problem using it).
 
 Language: Python 2.7
 
