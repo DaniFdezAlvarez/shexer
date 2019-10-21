@@ -1,13 +1,14 @@
 import traceback
 from flask import Flask, request
 from flask_cors import CORS
-from dbshx.shaper import NT
-from dbshx.shaper import Shaper
+from shexer.consts import NT, RDF_TYPE
+from shexer.shaper import Shaper
+from shexer.utils.uri import remove_corners
 import json
 
 ################ CONFIG
 
-PORT = 5008
+PORT = 8080
 HOST = "0.0.0.0"
 MAX_LEN = 100000
 
@@ -15,7 +16,7 @@ MAX_LEN = 100000
 ################ PARAM NAMES
 
 TARGET_CLASSES_PARAM = "target_classes"
-TARGET_GRAPH_PARAM = "graph"
+TARGET_GRAPH_PARAM = "raw_graph"
 INPUT_FORMAT_PARAM = "input_format"
 INSTANTIATION_PROPERTY_PARAM = "instantiation_prop"
 NAMESPACES_TO_IGNORE_PARAM = "ignore"
@@ -25,6 +26,10 @@ ALL_INSTANCES_COMPLIANT_PARAM = "all_compliant"
 KEEP_LESS_SPECIFIC_PARAM = "keep_less_specific"
 ACEPTANCE_THRESHOLD_PARAM = "threshold"
 ALL_CLASSES_MODE_PARAM = "all_classes"
+SHAPE_MAP_PARAM = "shape_map"
+REMOTE_GRAPH_PARAM = "graph_url"
+ENDPOINT_GRAPH_PARAM = "endpoint"
+
 
 
 
@@ -51,14 +56,52 @@ def _missing_param_error(param):
     return "Missing mandatory param: " + param
 
 
+def _parse_endpoint_sparql(data, error_pool):
+    if ENDPOINT_GRAPH_PARAM not in data:
+        return None
+    if type(data[ENDPOINT_GRAPH_PARAM]) != str:
+        error_pool.append("You must provide a URL (string) in the field " + ENDPOINT_GRAPH_PARAM)
+        return None
+    return str(data[ENDPOINT_GRAPH_PARAM])
+
+
+def _parse_remote_graph(data, error_pool):
+    if REMOTE_GRAPH_PARAM not in data:
+        return None
+    if type(data[REMOTE_GRAPH_PARAM]) != str:
+        error_pool.append("You must provide a URL (string) in the field " + REMOTE_GRAPH_PARAM)
+        return None
+    return str(data[REMOTE_GRAPH_PARAM])
+
+
+def _parse_shape_map(data, error_pool):
+    if SHAPE_MAP_PARAM not in data:
+        return None
+    if type(data[SHAPE_MAP_PARAM]) != str:
+        error_pool.append("You must provide a string containing the shape map")
+        return
+    return str(data[SHAPE_MAP_PARAM])
+
+
+def _parse_namespaces_to_ignore(data, error_pool):
+    if NAMESPACES_TO_IGNORE_PARAM not in data:
+        return None
+    if type(data[NAMESPACES_TO_IGNORE_PARAM]) != list:
+        error_pool.append("You must provide a non-empty list of URIs (string) in " + NAMESPACES_TO_IGNORE_PARAM)
+        return None
+    if len(data[NAMESPACES_TO_IGNORE_PARAM]) == 0 or type(data[NAMESPACES_TO_IGNORE_PARAM][0]) != str:
+        error_pool.append("You must provide a non-empty list of URIs (string) in " + NAMESPACES_TO_IGNORE_PARAM)
+        return
+    return [str(a_uri) for a_uri in data[NAMESPACES_TO_IGNORE_PARAM]]
+
+
 def _parse_target_classes(data, error_pool):
     if TARGET_CLASSES_PARAM not in data:
-        error_pool.append(_missing_param_error(TARGET_CLASSES_PARAM))
-        return
+        return None
     if type(data[TARGET_CLASSES_PARAM]) != list:
         error_pool.append("You must provide a non-empty list of URIs (string) in " + TARGET_CLASSES_PARAM)
         return
-    if len(data[TARGET_CLASSES_PARAM]) == 0 or type(data[TARGET_CLASSES_PARAM][0]) != unicode:
+    if len(data[TARGET_CLASSES_PARAM]) == 0 or type(data[TARGET_CLASSES_PARAM][0]) != str:
         error_pool.append("You must provide a non-empty list of URIs (string) in " + TARGET_CLASSES_PARAM)
         return
     return [str(a_uri) for a_uri in data[TARGET_CLASSES_PARAM]]
@@ -66,13 +109,12 @@ def _parse_target_classes(data, error_pool):
 
 def _parse_graph(data, error_pool):
     if TARGET_GRAPH_PARAM not in data:
-        error_pool.append(_missing_param_error(TARGET_GRAPH_PARAM))
-        return
-    if type(data[TARGET_GRAPH_PARAM]) != unicode:
+        return None
+    if type(data[TARGET_GRAPH_PARAM]) != str:
         error_pool.append("You must provide a str containing an RDF graph ")
         return
     if len(data[TARGET_GRAPH_PARAM]) > MAX_LEN:
-        error_pool.append("The size of the graph is too big for this deployment. Introduce a graph using less than "
+        error_pool.append("The size of the graphic is too big for this deployment. Introduce a graph using less than "
                           + str(MAX_LEN) + " chars")
         return
     return str(data[TARGET_GRAPH_PARAM])
@@ -81,8 +123,8 @@ def _parse_graph(data, error_pool):
 def _parse_str_param(data, error_pool, key, default_value, opt_message=""):
     result = default_value
     if key in data:
-        if type(data[key]) == unicode:
-            result = str(data[key])
+        if type(data[key]) == str:
+            result = data[key]
         else:
             error_pool.append(key + " must be a str. " + opt_message)
             return
@@ -102,13 +144,15 @@ def _parse_bool_param(data, error_pool, key, default_value, opt_message=""):
 
 
 def _parse_input_format(data, error_pool):
-    return _parse_str_param(data=data, error_pool=error_pool, key=INPUT_FORMAT_PARAM, default_value="NT")
+    return _parse_str_param(data=data, error_pool=error_pool, key=INPUT_FORMAT_PARAM, default_value=NT)
 
 
 def _parse_instantiation_prop(data, error_pool):
-    return _parse_str_param(data=data, error_pool=error_pool, key=INSTANTIATION_PROPERTY_PARAM,
-                            default_value=NT,
-                            opt_message="The default value is rdf:type")
+    candidate = _parse_str_param(data=data, error_pool=error_pool, key=INSTANTIATION_PROPERTY_PARAM,
+                                 default_value=RDF_TYPE,
+                                 opt_message="The default value is rdf:type")
+    return remove_corners(a_uri=candidate,
+                          raise_error_if_no_corners=False)
 
 
 def _parse_infer_untyped_num(data, error_pool):
@@ -152,7 +196,8 @@ def _parse_threshold(data, error_pool):
 
 def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                  infer_untyped_num, discard_useles_constraints, all_compliant,
-                 keep_less_specific, threshold, all_classes_mode, namespaces_dict):
+                 keep_less_specific, threshold, all_classes_mode, namespaces_dict,
+                 namespaces_to_ignore, shape_map, remote_graph, endpoint_sparql):
     shaper = Shaper(target_classes=target_classes,
                     input_format=input_fotmat,
                     instantiation_property=instantiation_prop,
@@ -162,9 +207,47 @@ def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                     keep_less_specific=keep_less_specific,
                     raw_graph=graph,
                     all_classes_mode=all_classes_mode,
-                    namespaces_dict=namespaces_dict)
+                    namespaces_dict=namespaces_dict,
+                    namespaces_to_ignore=namespaces_to_ignore,
+                    shape_map_raw=shape_map,
+                    url_graph_input=remote_graph,
+                    url_endpoint=endpoint_sparql)
     result = shaper.shex_graph(aceptance_threshold=threshold, string_output=True)
     return _jsonize_response(result)
+
+
+def _check_combination_error_input_data(data, error_pool):
+    target_params = [TARGET_GRAPH_PARAM, REMOTE_GRAPH_PARAM, ENDPOINT_GRAPH_PARAM]
+    counter = 0
+    for elem in target_params:
+        if elem in data:
+
+            counter += 1
+    if counter != 1:
+        error_pool.append("You must provide exactly one of the following params: " + ", ".join(target_params) + ".")
+        return True
+    return False
+
+
+def _check_combination_error_target_shapes(data, error_pool, all_classes_mode):
+    target_params = [TARGET_CLASSES_PARAM, SHAPE_MAP_PARAM]
+    counter = 0
+    for elem in target_params:
+        if elem in data:
+            counter += 1
+    if counter == 1:
+        return False
+    if counter == 0 and ALL_CLASSES_MODE_PARAM in data and all_classes_mode == True:
+        return False
+    error_pool.append("Yoy must provide exactly one of " + ", ".join(target_params) + " or set " + ALL_CLASSES_MODE_PARAM + " to True")
+    return True
+
+def _check_all_classes_mode_uncompatibility(data, error_pool, all_classes_mode):
+    if all_classes_mode and ENDPOINT_GRAPH_PARAM in data and SHAPE_MAP_PARAM not in data:
+        error_pool.append("If you use all classes mode with input via endpoint, you must provide a shape map as well "
+                          "to let sheXer knows what part of the graph it should consider.")
+
+
 
 ################ Default namespace
 
@@ -185,7 +268,6 @@ def shexer():
     error_pool = []
     try:
         data = request.json
-        graph = _parse_graph(data, error_pool)
         input_fotmat = _parse_input_format(data, error_pool)
         instantiation_prop = _parse_instantiation_prop(data, error_pool)
         infer_untyped_num = _parse_infer_untyped_num(data, error_pool)
@@ -194,9 +276,30 @@ def shexer():
         keep_less_specific = _parse_keep_less_specific(data, error_pool)
         threshold = _parse_threshold(data, error_pool)
         all_classes_mode = _parse_all_classes_mode(data, error_pool)
-        target_classes = None if all_classes_mode else _parse_target_classes(data, error_pool)
+        namespaces_to_ignore = _parse_namespaces_to_ignore(data, error_pool)
+        target_classes = None
+        graph = None
+        shape_map = None
+        remote_graph = None
+        endpoint_sparql = None
+
+        err_input = _check_combination_error_input_data(data, error_pool)
+        if not err_input:
+            graph = _parse_graph(data, error_pool)
+            remote_graph = _parse_remote_graph(data, error_pool)
+            endpoint_sparql = _parse_endpoint_sparql(data, error_pool)
+
+        err_target = _check_combination_error_target_shapes(data, error_pool, all_classes_mode)
+        if not err_target:
+            target_classes = _parse_target_classes(data, error_pool)
+            shape_map = _parse_shape_map(data, error_pool)
+            _check_all_classes_mode_uncompatibility(data, error_pool, all_classes_mode)
+
+        # remote_graph = _parse_remote_graph(data, error_pool)
+        # endpoint_sparql = _parse_endpoint_sparql(data, error_pool)
 
         if len(error_pool) == 0:
+            #todo: Call shaper with the new params!
             return _call_shaper(target_classes=target_classes,
                                 graph=graph,
                                 input_fotmat=input_fotmat,
@@ -207,13 +310,17 @@ def shexer():
                                 keep_less_specific=keep_less_specific,
                                 threshold=threshold,
                                 all_classes_mode=all_classes_mode,
-                                namespaces_dict=default_namespaces)
+                                namespaces_dict=default_namespaces,
+                                endpoint_sparql=endpoint_sparql,
+                                shape_map=shape_map,
+                                remote_graph=remote_graph,
+                                namespaces_to_ignore=namespaces_to_ignore)
         else:
            return _return_json_error_pool(error_pool)
 
     except BaseException as e:
         traceback.print_exc()
-        error_pool.append(e.message)
+        error_pool.append("Internal unexpected server error: " + str(e))
         return _return_json_error_pool(error_pool)
 
 CORS(app)
