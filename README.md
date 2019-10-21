@@ -1,10 +1,23 @@
 # Shexer
 
-Try an online demo: [http://shexer.weso.es/](http://shexer.weso.es/)
+Try an online demo: [http://shexer.weso.es/](http://shexer.weso.es/) (and ping if you find this service down or you have any problem using it).
 
-Language: Python 2.7
-
+Language: Python 3.5
 This repository contains a software prototype to perform induction of Shapes in an RDF Graph. 
+
+There is a [Shexer for Python 2.7](https://github.com/DaniFdezAlvarez/shexer). However, 2.7 version may not be maintained.
+
+## Installation
+
+Shexer has some external dependencies listed in the files requirements.txt. You can install them all using pip:
+
+    $ pip install -r requirements.txt
+
+In case you are not planning to use the web service feature of this repo, you do not need to install the dependencies related to Flask.
+
+Shexer itself can be installed using pip as well:
+    
+    $ pip install shexer
 
 ## Features
 The user must provide a list of classes (URIs). The prototype will track all their instances, explore the triples in which they appear, and build with that information a profile of the each class.
@@ -30,7 +43,7 @@ In the folder [experiments](https://github.com/DaniFdezAlvarez/dbpedia-shexer/tr
 The following code is handy for analyzing a) a file containing class-instance relations and b) a set of files containing the whole content of an RDF graph. It serializes a profile of each class in JSON and the inferred shapes in ShEx.
 
 ```python
-from dbshx.shaper import Shaper
+from shexer.shaper import Shaper
 
 target_classes = [
     "http://example.org/Person",
@@ -55,7 +68,7 @@ shaper = Shaper(target_classes=target_classes,
 shaper.shex_graph(output_file=shex_target_file,
                   aceptance_threshold=0.1)
 
-print "Done!"
+print("Done!")
 
 ```
 
