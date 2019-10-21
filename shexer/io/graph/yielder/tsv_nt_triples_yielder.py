@@ -35,8 +35,8 @@ class TsvNtTriplesYielder(BaseTriplesYielder):
                     except ValueError as ve:
                         log_to_error(msg=ve.message + "This line caused error: " + a_line,
                                      source=self._source_file)
-                    if self._triples_count % 10000 == 0:
-                        print("Reading..." + self._triples_count)
+                    # if self._triples_count % 10000 == 0:
+                    #     print("Reading..." + self._triples_count)
 
     def _look_for_tokens(self, str_line):
         return str_line.split("\t")
