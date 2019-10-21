@@ -33,7 +33,6 @@ def query_endpoint_single_variable(endpoint_url, str_query, variable_id, max_ret
                 result.append(row[variable_id][_VALUE_KEY])
             return result
         except (HTTPError, EndPointInternalError) as e:
-            print(e)
             max_retries -= 1
             sleep(sleep_time)
             last_error = e
@@ -62,7 +61,6 @@ def query_endpoint_po_of_an_s(endpoint_url, str_query, p_id, o_id, max_retries=5
                 result.append((p_value, o_value))
             return result
         except (HTTPError, EndPointInternalError) as e:
-            print(e)
             max_retries -= 1
             sleep(sleep_time)
             last_error = e
