@@ -5,8 +5,6 @@ Try an online demo: [http://shexer.weso.es/](http://shexer.weso.es/) (and ping i
 Language: Python 3.5
 This repository contains a software prototype to perform induction of Shapes in an RDF Graph. 
 
-There is a [Shexer for Python 2.7](https://github.com/DaniFdezAlvarez/shexer). However, 2.7 version may not be maintained.
-
 ## Installation
 
 Shexer has some external dependencies listed in the files requirements.txt. You can install them all using pip:
