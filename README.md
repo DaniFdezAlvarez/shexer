@@ -18,18 +18,18 @@ Shexer itself can be installed using pip as well:
     $ pip install shexer
 
 ## Features
-The user must provide a list of classes (URIs). The prototype will track all their instances, explore the triples in which they appear, and build with that information a profile of the each class.
-The profile will be serialized into a Shape associated to the class. The results are serialized using Shape Expressions (ShEx).
+This library can be used to perform automatic extraction of shape expressions for a target RDF grpah. Main features:
 
-* Free input. The prototype has been thought to be used against DBpedia, but the process of tracking the information is independent of the process of class profiling. Currently, some parsers to work with local file sin n-triples format are provided, but any other parser (or API consumer, DAO...) can be implemented to feed the class profiler.
-* ShEx. Each class produce a Shape composed by a set of triple constrainst. The Shape in compilant with the current expecification of ShEx2.
+* Several ways to provide the input data, consisting of a target graph and some target shapes. Tha graph can be provided via a raw string content, local/remote files or tracking on the fly some triples from a SPARQL endpoint. There are defined interfaces in case you want to implement some other way to provide this information. Targte shapes cna be selected by just picking some/all classes in the graph, in which case their respective instances will be used to extract the shape, or with custom node agrupations associated via shape maps.
+* Valid ShEx. The produced shapes are compilant with the current expecification of ShEx2.
 * Score of thrustworthines. Every triple constraint is serialized associated to one or more comments. In the comments there is information about how many of the instances of a given class actually conform to the inferred triple constraint.
-* Threshold of tolerance. All the triples found for any isntance of a given class have an effect on the in-memory class profile of that class. However, the prototype can be configured to serialize constraints with a minimun configurable score of trustworthiness.
-* Literals and IRIs recognition. All kinds of literals are recognized and treated separately when inferring the constraints. In case a literal is not explicitly associated with a type in the original KG, xsd:string is used by default. When the object of a triple is an IRI, the macro IRI is used.
-* Special treatment of rdf:type. The only exception to the previous feature happens when analyzing triples whose predicate is rdf:type. In those cases, if the object is an IRI, we create a triple constraint whose object is a value set containing a single element, which is the actual object of the original triple.
+* Threshold of tolerance. The constraints inferred for each shape may not be compatible with every node associated to the shapes (except constraints with Kleene closure). With this threshold you can indicate the minimun percentage of nodes that should conform with a constraint c. If c does not reach the indicated ratio, its associated information will not appear in the fina shape.
+* Literals recognition. All kinds of literals are recognized and treated separately when inferring the constraints. In case a literal is not explicitly associated with a type in the original KG, xsd:string is used by default. By default, when it finds an untyped literal shexer may try to infer its type in case it is a number. Support to some other literals, such as geolocated points, will be included in future releases.
+* Shapes interlinkage: sheXer is able to detect links between nodes in target shapes. If that's the case, it will create constraints relating the shapes. If it detects triples whose object is a node which dos not belong to any other shape, then it will use the macro IRI instead.
+* Special treatment of rdf:type (or the specified instantiation property). The only exception to the previous feature happens when analyzing triples whose predicate is rdf:type. In those cases, if the object is an IRI, we create a triple constraint whose object is a value set containing a single element, which is the actual object of the original triple.
 * Cardinality management. Some of the triples of a given instance may fit in an infinite number of constraint triples with the same predicate and object but different cardinality. For example, if a given instance has a single label specified by rdfs:label, that makes it fit with infinite triple constraints with the schema {rdfs:label xsd:string C}, where C can be any cardinality that includes the posibility of a single occurrence: {1}, + , {1,2}, {1,3}, {1,4},... Currently, our prototype just keeps rules with exact cardinality or + closure. 
 * Configurable priority of cardinalities. Our prototype can be configured to prioritize the less specific cardinality or the most specific one if its trustworthiness is high enough.
-* Shapes interlinkage. Shapes can point to some other shapes within its triple constraints.
+
 
 ## Experimental results
 
@@ -70,7 +70,7 @@ print("Done!")
 
 ```
 
-## Class Shaper
+## The Class Shaper
 
 Most of the features provided by this software are reachable using the class Shaper. As it is shown in the previous example code, one must get an instance of Shaper with some params and execute a method to perform the schema inference.
 
