@@ -48,7 +48,7 @@ target_classes = [
     "http://example.org/Place"
 ]
 
-output_file = "shaper_example.shex"
+shex_target_file = "shaper_example.shex"
 
 namespaces_dict = {"http://www.w3.org/1999/02/22-rdf-syntax-ns#": "rdf",
                    "http://example.org/": "foo"
