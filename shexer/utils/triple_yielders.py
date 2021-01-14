@@ -23,9 +23,10 @@ def check_if_property_belongs_to_namespace_list(str_prop, namespaces):
     return False
 
 
-def tune_subj(a_token):
+def tune_subj(a_token, raise_error_if_no_corners=True):
     if a_token.startswith("<"):
-        return IRI(remove_corners(a_token))
+        return IRI(remove_corners(a_uri=a_token,
+                                  raise_error_if_no_corners=raise_error_if_no_corners))
     elif a_token.startswith('"'):
         content, elem_type = parse_literal(a_token)
         return Literal(content=content,
@@ -41,9 +42,10 @@ def tune_subj(a_token):
                        elem_type=elem_type)
 
 
-def tune_token(a_token, allow_untyped_numbers=False):
+def tune_token(a_token, allow_untyped_numbers=False, raise_error_if_no_corners=True):
     if a_token.startswith("<"):
-        return IRI(remove_corners(a_token))
+        return IRI(remove_corners(a_uri=a_token,
+                                  raise_error_if_no_corners=raise_error_if_no_corners))
     elif a_token.startswith('"'):
         content, elem_type = parse_literal(a_token)
         return Literal(content=content,
@@ -73,5 +75,6 @@ def _is_integer(float_number):
         return True
     return False
 
-def tune_prop(a_token):
-    return Property(remove_corners(a_token))
+def tune_prop(a_token, raise_error_if_no_corners=True):
+    return Property(remove_corners(a_uri=a_token,
+                                   raise_error_if_no_corners=raise_error_if_no_corners))

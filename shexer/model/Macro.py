@@ -6,6 +6,8 @@ _VALID_MACROS = [IRI_ELEM_TYPE, LITERAL_ELEM_TYPE, DOT_ELEM_TYPE, BNODE_ELEM_TYP
 class Macro(object):
     def __init__(self, macro_const):
         if macro_const not in _VALID_MACROS:
+            # print(_VALID_MACROS)
+            # print(macro_const == DOT_ELEM_TYPE)
             raise ValueError("Not recognized macro: " + macro_const)
         self._macro_representation = macro_const
 

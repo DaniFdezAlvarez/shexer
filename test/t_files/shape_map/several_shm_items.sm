@@ -1,0 +1,2 @@
+{FOCUS a foaf:Person}  @ <Person>
+{FOCUS a foaf:Document} @ <Document>

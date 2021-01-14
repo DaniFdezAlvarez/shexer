@@ -1,4 +1,4 @@
-from shexer.consts import NT, FIXED_SHAPE_MAP
+from shexer.consts import NT, FIXED_SHAPE_MAP, SHAPES_DEFAULT_NAMESPACE
 from shexer.utils.factories.triple_yielders_factory import get_triple_yielder, tune_target_classes_if_needed, \
     read_target_classes_from_file
 from shexer.core.instances.instance_tracker import InstanceTracker
@@ -8,25 +8,33 @@ from shexer.utils.factories.iri_factory import create_IRIs_from_string_list
 from shexer.utils.factories.shape_map_parser_factory import get_shape_map_parser
 from shexer.model.graph.endpoint_sgraph import EndpointSGraph
 from shexer.model.graph.rdflib_sgraph import RdflibSgraph
+from shexer.utils.dict import reverse_keys_and_values
 
 
 def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                          graph_list_of_files_input=None, target_classes=None,
                          file_target_classes=None, input_format=NT,
                          instantiation_property=None,
+                         infer_numeric_types_for_untyped_literals=None,
                          namespaces_to_ignore=None,
                          raw_graph=None,
                          all_classes_mode=False,
                          namespaces_dict=None,
                          url_input=None,
                          list_of_url_input=None,
+                         rdflib_graph=None,
                          shape_map_file=None,
                          shape_map_raw=None,
                          shape_map_format=FIXED_SHAPE_MAP,
                          track_classes_for_entities_at_last_depth_level=True,
                          depth_for_building_subgraph=1,
                          url_endpoint=None,
-                         strict_syntax_with_corners=False
+                         strict_syntax_with_corners=False,
+                         namespaces_for_qualifier_props=None,
+                         shape_qualifiers_mode=False,
+                         built_remote_graph=None,
+                         built_shape_map=None,
+                         shapes_namespace=SHAPES_DEFAULT_NAMESPACE
                          ):
     """
 
@@ -45,13 +53,19 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
     :param list_of_url_input:
     :param shape_map_file:
     :param shape_map_raw:
+    :param shape_map_format:
     :param track_classes_for_entities_at_last_depth_level:
     :param depth_for_building_subgraph:
     :param url_endpoint:
     :param strict_syntax_with_corners:
+    :param namespaces_for_qualifier_props:
+    :param shape_qualifiers_mode:
+    :param built_remote_graph:
+    :param built_shape_map:
     :return:
     """
 
+    prefix_namespaces_dict = reverse_keys_and_values(namespaces_dict)
     instance_yielder = None
     if instances_file_input is not None:
         instance_yielder = get_triple_yielder(source_file=instances_file_input,
@@ -59,17 +73,22 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                                               namespaces_to_ignore=namespaces_to_ignore,
                                               raw_graph=raw_graph,
                                               namespaces_dict=namespaces_dict,
+                                              allow_untyped_numbers=infer_numeric_types_for_untyped_literals,
                                               url_input=url_input,
                                               list_of_url_input=list_of_url_input,
+                                              rdflib_graph=rdflib_graph,
                                               instantiation_property=instantiation_property,
                                               shape_map_file=shape_map_file,
                                               shape_map_raw=shape_map_raw,
-                                              track_classes_for_entities_at_last_depth_level=track_classes_for_entities_at_last_depth_level,
+                                              track_classes_for_entities_at_last_depth_level=
+                                              track_classes_for_entities_at_last_depth_level,
                                               depth_for_building_subgraph=depth_for_building_subgraph,
                                               url_endpoint=url_endpoint,
                                               strict_syntax_with_corners=strict_syntax_with_corners,
                                               target_classes=target_classes,
-                                              file_target_classes=file_target_classes
+                                              file_target_classes=file_target_classes,
+                                              built_remote_graph=built_remote_graph,
+                                              built_shape_map=built_shape_map
                                               )
     else:
         instance_yielder = get_triple_yielder(source_file=graph_file_input,
@@ -78,8 +97,10 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                                               namespaces_to_ignore=namespaces_to_ignore,
                                               raw_graph=raw_graph,
                                               namespaces_dict=namespaces_dict,
+                                              allow_untyped_numbers=infer_numeric_types_for_untyped_literals,
                                               url_input=url_input,
                                               list_of_url_input=list_of_url_input,
+                                              rdflib_graph=rdflib_graph,
                                               instantiation_property=instantiation_property,
                                               shape_map_file=shape_map_file,
                                               shape_map_raw=shape_map_raw,
@@ -88,7 +109,9 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                                               url_endpoint=url_endpoint,
                                               strict_syntax_with_corners=strict_syntax_with_corners,
                                               target_classes=target_classes,
-                                              file_target_classes=file_target_classes
+                                              file_target_classes=file_target_classes,
+                                              built_remote_graph=built_remote_graph,
+                                              built_shape_map=built_shape_map
                                               )
 
     selectors_tracker = None
@@ -99,35 +122,46 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                                       raw_graph=raw_graph,
                                       graph_file_input=graph_file_input,
                                       url_input=url_input,
-                                      graph_format=input_format)
-        shape_map_parser = get_shape_map_parser(format=shape_map_format,
-                                                sgraph=sgraph,
-                                                namespaces_prefix_dict=namespaces_dict)
-        selectors_tracker = ShapeMapInstanceTracker(shape_map=shape_map_parser.parse_shape_map(source_file=shape_map_file,
-                                                                                               raw_content=shape_map_raw))
-    if _are_there_some_target_classes(target_classes, file_target_classes, all_classes_mode):
+                                      graph_format=input_format,
+                                      built_remote_graph=built_remote_graph)
+        valid_shape_map = built_shape_map
+        if built_shape_map is None:
+            shape_map_parser = get_shape_map_parser(format=shape_map_format,
+                                                    sgraph=sgraph,
+                                                    namespaces_prefix_dict=namespaces_dict)
+            valid_shape_map = shape_map_parser.parse_shape_map(source_file=shape_map_file,
+                                                               raw_content=shape_map_raw)
+        selectors_tracker = ShapeMapInstanceTracker(shape_map=valid_shape_map)
+    if _are_there_some_target_classes(target_classes, file_target_classes, all_classes_mode, shape_qualifiers_mode):
         model_classes = None
-        if not all_classes_mode:
+        if file_target_classes or target_classes is not None:
             list_of_str_target_classes = tune_target_classes_if_needed(
-                target_classes) if target_classes is not None else read_target_classes_from_file(file_target_classes)
+                list_target_classes=target_classes,
+                prefix_namespaces_dict=prefix_namespaces_dict) if target_classes is not None else read_target_classes_from_file(
+                file_target_classes=file_target_classes,
+                prefix_namespaces_dict=prefix_namespaces_dict)
             model_classes = get_list_of_model_classes(list_of_str_target_classes)
 
         pure_instances_tracker = InstanceTracker(target_classes=model_classes,
                                                  triples_yielder=instance_yielder,
                                                  instantiation_property=instantiation_property,
                                                  all_classes_mode=all_classes_mode,
-                                                 track_hierarchies=False)
+                                                 track_hierarchies=False,
+                                                 namespaces_for_qualifier_props=namespaces_for_qualifier_props,
+                                                 shape_qualifiers_mode=shape_qualifiers_mode,
+                                                 shapes_namespace=shapes_namespace)
 
     return _decide_tracker_to_return(selectors_tracker, pure_instances_tracker)
 
 
-def _get_adequate_sgraph(endpoint_url, graph_file_input, url_input, graph_format, raw_graph):
+def _get_adequate_sgraph(endpoint_url, graph_file_input, url_input, graph_format, raw_graph, built_remote_graph):
     if endpoint_url is not None:
-        return EndpointSGraph(endpoint_url=endpoint_url)
+        return built_remote_graph if built_remote_graph is not None else EndpointSGraph(endpoint_url=endpoint_url)
     else:
         return RdflibSgraph(source_file=graph_file_input if graph_file_input is not None else url_input,
                             raw_graph=raw_graph,
                             format=graph_format)
+
 
 def _decide_tracker_to_return(selectors_tracker, pure_instances_tracker):
     if selectors_tracker is not None and pure_instances_tracker is not None:
@@ -141,14 +175,11 @@ def _are_there_selectors(shape_map_file, shape_map_raw):
     return True
 
 
-def _are_there_some_target_classes(target_classes, file_target_classes, all_classes_mode):
-    if target_classes is None and file_target_classes is None and not all_classes_mode:
+def _are_there_some_target_classes(target_classes, file_target_classes, all_classes_mode, shape_qualifiers_mode):
+    if target_classes is None and file_target_classes is None and not all_classes_mode and not shape_qualifiers_mode:
         return False
     return True
 
 
 def get_list_of_model_classes(list_of_str_target_classes):
     return create_IRIs_from_string_list(list_of_str_target_classes)
-
-
-

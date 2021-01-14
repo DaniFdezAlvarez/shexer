@@ -1,0 +1,137 @@
+[
+  {
+    "@id": "http://example.org/Bella",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Person"
+    ],
+    "http://xmlns.com/foaf/0.1/age": [
+      {
+        "@value": 56
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/name": [
+      {
+        "@value": "Isabella"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.org/David",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Person"
+    ],
+    "http://xmlns.com/foaf/0.1/name": [
+      {
+        "@value": "David"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/familyName": [
+      {
+        "@value": "Doulofeau"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/knows": [
+      {
+        "@id": "http://example.org/Sarah"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.org/HumanLike",
+    "http://xmlns.com/foaf/0.1/name": [
+      {
+        "@value": "Person"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/familyName": [
+      {
+        "@value": "Maybe"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/age": [
+      {
+        "@value": 99
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/knows": [
+      {
+        "@id": "http://example.org/David"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.org/Jimmy",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Person"
+    ],
+    "http://xmlns.com/foaf/0.1/age": [
+      {
+        "@value": 23
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/name": [
+      {
+        "@value": "Jimmy"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/familyName": [
+      {
+        "@value": "Jones"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.org/Sarah",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Person"
+    ],
+    "http://xmlns.com/foaf/0.1/age": [
+      {
+        "@value": 22
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/name": [
+      {
+        "@value": "Sarah"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/familyName": [
+      {
+        "@value": "Salem"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.org/x1",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Document"
+    ],
+    "http://xmlns.com/foaf/0.1/depiction": [
+      {
+        "@value": "A thing that s nice"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/title": [
+      {
+        "@value": "A nice thing"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.org/x2",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Document"
+    ],
+    "http://xmlns.com/foaf/0.1/title": [
+      {
+        "@value": "Another thing"
+      }
+    ]
+  },
+  {
+    "@id": "http://xmlns.com/foaf/0.1/Document"
+  },
+  {
+    "@id": "http://xmlns.com/foaf/0.1/Person"
+  }
+]

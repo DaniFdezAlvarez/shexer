@@ -1,3 +1,7 @@
+POSITIVE_CLOSURE = "+"
+KLEENE_CLOSURE = "*"
+OPT_CARDINALITY = "?"
+
 class Statement(object):
 
     def __init__(self, st_property, st_type, cardinality, probability,
@@ -29,6 +33,9 @@ class Statement(object):
             self._comments.append(comment)
         else:
             self._comments.insert(0, comment)
+
+    def remove_comments(self):
+        self._comments = []
 
 
 

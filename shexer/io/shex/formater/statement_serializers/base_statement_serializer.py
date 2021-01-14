@@ -1,15 +1,15 @@
 from shexer.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, \
-    COMMENT_INI, TARGET_LINE_LENGHT, SPACES_GAP_FOR_FREQUENCY, KLEENE_CLOSURE, POSITIVE_CLOSURE
+    COMMENT_INI, TARGET_LINE_LENGHT, SPACES_GAP_FOR_FREQUENCY, KLEENE_CLOSURE, POSITIVE_CLOSURE, OPT_CARDINALITY
 from shexer.model.IRI import IRI_ELEM_TYPE
 from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
-
+from shexer.utils.shapes import prefixize_shape_name_if_possible
 
 
 class BaseStatementSerializer(object):
 
-    def __init__(self, instantiation_property_str):
+    def __init__(self, instantiation_property_str, disable_comments=False):
         self._instantiation_property_str = instantiation_property_str
-
+        self._disable_comments = disable_comments
 
     def serialize_statement_with_indent_level(self, a_statement, is_last_statement_of_shape, namespaces_dict):
         tuples_line_indent = []
@@ -24,7 +24,7 @@ class BaseStatementSerializer(object):
         result = st_property + SPACES_GAP_BETWEEN_TOKENS + st_target_element + SPACES_GAP_BETWEEN_TOKENS + \
                  cardinality + BaseStatementSerializer.closure_of_statement(is_last_statement_of_shape)
 
-        if a_statement.cardinality != KLEENE_CLOSURE:
+        if a_statement.cardinality not in [KLEENE_CLOSURE, OPT_CARDINALITY] and not self._disable_comments:
             result += BaseStatementSerializer.adequate_amount_of_final_spaces(result)
             result += BaseStatementSerializer.probability_representation(a_statement.probability)
         tuples_line_indent.append((result, 1))
@@ -33,7 +33,6 @@ class BaseStatementSerializer(object):
             tuples_line_indent.append((a_comment, 4))
 
         return tuples_line_indent
-
 
     def str_of_target_element(self, target_element, st_property, namespaces_dict):
         """
@@ -46,43 +45,63 @@ class BaseStatementSerializer(object):
             return "[" + BaseStatementSerializer.tune_token(target_element, namespaces_dict) + "]"
         return BaseStatementSerializer.tune_token(target_element, namespaces_dict)
 
-
     @staticmethod
     def tune_token(a_token, namespaces_dict):
         # TODO:  a lot to correct here for normal behaviour
-        if a_token == IRI_ELEM_TYPE: # iri
-            return a_token
         if a_token.startswith(STARTING_CHAR_FOR_SHAPE_NAME):  # Shape
-            return "@:" + a_token.replace(STARTING_CHAR_FOR_SHAPE_NAME, "")
-
-        for a_namespace in namespaces_dict:  # Prefixed element (all literals are prefixed elements)
-            if a_namespace in a_token:
-                return a_token.replace(a_namespace, namespaces_dict[a_namespace] + ":")
+            # return STARTING_CHAR_FOR_SHAPE_NAME +":" + a_token.replace(STARTING_CHAR_FOR_SHAPE_NAME, "")
+            return STARTING_CHAR_FOR_SHAPE_NAME \
+                   + prefixize_shape_name_if_possible(a_shape_name=a_token,
+                                                      namespaces_prefix_dict=namespaces_dict)
+        if a_token == IRI_ELEM_TYPE:  # iri
+            return a_token
+        if ":" not in a_token:
+            if "<" in a_token:
+                return STARTING_CHAR_FOR_SHAPE_NAME + a_token
+            else:
+                return STARTING_CHAR_FOR_SHAPE_NAME + "<" + a_token + ">"
+        candidate_prefixed = BaseStatementSerializer._prefixize_uri_if_possible(uri=a_token,
+                                                                                namespaces_dict=namespaces_dict)
+        if candidate_prefixed is not None:
+            return candidate_prefixed
 
         return "<" + a_token + ">"  # Complete URIs
 
+    @staticmethod
+    def _prefixize_uri_if_possible(uri, namespaces_dict):
+        """
+        It returns None it it doesnt find an adequate prefix
+
+        :param uri:
+        :param namespaces_dict:
+        :return:
+        """
+        best_match = None
+        for a_namespace in namespaces_dict:  # Prefixed element (all literals are prefixed elements)
+            if uri.startswith(a_namespace):
+                if best_match is None or len(best_match) < len(a_namespace):
+                    best_match = a_namespace
+
+        return None if best_match is None else uri.replace(best_match, namespaces_dict[best_match] + ":")
 
     @staticmethod
     def probability_representation(probability):
         return COMMENT_INI + str(probability * 100) + " %"
 
-
     @staticmethod
     def cardinality_representation(cardinality, statement, out_of_comment=False):
         if out_of_comment and statement.cardinality == 1:
             return ""
-        if cardinality in [POSITIVE_CLOSURE, KLEENE_CLOSURE]:
+        if cardinality in [POSITIVE_CLOSURE, KLEENE_CLOSURE, OPT_CARDINALITY]:
             return cardinality
         else:
             return "{" + str(cardinality) + "}"
-
 
     @staticmethod
     def closure_of_statement(is_last_statement):
         if is_last_statement:
             return ""
         return ";"
-
 
     @staticmethod
     def adequate_amount_of_final_spaces(current_line):

@@ -1,5 +1,5 @@
 from shexer.io.graph.yielder.multifile_base_triples_yielder import MultifileBaseTripleYielder
-from shexer.io.graph.yielder.rdflib_triple_yielder import RdflibTripleYielder
+from shexer.io.graph.yielder.rdflib_triple_yielder import RdflibParserTripleYielder
 from shexer.consts import TURTLE
 
 
@@ -18,9 +18,9 @@ class MultiRdfLibTripleYielder(MultifileBaseTripleYielder):
             yield a_triple
 
     def _constructor_file_yielder(self, a_source_file):
-        return RdflibTripleYielder(source=a_source_file,
-                                   allow_untyped_numbers=self._allow_untyped_numbers,
-                                   input_format=self._input_format)
+        return RdflibParserTripleYielder(source=a_source_file,
+                                         allow_untyped_numbers=self._allow_untyped_numbers,
+                                         input_format=self._input_format)
 
     @property
     def namespaces(self):

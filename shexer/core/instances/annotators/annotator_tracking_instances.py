@@ -6,19 +6,19 @@ class AnnotatorTrackingInstances(BaseAnnotator):
     def __init__(self, instance_tracker):
         super().__init__(instance_tracker)
 
-    def anotate_triple(self, a_triple):
+    def annotate_triple(self, a_triple):
         if self._instance_tracker.is_subclass_property(a_triple[_P]):
-            self._anotate_subclass(a_triple)
+            self._annotate_subclass(a_triple)
         else:
-            super().anotate_triple(a_triple)
+            super().annotate_triple(a_triple)
 
     def is_relevant_triple(self, a_triple):
         if a_triple[_P] == self._subclass_property:
             return True
         else:
-            return super().anotate_triple(a_triple)
+            return super().annotate_triple(a_triple)
 
-    def anotation_post_parsing(self):
+    def annotation_post_parsing(self):
         for a_key_class in self._instances_dict:
             self._classes_considered_in_htree.add(a_key_class)
         iri_node = self._htree.iri_node
@@ -31,7 +31,7 @@ class AnnotatorTrackingInstances(BaseAnnotator):
         return self._htree.get_node_of_element(str_iri) if self._htree.contains_element(str_iri) \
             else self._htree.create_node_IRI(str_iri)
 
-    def _anotate_subclass(self, a_triple):
+    def _annotate_subclass(self, a_triple):
         str_s = str(a_triple[_S])
         str_o = str(a_triple[_O])
 
