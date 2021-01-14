@@ -1,0 +1,524 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xml: <http://www.w3.org/XML/1998/namespace>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX schema: <http://schema.org/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
+PREFIX pqv: <http://www.wikidata.org/prop/qualifier/value/>
+PREFIX psn: <http://www.wikidata.org/prop/statement/value-normalized/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wdtn: <http://www.wikidata.org/prop/direct-normalized/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX : <http://weso.es/shapes/>
+
+<Virus>
+{
+   rdfs:label  rdf:langString  {140};
+   skos:altLabel  rdf:langString  {302};
+   schema:dateModified  xsd:string  ;
+   p:P1889  @:P1889  {5};
+   p:P2975  @:P2975  {10};
+   wdt:P486  xsd:string  ;
+   wdt:P2143  xsd:string  ;
+   wdt:P2975  IRI  {9};
+   p:P2572  @:P2572  {4};
+   schema:description  rdf:langString  {61};
+   wdt:P5337  xsd:string  ;
+   p:P7329  @:P7329  ;
+   p:P4628  @:P4628  ;
+   p:P105  @:P105  ;
+   p:P227  @:P227  ;
+   wdt:P1604  IRI  ;
+   wdtn:P227  IRI  ;
+   wdt:P6900  xsd:string  ;
+   p:P31  @:P31  {2};
+   wdt:P1605  xsd:string  ;
+   wdt:P1813  rdf:langString  ;
+   p:P129  @:P129  ;
+   wdt:P5806  xsd:string  ;
+   p:P1813  @:P1813  ;
+   wdt:P527  IRI  {5};
+   wdtn:P685  IRI  ;
+   wdt:P1889  IRI  {5};
+   p:P1542  @:P1542  {2};
+   p:P279  @:P279  ;
+   wdt:P973  IRI  {2};
+   p:P527  @:P527  {5};
+   wdt:P1036  xsd:string  ;
+   wdt:P10  IRI  ;
+   p:P973  @:P973  {2};
+   p:P6104  @:P6104  ;
+   wikibase:sitelinks  xsd:string  ;
+   wdt:P7807  xsd:string  ;
+   wdt:P2572  xsd:string  {4};
+   p:P5806  @:P5806  ;
+   p:P268  @:P268  ;
+   p:P10  @:P10  ;
+   wdt:P227  xsd:string  ;
+   wdt:P838  xsd:string  ;
+   p:P910  @:P910  ;
+   wdt:P171  IRI  ;
+   p:P7807  @:P7807  ;
+   wdt:P3471  xsd:string  ;
+   wdt:P6694  xsd:string  ;
+   p:P1992  @:P1992  ;
+   wdt:P2671  xsd:string  ;
+   wdt:P6104  IRI  ;
+   p:P1605  @:P1605  {3};
+   wdt:P8309  xsd:string  ;
+   wdt:P279  IRI  ;
+   schema:version  xsd:string  ;
+   p:P685  @:P685  ;
+   p:P1036  @:P1036  ;
+   wdt:P1542  IRI  {2};
+   wdt:P189  IRI  ;
+   p:P18  @:P18  {3};
+   wdtn:P486  IRI  ;
+   wdt:P31  [wd:Q75913269]  ;
+   wdt:P31  [wd:Q855769]  ;
+   wdt:P138  IRI  ;
+   wdt:P7329  xsd:string  ;
+   p:P1604  @:P1604  ;
+   wdt:P268  xsd:string  ;
+   p:P838  @:P838  ;
+   wdtn:P268  IRI  ;
+   wdt:P129  IRI  ;
+   rdf:type  IRI  ;
+   wdtn:P2671  IRI  ;
+   wdt:P4628  IRI  ;
+   p:P373  @:P373  ;
+   wikibase:statements  xsd:string  ;
+   p:P5008  @:P5008  ;
+   wdtn:P6694  IRI  ;
+   wikibase:timestamp  xsd:string  ;
+   wdt:P5008  IRI  ;
+   wdt:P575  xsd:string  ;
+   wdt:P910  IRI  ;
+   wdtn:P5806  IRI  ;
+   wdt:P8339  IRI  ;
+   p:P171  @:P171  ;
+   wdt:P685  xsd:string  ;
+   p:P2143  @:P2143  ;
+   wdt:P373  xsd:string  ;
+   p:P8339  @:P8339  ;
+   wdt:P3479  xsd:string  ;
+   p:P6900  @:P6900  ;
+   p:P3479  @:P3479  ;
+   wdt:P1992  xsd:string  ;
+   p:P3471  @:P3471  ;
+   wdt:P18  IRI  ;
+   wdt:P225  xsd:string  ;
+   p:P189  @:P189  ;
+   p:P486  @:P486  ;
+   p:P138  @:P138  ;
+   wdt:P4333  xsd:string  ;
+   wikibase:identifiers  xsd:string  ;
+   p:P8309  @:P8309  ;
+   p:P225  @:P225  ;
+   p:P5337  @:P5337  ;
+   p:P2671  @:P2671  ;
+   p:P6694  @:P6694  ;
+   p:P575  @:P575  ;
+   p:P4333  @:P4333
+}
+
+
+:P31
+{
+   wikibase:rank  IRI  *;
+   ps:P31  IRI  *;
+   rdf:type  IRI  *;
+   prov:wasDerivedFrom  IRI  *
+}
+
+
+:P268
+{
+   psn:P268  IRI  *;
+   ps:P268  xsd:string  *;
+   rdf:type  IRI  *;
+   wikibase:rank  IRI  *
+}
+
+
+:P129
+{
+   rdf:type  IRI  *;
+   prov:wasDerivedFrom  IRI  *;
+   wikibase:rank  IRI  *;
+   ps:P129  IRI  *
+}
+
+
+:P2975
+{
+   wikibase:rank  IRI  *;
+   prov:wasDerivedFrom  IRI  *;
+   ps:P2975  IRI  *;
+   rdf:type  IRI  *
+}
+
+
+:P2572
+{
+   rdf:type  IRI  *;
+   wikibase:rank  IRI  *;
+   ps:P2572  xsd:string  *
+}
+
+
+:P1605
+{
+   prov:wasDerivedFrom  IRI  *;
+   wikibase:rank  IRI  *;
+   pq:P1480  IRI  *;
+   ps:P1605  IRI  *;
+   ps:P1605  xsd:string  *;
+   rdf:type  IRI  *
+}
+
+
+:P1036
+{
+   prov:wasDerivedFrom  IRI  {2};
+   ps:P1036  xsd:string  ;
+   wikibase:rank  IRI  ;
+   rdf:type  IRI
+}
+
+
+:P1889
+{
+   rdf:type  IRI  *;
+   ps:P1889  IRI  *;
+   wikibase:rank  IRI  *;
+   prov:wasDerivedFrom  IRI  *
+}
+
+
+:P18
+{
+   ps:P18  IRI  *;
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *
+}
+
+
+:P227
+{
+   ps:P227  xsd:string  *;
+   psn:P227  IRI  *;
+   rdf:type  IRI  *;
+   wikibase:rank  IRI  *;
+   prov:wasDerivedFrom  IRI  *
+}
+
+
+:P4333
+{
+   prov:wasDerivedFrom  IRI  *;
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *;
+   ps:P4333  xsd:string  *
+}
+
+
+:P6104
+{
+   wikibase:rank  IRI  *;
+   ps:P6104  IRI  *;
+   rdf:type  IRI  *
+}
+
+
+:P685
+{
+   psn:P685  IRI  *;
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *;
+   prov:wasDerivedFrom  IRI  *;
+   ps:P685  xsd:string  *
+}
+
+
+:P527
+{
+   ps:P527  IRI  *;
+   prov:wasDerivedFrom  IRI  *;
+   rdf:type  IRI  *;
+   wikibase:rank  IRI  *
+}
+
+
+:P373
+{
+   rdf:type  IRI  *;
+   ps:P373  xsd:string  *;
+   wikibase:rank  IRI  *
+}
+
+
+:P838
+{
+   wikibase:rank  IRI  ;
+   rdf:type  IRI  ;
+   ps:P838  xsd:string
+}
+
+
+:P1813
+{
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *;
+   ps:P1813  rdf:langString  *
+}
+
+
+:P6900
+{
+   rdf:type  IRI  *;
+   ps:P6900  xsd:string  *;
+   wikibase:rank  IRI  *
+}
+
+
+:P8309
+{
+   rdf:type  IRI  ;
+   ps:P8309  xsd:string  ;
+   wikibase:rank  IRI
+}
+
+
+:P973
+{
+   wikibase:rank  IRI  *;
+   ps:P973  IRI  *;
+   rdf:type  IRI  *;
+   pq:P407  IRI  *
+}
+
+
+:P279
+{
+   rdf:type  IRI  *;
+   ps:P279  IRI  *;
+   wikibase:rank  IRI  *
+}
+
+
+:P1542
+{
+   ps:P1542  IRI  *;
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *;
+   pq:P580  xsd:string  *;
+   prov:wasDerivedFrom  IRI  *;
+   pqv:P580  IRI  *
+}
+
+
+:P4628
+{
+   ps:P4628  IRI  *;
+   rdf:type  IRI  *;
+   wikibase:rank  IRI  *
+}
+
+
+:P7807
+{
+   ps:P7807  xsd:string  *;
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *
+}
+
+
+:P5337
+{
+   ps:P5337  xsd:string  *;
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *
+}
+
+
+:P5008
+{
+   rdf:type  IRI  *;
+   ps:P5008  IRI  *;
+   wikibase:rank  IRI  *
+}
+
+
+:P171
+{
+   wikibase:rank  IRI  *;
+   ps:P171  IRI  *;
+   rdf:type  IRI  *;
+   prov:wasDerivedFrom  IRI  *
+}
+
+
+:P105
+{
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *
+}
+
+
+:P3471
+{
+   rdf:type  IRI  *;
+   ps:P3471  xsd:string  *;
+   wikibase:rank  IRI  *
+}
+
+
+:P5806
+{
+   wikibase:rank  IRI  *;
+   ps:P5806  xsd:string  *;
+   psn:P5806  IRI  *;
+   rdf:type  IRI  *;
+   prov:wasDerivedFrom  IRI  *
+}
+
+
+:P486
+{
+   psn:P486  IRI  *;
+   pq:P1810  xsd:string  *;
+   pqv:P580  IRI  *;
+   pq:P580  xsd:string  *;
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *;
+   ps:P486  xsd:string  *
+}
+
+
+:P189
+{
+   ps:P189  IRI  *;
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *
+}
+
+
+:P910
+{
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *;
+   ps:P910  IRI  *
+}
+
+
+:P225
+{
+   prov:wasDerivedFrom  IRI  *;
+   rdf:type  IRI  *;
+   ps:P225  xsd:string  *;
+   wikibase:rank  IRI  *
+}
+
+
+:P6694
+{
+   ps:P6694  xsd:string  *;
+   wikibase:rank  IRI  *;
+   psn:P6694  IRI  *;
+   rdf:type  IRI  *
+}
+
+
+:P575
+{
+   rdf:type  IRI  *;
+   psv:P575  IRI  *;
+   wikibase:rank  IRI  *;
+   ps:P575  xsd:string  *
+}
+
+
+:P7329
+{
+   pq:P1810  xsd:string  *;
+   wikibase:rank  IRI  *;
+   rdf:type  IRI  *;
+   ps:P7329  xsd:string  *
+}
+
+
+:P8339
+{
+   rdf:type  IRI  *;
+   ps:P8339  IRI  *;
+   prov:wasDerivedFrom  IRI  *;
+   wikibase:rank  IRI  *
+}
+
+
+:P138
+{
+   rdf:type  IRI  ;
+   wikibase:rank  IRI  ;
+   ps:P138  IRI
+}
+
+
+:P3479
+{
+   rdf:type  IRI  *;
+   wikibase:rank  IRI  *;
+   ps:P3479  xsd:string  *
+}
+
+
+:P2671
+{
+   psn:P2671  IRI  *;
+   wikibase:rank  IRI  *;
+   ps:P2671  xsd:string  *;
+   rdf:type  IRI  *
+}
+
+
+:P10
+{
+   wikibase:rank  IRI  ;
+   ps:P10  IRI  ;
+   rdf:type  IRI
+}
+
+
+:P1992
+{
+   rdf:type  IRI  ;
+   ps:P1992  xsd:string  ;
+   wikibase:rank  IRI
+}
+
+
+:P1604
+{
+   ps:P1604  IRI  ;
+   prov:wasDerivedFrom  IRI  {2};
+   wikibase:rank  IRI  ;
+   rdf:type  IRI
+}
+
+
+:P2143
+{
+   psv:P2143  IRI  ;
+   prov:wasDerivedFrom  IRI  {2};
+   rdf:type  IRI  ;
+   ps:P2143  xsd:string  ;
+   wikibase:rank  IRI
+}

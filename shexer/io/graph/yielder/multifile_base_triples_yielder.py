@@ -11,6 +11,7 @@ class MultifileBaseTripleYielder(BaseTriplesYielder):
 
         self._triples_yielded_from_used_yielders = 0
         self._error_triples_from_used_yielders = 0
+        self._last_yielder = None
 
 
     def yield_triples(self, parse_namespaces=True):

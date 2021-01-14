@@ -1,11 +1,12 @@
 from shexer.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer
-from shexer.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, KLEENE_CLOSURE
+from shexer.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, KLEENE_CLOSURE, OPT_CARDINALITY
 
 
 class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
 
-    def __init__(self, instantiation_property_str):
-        super(FixedPropChoiceStatementSerializer, self).__init__(instantiation_property_str)
+    def __init__(self, instantiation_property_str, disable_comments=False):
+        super(FixedPropChoiceStatementSerializer, self).__init__(instantiation_property_str=instantiation_property_str,
+                                                                 disable_comments=disable_comments)
 
     def serialize_statement_with_indent_level(self, a_statement, is_last_statement_of_shape, namespaces_dict):
         tuples_line_indent = []
@@ -28,8 +29,8 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
                 FixedPropChoiceStatementSerializer._statement_in_choice_no_cardinality(st_property,
                                                                                        a_type))
 
-        tuples_line_indent.append(FixedPropChoiceStatementSerializer._tuple_closing_choice(a_statement,
-                                                                                           is_last_statement_of_shape))
+        tuples_line_indent.append(self._tuple_closing_choice(a_statement,
+                                                             is_last_statement_of_shape))
 
         for a_comment in a_statement.comments:
             tuples_line_indent.append((a_comment, 4))
@@ -37,15 +38,15 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
 
         return tuples_line_indent
 
-    @staticmethod
-    def _tuple_closing_choice(a_statement, is_last_statement_of_shape):
+
+    def _tuple_closing_choice(self, a_statement, is_last_statement_of_shape):
         str_res = ")" + SPACES_GAP_BETWEEN_TOKENS + \
                   BaseStatementSerializer.cardinality_representation(cardinality=a_statement.cardinality,
                                                                      statement=a_statement,
                                                                      out_of_comment=True) + \
                   BaseStatementSerializer.closure_of_statement(is_last_statement_of_shape)
 
-        if a_statement.cardinality != KLEENE_CLOSURE:
+        if a_statement.cardinality not in [KLEENE_CLOSURE, OPT_CARDINALITY] and not self._disable_comments:
             str_res += BaseStatementSerializer.adequate_amount_of_final_spaces(str_res) + \
                        BaseStatementSerializer.probability_representation(a_statement.probability)
         return str_res, 1

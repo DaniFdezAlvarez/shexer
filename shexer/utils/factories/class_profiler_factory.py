@@ -3,10 +3,14 @@ from shexer.core.class_profiler import ClassProfiler
 
 
 def get_class_profiler(target_classes_dict, source_file, list_of_source_files, input_format,
-                       instantiation_property_str, namespaces_to_ignore=None,
+                       instantiation_property_str,
+                       namespaces_to_ignore=None,
                        infer_numeric_types_for_untyped_literals=False,
-                       raw_graph=None, namespaces_dict=None,
-                       url_input=None, list_of_url_input=None,
+                       raw_graph=None,
+                       namespaces_dict=None,
+                       url_input=None,
+                       list_of_url_input=None,
+                       rdflib_graph=None,
                        shape_map_file=None,
                        shape_map_raw=None,
                        track_classes_for_entities_at_last_depth_level=True,
@@ -14,7 +18,10 @@ def get_class_profiler(target_classes_dict, source_file, list_of_source_files, i
                        url_endpoint=None,
                        strict_syntax_with_corners=False,
                        target_classes=None,
-                       file_target_classes=None):
+                       file_target_classes=None,
+                       built_remote_graph=None,
+                       built_shape_map=None,
+                       remove_empty_shapes=True):
     yielder = get_triple_yielder(source_file=source_file,
                                  list_of_source_files=list_of_source_files,
                                  input_format=input_format,
@@ -24,6 +31,7 @@ def get_class_profiler(target_classes_dict, source_file, list_of_source_files, i
                                  namespaces_dict=namespaces_dict,
                                  url_input=url_input,
                                  list_of_url_input=list_of_url_input,
+                                 rdflib_graph=rdflib_graph,
                                  shape_map_file=shape_map_file,
                                  shape_map_raw=shape_map_raw,
                                  track_classes_for_entities_at_last_depth_level=track_classes_for_entities_at_last_depth_level,
@@ -32,8 +40,13 @@ def get_class_profiler(target_classes_dict, source_file, list_of_source_files, i
                                  instantiation_property=instantiation_property_str,
                                  strict_syntax_with_corners=strict_syntax_with_corners,
                                  target_classes=target_classes,
-                                 file_target_classes=file_target_classes)
+                                 file_target_classes=file_target_classes,
+                                 built_remote_graph=built_remote_graph,
+                                 built_shape_map=built_shape_map)
 
     return ClassProfiler(triples_yielder=yielder,
                          target_classes_dict=target_classes_dict,
-                         instantiation_property_str=instantiation_property_str)
+                         instantiation_property_str=instantiation_property_str,
+                         original_target_classes=target_classes,
+                         original_shape_map=built_shape_map,
+                         remove_empty_shapes=remove_empty_shapes)

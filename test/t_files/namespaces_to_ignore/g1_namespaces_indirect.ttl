@@ -1,0 +1,47 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix other: <http://other.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:Jimmy a foaf:Person ;  # Complete
+	foaf:age "23"^^xsd:integer ;
+	foaf:name "Jimmy" ;
+	other:prop "Foo" ;
+	<http://other.org/child/prop2> "Foo2" ;
+	foaf:familyName "Jones" .
+
+ex:Sarah a foaf:Person ;  # Complete implicit type for age
+	foaf:age 22 ;
+	foaf:name "Sarah" ;
+	other:prop "Foo" ;
+	<http://other.org/child/prop2> "Foo2" ;
+	foaf:familyName "Salem" .
+
+ex:Bella a foaf:Person ;  # Missing familyName
+	foaf:age "56"^^xsd:integer ;
+	other:prop "Foo" ;
+	<http://other.org/child/prop2> "Foo2" ;
+	foaf:name "Isabella" .
+
+ex:David a foaf:Person ;  # Missing age and use knows
+	foaf:name "David" ;
+	foaf:familyName "Doulofeau" ;
+	other:prop "Foo" ;
+	<http://other.org/child/prop2> "Foo2" ;
+	foaf:knows ex:Sarah .
+
+ex:HumanLike foaf:name "Person" ;  # foaf properties, but not explicit type.
+	foaf:familyName "Maybe" ;
+	foaf:age 99 ;
+	foaf:knows ex:David .
+
+
+ex:x1 rdf:type foaf:Document ;
+	foaf:depiction "A thing that is nice" ;
+	foaf:title "A nice thing" .
+
+
+ex:x2 rdf:type foaf:Document ;
+	foaf:title "Another thing" .

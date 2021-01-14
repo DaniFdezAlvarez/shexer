@@ -1,0 +1,1 @@
+SPARQL "select ?p where { ?p a foaf:Person }"@<Person>

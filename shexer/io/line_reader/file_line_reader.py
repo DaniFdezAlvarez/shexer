@@ -6,6 +6,6 @@ class FileLineReader(object):
         self._source_file = source_file
 
     def read_lines(self):
-        with open(self._source_file, "r") as in_stream:
+        with open(self._source_file, "r", errors='ignore') as in_stream:
             for a_line in in_stream:
                 yield a_line

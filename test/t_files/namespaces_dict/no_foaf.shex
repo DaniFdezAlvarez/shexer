@@ -1,0 +1,23 @@
+PREFIX ex: <http://example.org/>
+PREFIX xml: <http://www.w3.org/XML/1998/namespace/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX : <http://weso.es/shapes/>
+
+:Person
+{
+   rdf:type  [<http://xmlns.com/foaf/0.1/Person>]  ;
+   <http://xmlns.com/foaf/0.1/name>  xsd:string  ;
+   <http://xmlns.com/foaf/0.1/age>  xsd:integer  ?;
+   <http://xmlns.com/foaf/0.1/familyName>  xsd:string  ?;
+   <http://xmlns.com/foaf/0.1/knows>  @:Person  ?
+}
+
+
+:Document
+{
+   rdf:type  [<http://xmlns.com/foaf/0.1/Document>]  ;
+   <http://xmlns.com/foaf/0.1/title>  xsd:string  ;
+   <http://xmlns.com/foaf/0.1/depiction>  xsd:string  ?
+}

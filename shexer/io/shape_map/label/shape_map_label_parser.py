@@ -1,12 +1,16 @@
+from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
+
 class ShapeMapLabelParser(object):
 
     def __init__(self, prefix_namespaces_dict=None):
         self._namespaces_prefix_dict = prefix_namespaces_dict if prefix_namespaces_dict is not None else {}
 
     def parse_shape_map_label(self, raw_label):
+
         if self._is_a_prefixed_uri(raw_label):
-            return self._parse_prefixed_label(raw_label)
-        return self._parse_unprefixed_label(raw_label)
+            return STARTING_CHAR_FOR_SHAPE_NAME + self._parse_prefixed_label(raw_label)
+        return STARTING_CHAR_FOR_SHAPE_NAME + raw_label
+        # return self._parse_unprefixed_label(raw_label)
 
 
     def _is_a_prefixed_uri(self, raw_label):
@@ -17,8 +21,8 @@ class ShapeMapLabelParser(object):
         return True
 
 
-    def _parse_unprefixed_label(self, raw_label):
-        return raw_label[1:-1]
+    # def _parse_unprefixed_label(self, raw_label):
+    #     return raw_label[1:-1]
 
     def _parse_prefixed_label(self, raw_label):
         index_sep = raw_label.find(":")

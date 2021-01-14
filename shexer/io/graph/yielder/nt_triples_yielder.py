@@ -26,10 +26,13 @@ class NtTriplesYielder(BaseTriplesYielder):
             tokens = self._look_for_tokens(a_line.strip())
             if len(tokens) != 3:
                 self._error_triples += 1
-                log_to_error(msg="This line caused error: " + a_line,
+                log_to_error(msg="This line was discarded: " + a_line,
                              source=self._source_file)
             else:
-                yield (tune_token(tokens[0]), tune_prop(tokens[1]), tune_token(tokens[2]))
+                yield (tune_token(a_token=tokens[0]),
+                       tune_prop(a_token=tokens[1]),
+                       tune_token(a_token=tokens[2],
+                                  allow_untyped_numbers=self._allow_untyped_numbers))
                 self._triples_count += 1
 
     def _look_for_tokens(self, str_line):
@@ -44,9 +47,17 @@ class NtTriplesYielder(BaseTriplesYielder):
                 last_index = self._look_for_last_index_of_literal_token(str_line, current_first_index)
                 result.append(str_line[current_first_index:last_index + 1])
                 current_first_index = last_index + 1
+            elif str_line[current_first_index] == '_':
+                last_index = self._look_for_last_index_of_bnode_token(str_line, current_first_index)
+                result.append(str_line[current_first_index:last_index + 1])
+                current_first_index = last_index + 1
             elif str_line[current_first_index] == '.':
-
                 break
+
+            elif str_line[current_first_index].isnumeric():
+                last_index = self._look_for_last_index_of_unlabelled_number_token(str_line, current_first_index)
+                result.append(str_line[current_first_index:last_index + 1])
+                current_first_index = last_index + 1
             else:
                 current_first_index += 1
 
@@ -56,6 +67,16 @@ class NtTriplesYielder(BaseTriplesYielder):
         target_substring = target_str[first_index:]
         index_sub = target_substring.find(">")
         return index_sub + (len(target_str) - len(target_substring))
+
+    def _look_for_last_index_of_bnode_token(self, target_str, first_index):
+        target_substring = target_str[first_index:]
+        index_sub = target_substring.find(" ")
+        return index_sub + (len(target_str) - len(target_substring)) - 1
+
+    def _look_for_last_index_of_unlabelled_number_token(self, target_str, first_index):
+        target_substring = target_str[first_index:]
+        index_sub = target_substring.find(" ")
+        return index_sub + (len(target_str) - len(target_substring)) - 1
 
     def _look_for_last_index_of_literal_token(self, target_str, first_index):
         target_substring = target_str[first_index:]
@@ -88,19 +109,3 @@ class NtTriplesYielder(BaseTriplesYielder):
         self._error_triples = 0
         self._triples_count = 0
 
-    # def _yield_triples_excluding_namespaces(self):
-    #     self._reset_count()
-    #     for a_line in self._line_reader.read_lines():
-    #         tokens = self._look_for_tokens(a_line.strip())
-    #         if len(tokens) != 3:
-    #             self._error_triples += 1
-    #             log_to_error(msg="This line caused error: " + a_line,
-    #                          source=self._source_file)
-    #         else:
-    #             candidate_triple = (tune_token(tokens[0]),
-    #                                 tune_prop(tokens[1]),
-    #                                 tune_token(tokens[2], allow_untyped_numbers=self._allow_untyped_numbers))
-    #             if not check_if_property_belongs_to_namespace_list(str(candidate_triple[1]),
-    #                                                                self._namespaces_to_ignore):
-    #                 yield candidate_triple
-    #             self._triples_count += 1

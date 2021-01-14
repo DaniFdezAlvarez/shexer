@@ -12,9 +12,10 @@ DT_PREFIX = "dt"
 OPENGIS_NAMESPACE = "http://www.opengis.net/ont/geosparql#"
 OPENGIS_PREFIX = "geo"
 
+LANG_STRING_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
 STRING_TYPE = "http://www.w3.org/2001/XMLSchema#string"
 FLOAT_TYPE = "http://www.w3.org/2001/XMLSchema#float"
-INTEGER_TYPE = "http://www.w3.org/2001/XMLSchema#int"
+INTEGER_TYPE = "http://www.w3.org/2001/XMLSchema#integer"
 
 
 def _add_prefix(unprefixed_elem, prefix):
@@ -33,6 +34,7 @@ def remove_corners(a_uri, raise_error_if_no_corners=True):
 def add_corners(a_uri):
     return "<" + a_uri + ">"
 
+
 def add_corners_if_it_is_an_uri(a_candidate_uri):
     if a_candidate_uri.startswith("http://"):
         return "<" + a_candidate_uri + ">"
@@ -40,9 +42,9 @@ def add_corners_if_it_is_an_uri(a_candidate_uri):
 
 
 def decide_literal_type(a_literal):
-    if "\"^^" not in a_literal:
-        return STRING_TYPE
-    elif there_is_arroba_after_last_quotes(a_literal):
+    if there_is_arroba_after_last_quotes(a_literal):
+        return LANG_STRING_TYPE
+    elif "\"^^" not in a_literal:
         return STRING_TYPE
     elif "xsd:" in a_literal:
         return XSD_NAMESPACE + a_literal[a_literal.find("xsd:") + 4:]
@@ -92,6 +94,24 @@ def parse_literal(an_elem):
 def parse_unquoted_literal(an_elem):
     elem_type = decide_literal_type(an_elem)
     return an_elem, elem_type
+
+
+def unprefixize_uri_if_possible(target_uri, prefix_namespaces_dict):
+    for a_prefix in prefix_namespaces_dict:
+        if target_uri.startswith(a_prefix+":"):
+            return target_uri.replace(a_prefix+":", prefix_namespaces_dict[a_prefix])
+    return target_uri
+
+
+def prefixize_uri_if_possible(target_uri, namespaces_prefix_dict):
+    best_match = None
+    candidate_uri = remove_corners(target_uri)
+    for a_namespace in namespaces_prefix_dict:  # Prefixed element (all literals are prefixed elements)
+        if candidate_uri.startswith(a_namespace):
+            if best_match is None or len(best_match) < len(a_namespace):
+                best_match = a_namespace
+
+    return target_uri if best_match is None else candidate_uri.replace(best_match, namespaces_prefix_dict[best_match] + ":")
 
 
 

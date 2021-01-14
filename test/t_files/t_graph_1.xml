@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/">
+
+  <foaf:Person rdf:about="http://example.org/Jimmy">
+    <foaf:age rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">23</foaf:age>
+    <foaf:name>Jimmy</foaf:name>
+    <foaf:familyName>Jones</foaf:familyName>
+  </foaf:Person>
+
+  <foaf:Person rdf:about="http://example.org/Sarah">
+    <foaf:age rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">22</foaf:age>
+    <foaf:name>Sarah</foaf:name>
+    <foaf:familyName>Salem</foaf:familyName>
+  </foaf:Person>
+
+  <foaf:Person rdf:about="http://example.org/Bella">
+    <foaf:age rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">56</foaf:age>
+    <foaf:name>Isabella</foaf:name>
+  </foaf:Person>
+
+  <foaf:Person rdf:about="http://example.org/David">
+    <foaf:name>David</foaf:name>
+    <foaf:familyName>Doulofeau</foaf:familyName>
+    <foaf:knows rdf:resource="http://example.org/Sarah"/>
+  </foaf:Person>
+
+  <rdf:Description rdf:about="http://example.org/HumanLike">
+    <foaf:name>Person</foaf:name>
+    <foaf:familyName>Maybe</foaf:familyName>
+    <foaf:age rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">99</foaf:age>
+    <foaf:knows rdf:resource="http://example.org/David"/>
+  </rdf:Description>
+
+  <foaf:Document rdf:about="http://example.org/x1">
+    <foaf:depiction>A thing that s nice</foaf:depiction>
+    <foaf:title>A nice thing</foaf:title>
+  </foaf:Document>
+
+  <foaf:Document rdf:about="http://example.org/x2">
+    <foaf:title>Another thing</foaf:title>
+  </foaf:Document>
+
+</rdf:RDF>

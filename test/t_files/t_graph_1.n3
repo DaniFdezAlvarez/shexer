@@ -1,0 +1,39 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<http://example.org/Jimmy>
+  a foaf:Person ;
+  foaf:age 23 ;
+  foaf:name "Jimmy" ;
+  foaf:familyName "Jones" .
+
+<http://example.org/Sarah>
+  a foaf:Person ;
+  foaf:age 22 ;
+  foaf:name "Sarah" ;
+  foaf:familyName "Salem" .
+
+<http://example.org/Bella>
+  a foaf:Person ;
+  foaf:age 56 ;
+  foaf:name "Isabella" .
+
+<http://example.org/David>
+  a foaf:Person ;
+  foaf:name "David" ;
+  foaf:familyName "Doulofeau" ;
+  foaf:knows <http://example.org/Sarah> .
+
+<http://example.org/HumanLike>
+  foaf:name "Person" ;
+  foaf:familyName "Maybe" ;
+  foaf:age 99 ;
+  foaf:knows <http://example.org/David> .
+
+<http://example.org/x1>
+  a foaf:Document ;
+  foaf:depiction "A thing that s nice" ;
+  foaf:title "A nice thing" .
+
+<http://example.org/x2>
+  a foaf:Document ;
+  foaf:title "Another thing" .

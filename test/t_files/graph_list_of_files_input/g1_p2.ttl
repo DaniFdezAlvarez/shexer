@@ -1,0 +1,21 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+ex:HumanLike foaf:name "Person" ;  # foaf properties, but not explicit type.
+	foaf:familyName "Maybe" ;
+	foaf:age 99 ;
+	foaf:knows ex:David .
+
+
+ex:x1 rdf:type foaf:Document ;
+	foaf:depiction "A thing that is nice" ;
+	foaf:title "A nice thing" .
+
+
+ex:x2 rdf:type foaf:Document ;
+	foaf:title "Another thing" .
+
