@@ -1,0 +1,27 @@
+PREFIX : <http://weso.es/shapes/>
+PREFIX xml: <http://www.w3.org/XML/1998/namespace/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX ex: <http://example.org/>
+
+:Q11689315
+{
+   wdt:P31  [wd:Q11689315]  ;
+   p:P31  IRI
+}
+
+
+:Q5
+{
+   wdt:P31  [wd:Q5]
+}
+
+
+:Q215627
+{
+   wdt:P31  [wd:Q215627]
+}

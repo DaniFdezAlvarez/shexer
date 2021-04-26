@@ -1,3 +1,5 @@
+from rdflib import Graph
+from rdflib.compare import to_isomorphic, graph_diff
 import re
 
 _BLANKS = re.compile("[ \t]+")
@@ -187,3 +189,28 @@ def shape_contains_constraint(target_str, shape, constraint):
         if lines[i].startswith(_BEG_SHAPE) and shape == lines[i-1].strip():
             seeking_mode = True
     return False
+
+
+def graph_comparison_rdflib(g1, g2):
+    iso1 = to_isomorphic(g1)
+    iso2 = to_isomorphic(g2)
+    both, in1, in2 = graph_diff(iso1, iso2)
+    return len(both) == len(g1) and len(in1) == 0 and len(in2) == 0
+
+
+def graph_comparison_file_vs_str(file_path, str_target, format="turtle"):
+    g1 = Graph()
+    g1.parse(data=str_target, format=format)
+
+    g2 = Graph()
+    g2.parse(source=file_path, format=format)
+
+    return graph_comparison_rdflib(g1, g2)
+
+def text_contains_lines(text, list_lines):
+    for a_line in list_lines:
+        if a_line not in text:
+            print(a_line)
+            return False
+        return True
+

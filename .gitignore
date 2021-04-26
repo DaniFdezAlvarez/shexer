@@ -108,6 +108,8 @@ ENV/
 
 dbshx/local_code/
 local_code/
+shexer/local_code/
 
 # data
 files/
+logs/

@@ -1,4 +1,6 @@
-SHEX = "ShEx"
+SHEXC = "ShEx"
+SHACL_TURTLE = "Shacl"
+
 NT = "nt"
 TSV_SPO = "tsv_spo"
 TURTLE = "turtle"

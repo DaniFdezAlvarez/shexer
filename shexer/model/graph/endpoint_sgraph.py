@@ -1,6 +1,7 @@
 from shexer.io.sparql.query import query_endpoint_po_of_an_s, query_endpoint_single_variable
 from shexer.model.graph.abstract_sgraph import SGraph
 from shexer.model.graph.rdflib_sgraph import RdflibSgraph
+from shexer.utils.uri import remove_corners
 from rdflib import Graph
 
 _DEF_PRED_VARIABLE = "?p"
@@ -40,7 +41,11 @@ class EndpointSGraph(SGraph):
                 yield a_triple
 
     def _yield_remote_class_triples_of_an_s(self, target_node, instantiation_property):
-        str_query = "SELECT {0} WHERE {{ <{1}> <{2}> {0} . }}".format(_DEF_OBJ_VARIABLE, target_node, instantiation_property)
+        str_query = "SELECT {0} WHERE {{ <{1}> <{2}> {0} . }}".format(_DEF_OBJ_VARIABLE,
+                                                                      remove_corners(a_uri=target_node,
+                                                                                     raise_error_if_no_corners=False),
+                                                                      remove_corners(a_uri=instantiation_property,
+                                                                                     raise_error_if_no_corners=False))
         for an_elem in query_endpoint_single_variable(endpoint_url=self._endpoint_url,
                                                       str_query=str_query,
                                                       variable_id=_DEF_OBJ_ID):
@@ -67,7 +72,10 @@ class EndpointSGraph(SGraph):
 
 
     def _yield_remote_p_o_triples_of_an_s(self, target_node):
-        str_query = "SELECT {0} {1} WHERE {{ <{2}> {0} {1} .}} ".format(_DEF_PRED_VARIABLE, _DEF_OBJ_VARIABLE, target_node)
+        str_query = "SELECT {0} {1} WHERE {{ <{2}> {0} {1} .}} ".format(_DEF_PRED_VARIABLE,
+                                                                        _DEF_OBJ_VARIABLE,
+                                                                        remove_corners(a_uri=target_node,
+                                                                                       raise_error_if_no_corners=False))
         for a_tuple_po in query_endpoint_po_of_an_s(endpoint_url=self._endpoint_url,
                                                     str_query=str_query,
                                                     p_id=_DEF_PRED_ID,

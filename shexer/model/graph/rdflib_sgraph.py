@@ -1,7 +1,7 @@
 from rdflib import URIRef, Graph, Literal, BNode
 from shexer.model.graph.abstract_sgraph import SGraph
 from shexer.utils.triple_yielders import tune_token, tune_prop, tune_subj
-from shexer.utils.uri import add_corners_if_it_is_an_uri
+from shexer.utils.uri import add_corners_if_it_is_an_uri, remove_corners
 from shexer.core.instances.pconsts import _S, _P, _O
 from shexer.model.IRI import IRI as ModelIRI
 from shexer.model.property import Property as ModelProperty
@@ -34,12 +34,19 @@ class RdflibSgraph(SGraph):
 
 
     def yield_p_o_triples_of_an_s(self, target_node):
-        for s, p ,o in self._rdflib_graph.triples((URIRef(target_node), None, None)):
+        for s, p ,o in self._rdflib_graph.triples((URIRef(remove_corners(a_uri=target_node,
+                                                                         raise_error_if_no_corners=False)),
+                                                   None,
+                                                   None)):
             yield str(s), str(p), self._add_lang_if_needed(o)
 
 
     def yield_class_triples_of_an_s(self, target_node, instantiation_property):
-        for s ,p, o in self._rdflib_graph.triples((URIRef(target_node), URIRef(instantiation_property), None)):
+        for s ,p, o in self._rdflib_graph.triples((URIRef(remove_corners(a_uri=target_node,
+                                                                         raise_error_if_no_corners=False)),
+                                                   URIRef(remove_corners(a_uri=instantiation_property,
+                                                                         raise_error_if_no_corners=False)),
+                                                   None)):
             yield str(s), str(p), self._add_lang_if_needed(o)
 
     def add_triple(self, a_triple):
