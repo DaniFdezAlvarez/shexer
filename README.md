@@ -1,25 +1,24 @@
 # sheXer
 
-This library can be used to perform automatic extraction of shape expressions (ShEx) or Shapes Constraint Language (SHACL) for a target RDF grpah.
+This library can be used to perform automatic extraction of shape expressions (ShEx) or Shapes Constraint Language (SHACL) for a target RDF grpah. Please, feel free to add an issue to this repository if you find any bug in sheXer or if you have a feature request.
 
-Try an online demo: [http://shexer.weso.es/](http://shexer.weso.es/) . 
-
-Please, contact Dani Fernández at fernandezalvdaniel@uniovi.es or add an issue to this repository if you find any bug in sheXer.
+There is an online demo available at: [http://shexer.weso.es/](http://shexer.weso.es/) . This demo may not include some of the sheXer's features. Install the library to try every feautre.
 
 Language: Python 3
-This repository contains a software prototype to perform induction of Shapes in an RDF Graph. 
+
 
 ## Installation
 
-Shexer has some external dependencies listed in the files requirements.txt. You can install them all using pip:
+sheXer can be installed using pip:
+
+    $ pip install shexer
+	
+Iy you want to install sheXer by source, all its external dependencies are listed in the file requirements.txt. Ypu can install them all as well using pip:
 
     $ pip install -r requirements.txt
 
-In case you are not planning to use the web service feature of this repo, you do not need to install the dependencies related to Flask.
+sheXer includes a package to deploy a wer service exposing sheXer with a REST API. In case you are not interested in deploying this web service, you don't need to install any dependency related to Flask.
 
-Shexer itself can be installed using pip as well:
-    
-    $ pip install shexer
 
 ## Features
 
@@ -36,12 +35,12 @@ Shexer itself can be installed using pip as well:
 * **Cardinality management**. Some of the triples of a given instance may fit in an infinite number of constraint triples with the same predicate and object but different cardinality. For example, if a given instance has a single label specified by rdfs:label, that makes it fit with infinite triple constraints with the schema {rdfs:label xsd:string C}, where C can be any cardinality that includes the posibility of a single occurrence: {1}, + , {1,2}, {1,3}, {1,4},... Currently, sheXer admints exact cardinalities ({2}, {3}..), kleene closure (\*), positive closure (+), and optional cardinality (?).
 * **Configurable priority of cardinalities**. sheXer can be configured to prioritize the less specific cardinality or the most specific one if its trustworthiness score is high enough.
 * **All compliant mode**: You can produce shapes that conform with every instance using to extract them. This is done by using cadinalities \* or ? for every constraint extracted that does not conform with EVERY instance. You may prefer to avoid these cardinalities and keep constraints that may not conform with every instance, but include the most frequent features of the instances. Both settings are available in sheXer.
-* **Manage of empty shapes**. You may get some shapes with no constraints, either because there where no isntances to explore or because the extracted features were not as common as requested with the threshold of tolerance. You can configure sheXer to automatically erase those shapes and every mention to them from the results. 
-* **Adaptation to Wikidata model**. sheXer includes configuration params to handle Wikidata's data model regarding qualifiers, so you can automatically extract the schema of qualifier nodes too.
+* **Management of empty shapes**. You may get some shapes with no constraints, either because there where no isntances to explore or because the extracted features were not as common as requested with the threshold of tolerance. You can configure sheXer to automatically erase those shapes and every mention to them from the results. 
+* **Adaptation to Wikidata model**. sheXer includes configuration params to handle Wikidata's data model regarding qualifiers, so you can automatically extract the schema of qualifier nodes too. You can also produce content where each Wikidata ID is associated with  its label in comments, as sheXer is integrated with [wLighter](https://github.com/DaniFdezAlvarez/wLighter).
 
 ## Experimental results
 
-In the folder [experiments](https://github.com/DaniFdezAlvarez/dbpedia-shexer/tree/develop/experiments), you can see some results of applying this tool over different graphs with different configurations.
+In the folder [experiments](https://github.com/DaniFdezAlvarez/shexer/tree/develop/experiments), you can see some results of applying this tool over different graphs with different configurations.
 
 
 ## Example code
@@ -193,7 +192,7 @@ The method __shex\_graph__  of shexer triggers all the inference process and giv
 
 * string_output (default False): when it is set to True, the method returns a string representation of the inferred shapes. It must be set to True iff output_file is None.
 * output_file (default None): it specifies the path of the file in which the inferred shapes will be written. It must have a value different to None iff string_output is False.
-* output_format (default "ShExC"): format in which the inferred shapes will be serialized. The values currently supported are const.SHEXC and const.SHACLE_TURTLE
+* output_format (default "ShExC"): format in which the inferred shapes will be serialized. The values currently supported are const.SHEXC and const.SHACLE_TURTLE.
 * aceptance_threshold (default 0): Given a certain inferred constraint __c__ for a shape __s__, the ammount of instances which conform to this constraint (ignoring constraints with '\*' cardinality) should be at least __aceptance\_threshold__. If this does not happen, then __c__ will not be included in __s__.
 
 
