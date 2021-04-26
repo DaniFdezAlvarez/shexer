@@ -1,0 +1,13 @@
+@prefix wdt: <http://www.wikidata.org/prop/direct/> .
+@prefix p: <http://www.wikidata.org/prop/> .
+@prefix wd: <http://www.wikidata.org/entity/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:Timmy wdt:P31 wd:Q5 .
+
+ex:Lana <http://www.wikidata.org/prop/direct/P31> wd:Q215627 .
+
+ex:Hippo p:P31 wd:Q11689315 ;
+         wdt:P31 wd:Q11689315 .

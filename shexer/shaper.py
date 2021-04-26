@@ -1,6 +1,6 @@
-from shexer.utils.obj_references import check_just_one_not_none, check_one_or_zero_not_none
+from shexer.utils.obj_references import check_just_one_not_none
 
-from shexer.consts import SHEX, NT, TSV_SPO, N3, TURTLE, RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE
+from shexer.consts import SHEXC, SHACL_TURTLE, NT, TSV_SPO, N3, TURTLE, RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE
 from shexer.utils.factories.class_profiler_factory import get_class_profiler
 from shexer.utils.factories.instance_tracker_factory import get_instance_tracker
 from shexer.utils.factories.class_shexer_factory import get_class_shexer
@@ -46,7 +46,10 @@ class Shaper(object):
                  disable_or_statements=True,
                  allow_opt_cardinality=True,
                  disable_exact_cardinality=False,
-                 shapes_namespace=SHAPES_DEFAULT_NAMESPACE):
+                 shapes_namespace=SHAPES_DEFAULT_NAMESPACE,
+                 limit_remote_instances=-1,
+                 wikidata_annotation=False
+                 ):
         """
 
         :param target_classes:
@@ -114,6 +117,8 @@ class Shaper(object):
         self._disable_or_statements = disable_or_statements
         self._allow_opt_cardinality = allow_opt_cardinality
         self._disable_exact_cardinality = disable_exact_cardinality
+        self._limit_remote_instances = limit_remote_instances
+        self._wikidata_annotation = wikidata_annotation
 
         self._depth_for_building_subgraph = depth_for_building_subgraph
         self._track_classes_for_entities_at_last_depth_level = track_classes_for_entities_at_last_depth_level
@@ -125,8 +130,6 @@ class Shaper(object):
         self._shapes_namespace = shapes_namespace
 
         self._add_shapes_namespaces_to_namespaces_dict()
-
-        #TODO check correctness of these last seven params
 
 
         #The following two atts are used for optimizations
@@ -144,7 +147,8 @@ class Shaper(object):
                                                         rdflib_graph=self._rdflib_graph,
                                                         raw_graph=self._raw_graph,
                                                         input_format=self._input_format,
-                                                        source_file_graph=self._graph_file_input)
+                                                        source_file_graph=self._graph_file_input,
+                                                        limit_remote_instances=self._limit_remote_instances)
 
 
 
@@ -165,7 +169,10 @@ class Shaper(object):
             return AbstractProfileSerializer(self._profile).get_string_representation()
         return AbstractProfileSerializer(self._profile).write_profile_to_file(target_file=output_file)
 
-    def shex_graph(self, string_output=False, output_file=None, output_format=SHEX, acceptance_threshold=0):
+    def shex_graph(self, string_output=False,
+                   output_file=None,
+                   output_format=SHEXC,
+                   acceptance_threshold=0):
         """
         :param string_output:
         :param output_file:
@@ -185,7 +192,7 @@ class Shaper(object):
         serializer = self._build_shapes_serializer(target_file=output_file,
                                                    string_return=string_output,
                                                    output_format=output_format)
-        return serializer.serialize_shex()  # If string return is active, returns string.
+        return serializer.serialize_shapes()  # If string return is active, returns string.
         # Otherwise, it writes to file and returns None
 
     def _add_shapes_namespaces_to_namespaces_dict(self):
@@ -233,7 +240,8 @@ class Shaper(object):
                                     namespaces_dict=self._namespaces_dict,
                                     output_format=output_format,
                                     instantiation_property=self._instantiation_property,
-                                    disable_comments=self._disable_comments)
+                                    disable_comments=self._disable_comments,
+                                    wikidata_annotation=self._wikidata_annotation)
 
     def _build_class_profiler(self):
         return get_class_profiler(target_classes_dict=self._target_classes_dict,
@@ -258,7 +266,8 @@ class Shaper(object):
                                   file_target_classes=self._file_target_classes,
                                   built_remote_graph=self._built_remote_graph,
                                   built_shape_map=self._built_shape_map,
-                                  remove_empty_shapes=self._remove_empty_shapes)
+                                  remove_empty_shapes=self._remove_empty_shapes,
+                                  limit_remote_instances=self._limit_remote_instances)
 
 
     def _build_instance_tracker(self):
@@ -287,7 +296,8 @@ class Shaper(object):
                                     shape_qualifiers_mode=self._shape_qualifiers_mode,
                                     built_remote_graph=self._built_remote_graph,
                                     built_shape_map=self._built_shape_map,
-                                    shapes_namespace=self._shapes_namespace)
+                                    shapes_namespace=self._shapes_namespace,
+                                    limit_remote_instances=self._limit_remote_instances)
 
 
     @staticmethod
@@ -317,7 +327,7 @@ class Shaper(object):
 
     @staticmethod
     def _check_output_format(output_format):
-        if output_format != SHEX:
+        if output_format not in [SHEXC, SHACL_TURTLE]:
             raise ValueError("Currently unsupported output format: " + output_format)
 
     @staticmethod

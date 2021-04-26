@@ -36,7 +36,7 @@ def add_corners(a_uri):
 
 
 def add_corners_if_it_is_an_uri(a_candidate_uri):
-    if a_candidate_uri.startswith("http://"):
+    if a_candidate_uri.startswith("http://") or a_candidate_uri.startswith("https://"):  # TODO, check this!
         return "<" + a_candidate_uri + ">"
     return a_candidate_uri
 

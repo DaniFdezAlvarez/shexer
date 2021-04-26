@@ -4,12 +4,17 @@ from shexer.model.property import Property
 from shexer.utils.uri import remove_corners
 from shexer.utils.shapes import prefixize_shape_name_if_possible
 from shexer.io.shex.formater.consts import SPACES_LEVEL_INDENTATION
+from shexer.io.wikidata import wikidata_annotation
+from shexer.io.file import read_file
+
+from wlighter import SHEXC_FORMAT
+
 
 
 class ShexSerializer(object):
 
     def __init__(self, target_file, shapes_list, namespaces_dict=None, string_return=False,
-                 instantiation_property_str=RDF_TYPE_STR, disable_comments=False):
+                 instantiation_property_str=RDF_TYPE_STR, disable_comments=False, wikidata_annotation=False):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._lines_buffer = []
@@ -17,16 +22,19 @@ class ShexSerializer(object):
         self._string_return = string_return
         self._instantiation_property_str = self._decide_instantiation_property(instantiation_property_str)
         self._disable_comments = disable_comments
+        self._wikidata_annotation = wikidata_annotation
 
         self._string_result = ""
 
-    def serialize_shex(self):
+    def serialize_shapes(self):
 
         self._reset_target_file()
         self._serialize_namespaces()
         for a_shape in self._shapes_list:
             self._serialize_shape(a_shape)
         self._flush()
+        if self._wikidata_annotation:
+            self._annotate_wikidata_ids_in_result()
         if self._string_return:
             return self._string_result
 
@@ -40,6 +48,19 @@ class ShexSerializer(object):
             return remove_corners(a_uri=instantiation_property_str,
                                   raise_error_if_no_corners=False)
         raise ValueError("Unrecognized param type to define instantiation property")
+
+    def _annotate_wikidata_ids_in_result(self):
+        self._string_result =  wikidata_annotation(raw_input=self._get_raw_input_for_wikidata_annotation(),
+                                                   string_return=self._string_return,
+                                                   out_file=self._target_file,
+                                                   format=SHEXC_FORMAT,
+                                                   rdfs_comments=True)
+
+    def _get_raw_input_for_wikidata_annotation(self):
+        if self._string_return:
+            return self._string_result
+        return read_file(self._target_file)
+
 
     def _serialize_namespaces(self):
         for a_namespace in self._namespaces_dict:

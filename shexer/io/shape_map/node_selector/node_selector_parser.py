@@ -67,7 +67,7 @@ class NodeSelectorParser(object):
                                   sgraph=self._sgraph)
 
     def _turn_focus_exp_tokens_into_query(self, subj, pred, obj):
-        return self._namespaces_to_string() + "SELECT " + _FOCUS_VARIABLE + " WHERE {" + subj + " " + pred + " " + obj + " . }"
+        return self._namespaces_to_string() + "SELECT " + _FOCUS_VARIABLE + " WHERE {" + subj + " " + pred + " " + obj + " . } " # LIMIT 20"
         # return sparql.prepareQuery(string_query, initNs=self._prefix_namespace_dict)
 
     def _parse_subj_obj_focus_expression(self, token, focus_count):
