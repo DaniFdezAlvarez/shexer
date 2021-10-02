@@ -6,13 +6,15 @@ from shexer.io.graph.yielder.rdflib_triple_yielder import RdflibParserTripleYiel
 from shexer.io.graph.yielder.multi_rdflib_triple_yielder import MultiRdfLibTripleYielder
 from shexer.io.graph.yielder.remote.sgraph_from_selectors_triple_yielder import SgraphFromSelectorsTripleYielder
 from shexer.io.graph.yielder.filter.filter_namespaces_triple_yielder import FilterNamespacesTriplesYielder
+from shexer.io.graph.yielder.big_ttl_triples_yielder import BigTtlTriplesYielder
+from shexer.io.graph.yielder.multi_big_ttl_files_triple_yielder import MultiBigTtlTriplesYielder
 from shexer.utils.factories.shape_map_parser_factory import get_shape_map_parser
 from shexer.model.graph.endpoint_sgraph import EndpointSGraph
 from shexer.utils.translators.list_of_classes_to_shape_map import ListOfClassesToShapeMap
 from shexer.utils.target_elements import tune_target_classes_if_needed
 from shexer.utils.dict import reverse_keys_and_values
 
-from shexer.consts import NT, TSV_SPO, N3, TURTLE, RDF_XML, FIXED_SHAPE_MAP, JSON_LD
+from shexer.consts import NT, TSV_SPO, N3, TURTLE, RDF_XML, FIXED_SHAPE_MAP, JSON_LD, TURTLE_ITER
 
 
 def produce_shape_map_according_to_input(sm_format, sgraph, namespaces_prefix_dict, target_classes,
@@ -101,7 +103,16 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
         else:
             result = MultiTsvNtTriplesYielder(list_of_files=list_of_source_files,
                                               allow_untyped_numbers=allow_untyped_numbers)
-    elif input_format in [TURTLE, N3, RDF_XML, JSON_LD]:
+    elif input_format == TURTLE_ITER:
+        if source_file is not None or raw_graph is not None:
+            result = BigTtlTriplesYielder(source_file=source_file,
+                                          allow_untyped_numbers=allow_untyped_numbers,
+                                          raw_graph=raw_graph)
+        else:
+            result = MultiBigTtlTriplesYielder(list_of_files=list_of_source_files,
+                                               allow_untyped_numbers=allow_untyped_numbers)
+
+    elif input_format in [N3, RDF_XML, JSON_LD, TURTLE]:
         if source_file is not None or raw_graph is not None:
             result = RdflibParserTripleYielder(source=source_file,
                                                allow_untyped_numbers=allow_untyped_numbers,

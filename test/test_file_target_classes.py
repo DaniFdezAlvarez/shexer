@@ -2,8 +2,9 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import G1, BASE_FILES
 from test.t_utils import file_vs_str_tunned_comparison
+import os.path as pth
 
-_BASE_DIR = BASE_FILES + "target_classes\\"
+_BASE_DIR = BASE_FILES + "target_classes" + pth.sep
 
 class TestFileTargetClasses(unittest.TestCase):
 

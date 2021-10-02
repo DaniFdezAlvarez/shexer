@@ -2,10 +2,10 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import G1, BASE_FILES, G1_NT, default_namespaces, BASE_FILES_GENERAL
 from test.t_utils import file_vs_str_tunned_comparison
-
+import os.path as pth
 from shexer.consts import NT, TURTLE
 
-_BASE_DIR = BASE_FILES + "graph_list_of_files_input\\"
+_BASE_DIR = BASE_FILES + "graph_list_of_files_input" + pth.sep
 
 class TestGraphListOfFilesInput(unittest.TestCase):
 

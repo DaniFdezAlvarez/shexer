@@ -1,6 +1,8 @@
-BASE_FILES = "C:\\Users\\Dani\\repos-git\\shexerp3\\test\\t_files\\"
+import os.path as pth
 
-BASE_FILES_GENERAL = BASE_FILES + "general\\"
+# BASE_FILES = "C:\\Users\\Dani\\repos-git\\shexerp3\\test\\t_files\\"
+BASE_FILES = pth.join(pth.dirname(pth.normpath(__file__)), "t_files" + pth.sep)
+BASE_FILES_GENERAL = BASE_FILES + "general" + pth.sep
 
 G1 = BASE_FILES + "t_graph_1.ttl"
 G1_NT = BASE_FILES + "t_graph_1.nt"

@@ -2,10 +2,10 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import G1, BASE_FILES, G1_JSON_LD, G1_NT, G1_TSVO_SPO, G1_XML, G1_N3, default_namespaces
 from test.t_utils import file_vs_str_tunned_comparison
-
+import os.path as pth
 from shexer.consts import NT, TSV_SPO, RDF_XML, JSON_LD, N3, TURTLE
 
-_BASE_DIR = BASE_FILES + "general\\"
+_BASE_DIR = BASE_FILES + "general" + pth.sep
 
 class TestInputFormat(unittest.TestCase):
 
