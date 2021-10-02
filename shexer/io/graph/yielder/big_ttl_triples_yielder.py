@@ -5,6 +5,8 @@ import re
 
 _OTHER_BLANKS = re.compile("[\r\n\t]")
 _SEVERAL_BLANKS = re.compile("  +")
+_QUOTES_FOR_LITERALS = re.compile('[^\\\]"')
+_INIT_INLINE_COMMENT = re.compile(" #")
 _RDF_TYPE_CONTRACTED = ["a", "rdf:type"]
 _RDF_TYPE_URI = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
 _BOOLEANS = ["true", "false"]
@@ -22,9 +24,11 @@ wel--formated input. Bad-formatted may remain undetected and produce wrong tripl
 Please, in case you do not need to parse huge files that do not fit in the main memory
 of your computer, use RdflifTriplesYielder instead
 """
+
+
 class BigTtlTriplesYielder(BaseTriplesYielder):
 
-    def __init__(self, source_file=None, allow_untyped_numbers=False, raw_graph=None):
+    def __init__(self, source_file=None, allow_untyped_numbers=True, raw_graph=None):
 
         super(BigTtlTriplesYielder, self).__init__()
         self._source_file = source_file
@@ -52,19 +56,51 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
             self._process_line(a_line)
             if self._triple_ready:
                 self._triples_count += 1
+                # print("Wue")
                 yield (
                     tune_subj(self._tmp_s),
                     tune_prop(self._tmp_p),
                     tune_token(self._tmp_o,
-                               base_namespace=self._base)
+                               base_namespace=self._base,
+                               allow_untyped_numbers=self._allow_untyped_numbers)
                 )
+                # print("Wuo!")
+                # print( tune_subj(self._tmp_s),
+                #     tune_prop(self._tmp_p),
+                #     tune_token(self._tmp_o,
+                #                base_namespace=self._base))
                 self._triple_ready = False
 
 
     def _clean_line(self, str_line):
         result = _OTHER_BLANKS.sub(" ", str_line)
         result = _SEVERAL_BLANKS.sub(" ", result)
-        return result.strip()
+        result = result.strip()
+        return result if " #" not in result else self._remove_comments_if_needed(result)
+
+    def _remove_comments_if_needed(self, str_line):
+        """Remove comments in the middle of the line.
+        Lines starting with # wont be erased
+        """
+        if '"' not in str_line:  # Comment mark and no literals, trivial case
+            return str_line[:str_line.find(" #")]
+        # We need to find the begining and end of the literal to avoid erasing
+        # comments whithin literals (actual content)
+        quotes_indexes = []
+        count_down_quotes = 2
+        for a_match in _QUOTES_FOR_LITERALS.finditer(str_line):
+            quotes_indexes.append(a_match.start(0))
+            count_down_quotes -= 1
+            if count_down_quotes == 0:
+                break
+        for a_match in _INIT_INLINE_COMMENT.finditer(str_line):
+            if a_match.start(0) < quotes_indexes[0] or a_match.start(0) > quotes_indexes[1]:
+                return str_line[:a_match.start(0)]
+        return str_line  # If this point is reached, it means that the potential comments
+                         # are actual content of a string literal
+
+
+
 
     def _process_line(self, str_line):
         str_line = self._clean_line(str_line)
