@@ -1,4 +1,6 @@
 from shexer.core.class_shexer import ClassShexer
+from shexer.utils.target_elements import tune_target_classes_if_needed
+from shexer.utils.dict import reverse_keys_and_values
 
 
 def get_class_shexer(class_instances_target_dict,

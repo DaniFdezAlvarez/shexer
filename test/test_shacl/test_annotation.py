@@ -33,7 +33,6 @@ class TestAnnotation(unittest.TestCase):
                         )
         str_result = shaper.shex_graph(string_output=True,
                                        output_format=SHACL_TURTLE)
-        print(str(str_result))
         self.assertTrue(graph_comparison_file_vs_str(file_path=_BASE_DIR + "wiki_example_noanot_shacl.ttl",
                                                      str_target=str_result))
         self.assertTrue(text_contains_lines(text=str_result,

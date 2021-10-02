@@ -42,12 +42,13 @@ def tune_subj(a_token, raise_error_if_no_corners=True):
                        elem_type=elem_type)
 
 
-def tune_token(a_token, allow_untyped_numbers=False, raise_error_if_no_corners=True):
+def tune_token(a_token, allow_untyped_numbers=False, raise_error_if_no_corners=True, base_namespace=None):
     if a_token.startswith("<"):
         return IRI(remove_corners(a_uri=a_token,
                                   raise_error_if_no_corners=raise_error_if_no_corners))
     elif a_token.startswith('"'):
-        content, elem_type = parse_literal(a_token)
+        content, elem_type = parse_literal(an_elem=a_token,
+                                           base_namespace=base_namespace)
         return Literal(content=content,
                        elem_type=elem_type)
     elif a_token.startswith("_:"):

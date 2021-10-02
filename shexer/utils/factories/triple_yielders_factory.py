@@ -9,7 +9,7 @@ from shexer.io.graph.yielder.filter.filter_namespaces_triple_yielder import Filt
 from shexer.utils.factories.shape_map_parser_factory import get_shape_map_parser
 from shexer.model.graph.endpoint_sgraph import EndpointSGraph
 from shexer.utils.translators.list_of_classes_to_shape_map import ListOfClassesToShapeMap
-from shexer.utils.uri import remove_corners, unprefixize_uri_if_possible
+from shexer.utils.target_elements import tune_target_classes_if_needed
 from shexer.utils.dict import reverse_keys_and_values
 
 from shexer.consts import NT, TSV_SPO, N3, TURTLE, RDF_XML, FIXED_SHAPE_MAP, JSON_LD
@@ -122,17 +122,6 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
     else:
         return FilterNamespacesTriplesYielder(actual_triple_yielder=result,
                                               namespaces_to_ignore=namespaces_to_ignore)
-
-
-def tune_target_classes_if_needed(list_target_classes, prefix_namespaces_dict):
-    result = []
-    for a_original_class in list_target_classes:
-        if a_original_class.startswith("<"):
-            result.append(remove_corners(a_uri=a_original_class))
-        else:
-            result.append(unprefixize_uri_if_possible(target_uri=a_original_class,
-                                                      prefix_namespaces_dict=prefix_namespaces_dict))
-    return result
 
 
 def read_target_classes_from_file(file_target_classes, prefix_namespaces_dict):
