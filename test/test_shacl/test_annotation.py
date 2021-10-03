@@ -2,10 +2,10 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import BASE_FILES
 from test.t_utils import graph_comparison_file_vs_str, text_contains_lines
-
+import os.path as pth
 from shexer.consts import SHACL_TURTLE
 
-_BASE_DIR = BASE_FILES + "wikidata_annotation\\"
+_BASE_DIR = BASE_FILES + "wikidata_annotation" + pth.sep
 
 
 class TestAnnotation(unittest.TestCase):

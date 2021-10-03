@@ -2,10 +2,10 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import G1, BASE_FILES, default_namespaces
 from test.t_utils import graph_comparison_file_vs_str
-
+import os.path as pth
 from shexer.consts import TURTLE, SHACL_TURTLE
 
-_BASE_DIR = BASE_FILES + "shacl\\"
+_BASE_DIR = BASE_FILES + "shacl" + pth.sep
 
 
 class TestClassSelection(unittest.TestCase):
