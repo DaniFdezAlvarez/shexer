@@ -2,10 +2,10 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import BASE_FILES, default_namespaces
 from test.t_utils import file_vs_str_tunned_comparison
-
+import os.path as pth
 from shexer.consts import TURTLE
 
-_BASE_DIR = BASE_FILES + "namespaces_to_ignore\\"
+_BASE_DIR = BASE_FILES + "namespaces_to_ignore" + pth.sep
 
 class TestNamespacesToIgnore(unittest.TestCase):
 

@@ -2,8 +2,9 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import G1, BASE_FILES, G1_ALL_CLASSES_NO_COMMENTS
 from test.t_utils import file_vs_str_tunned_comparison, number_of_shapes
+import os.path as pth
 
-_BASE_DIR = BASE_FILES + "empty_shapes\\"
+_BASE_DIR = BASE_FILES + "empty_shapes" + pth.sep
 
 class TestRemoveEmptyShapes(unittest.TestCase):
 

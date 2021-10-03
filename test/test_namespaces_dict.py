@@ -2,10 +2,10 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import G1_NT, G1, BASE_FILES, default_namespaces, G1_ALL_CLASSES_NO_COMMENTS
 from test.t_utils import file_vs_str_tunned_comparison
-
+import os.path as pth
 from shexer.consts import TURTLE, NT
 
-_BASE_DIR = BASE_FILES + "namespaces_dict\\"
+_BASE_DIR = BASE_FILES + "namespaces_dict" + pth.sep
 
 class TestNamespacesDict(unittest.TestCase):
 

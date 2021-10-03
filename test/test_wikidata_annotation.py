@@ -29,8 +29,9 @@ class TestWikidataAnnotation(unittest.TestCase):
         str_result = shaper.shex_graph(string_output=True)
         self.assertTrue(text_contains_lines(text=str_result,
                                             list_lines=[
-                                                'wdt:P31  [wd:Q5]            // rdfs:comment "P31  -->  instance of ; Q5  -->  human"',
-                                                'wdt:P31  [wd:Q215627]       // rdfs:comment "P31  -->  instance of ; Q215627  -->  person"',
-                                                'wdt:P31  [wd:Q11689315]  ;  // rdfs:comment "P31  -->  instance of ; Q11689315  -->  hipopotams',
-                                                'p:P31  IRI                  // rdfs:comment "P31  -->  instance of"'
+                                                "rdfs:comment",
+                                                "Q5  -->  human",
+                                                "P31  -->  instance of",
+                                                "Q215627  -->  person",
+                                                "Q11689315  -->  (no label available)"
                                             ]))

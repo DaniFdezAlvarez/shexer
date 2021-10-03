@@ -1,6 +1,7 @@
 from shexer.utils.obj_references import check_just_one_not_none
 
-from shexer.consts import SHEXC, SHACL_TURTLE, NT, TSV_SPO, N3, TURTLE, RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE
+from shexer.consts import SHEXC, SHACL_TURTLE, NT, TSV_SPO, N3, TURTLE, TURTLE_ITER, \
+    RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE
 from shexer.utils.factories.class_profiler_factory import get_class_profiler
 from shexer.utils.factories.instance_tracker_factory import get_instance_tracker
 from shexer.utils.factories.class_shexer_factory import get_class_shexer
@@ -307,7 +308,7 @@ class Shaper(object):
 
     @staticmethod
     def _check_input_format(input_format):
-        if input_format not in [NT, TSV_SPO, N3, TURTLE, RDF_XML, JSON_LD]:
+        if input_format not in [NT, TSV_SPO, N3, TURTLE, RDF_XML, JSON_LD, TURTLE_ITER]:
             raise ValueError("Currently unsupported input format: " + input_format)
 
     @staticmethod

@@ -2,10 +2,10 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import BASE_FILES, default_namespaces
 from test.t_utils import file_vs_str_tunned_comparison
-
+import os.path as pth
 from shexer.consts import TURTLE
 
-_BASE_DIR = BASE_FILES + "opt_cardinality\\"  # We just need something with another instantiation property
+_BASE_DIR = BASE_FILES + "opt_cardinality" + pth.sep  # We just need something with another instantiation property
 
 
 class TestAllowOptCardinality(unittest.TestCase):
