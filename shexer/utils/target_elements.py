@@ -1,4 +1,16 @@
 from shexer.utils.shapes import build_shapes_name_for_class_uri
+from shexer.utils.uri import remove_corners, unprefixize_uri_if_possible
+
+
+def tune_target_classes_if_needed(list_target_classes, prefix_namespaces_dict):
+    result = []
+    for a_original_class in list_target_classes:
+        if a_original_class.startswith("<"):
+            result.append(remove_corners(a_uri=a_original_class))
+        else:
+            result.append(unprefixize_uri_if_possible(target_uri=a_original_class,
+                                                      prefix_namespaces_dict=prefix_namespaces_dict))
+    return result
 
 def determine_original_target_nodes_if_needed(remove_empty_shapes, original_target_classes, original_shape_map, shapes_namespace):
     if not remove_empty_shapes:

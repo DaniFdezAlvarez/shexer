@@ -3,8 +3,9 @@ from shexer.shaper import Shaper
 from test.const import BASE_FILES
 from test.t_utils import file_vs_str_tunned_comparison
 from shexer.consts import TURTLE
+import os.path as pth
 
-_BASE_DIR = BASE_FILES + "qualifiers\\"
+_BASE_DIR = BASE_FILES + "qualifiers" + pth.sep
 
 class TestShapeQualifiersMode(unittest.TestCase):
 

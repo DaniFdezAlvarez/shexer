@@ -2,12 +2,12 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import G1, BASE_FILES, default_namespaces
 from test.t_utils import file_vs_str_tunned_comparison
-
+import os.path as pth
 from rdflib import Graph
 
 from shexer.consts import TURTLE
 
-_BASE_DIR = BASE_FILES + "general\\"
+_BASE_DIR = BASE_FILES + "general" + pth.sep
 
 class TestGraphFileInput(unittest.TestCase):
 

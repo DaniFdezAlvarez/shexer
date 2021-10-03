@@ -2,10 +2,10 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import BASE_FILES
 from test.t_utils import graph_comparison_file_vs_str, text_contains_lines
-
+import os.path as pth
 from shexer.consts import SHACL_TURTLE
 
-_BASE_DIR = BASE_FILES + "wikidata_annotation\\"
+_BASE_DIR = BASE_FILES + "wikidata_annotation" + pth.sep
 
 
 class TestAnnotation(unittest.TestCase):
@@ -33,7 +33,6 @@ class TestAnnotation(unittest.TestCase):
                         )
         str_result = shaper.shex_graph(string_output=True,
                                        output_format=SHACL_TURTLE)
-        print(str(str_result))
         self.assertTrue(graph_comparison_file_vs_str(file_path=_BASE_DIR + "wiki_example_noanot_shacl.ttl",
                                                      str_target=str_result))
         self.assertTrue(text_contains_lines(text=str_result,

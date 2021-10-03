@@ -1,12 +1,16 @@
-BASE_FILES = "C:\\Users\\Dani\\repos-git\\shexerp3\\test\\t_files\\"
+import os.path as pth
 
-BASE_FILES_GENERAL = BASE_FILES + "general\\"
+# BASE_FILES = "C:\\Users\\Dani\\repos-git\\shexerp3\\test\\t_files\\"
+BASE_FILES = pth.join(pth.dirname(pth.normpath(__file__)), "t_files" + pth.sep)
+BASE_FILES_GENERAL = BASE_FILES + "general" + pth.sep
 
 G1 = BASE_FILES + "t_graph_1.ttl"
 G1_NT = BASE_FILES + "t_graph_1.nt"
 G1_TSVO_SPO = BASE_FILES + "t_graph_1.tsv"
 G1_JSON_LD = BASE_FILES + "t_graph_1.json"
 G1_XML = BASE_FILES + "t_graph_1.xml"
+G1_TTL_WITH_BASE = BASE_FILES + "t_graph_1_base.ttl"
+
 G1_N3 = BASE_FILES + "t_graph_1.n3"
 
 G1_ALL_CLASSES_NO_COMMENTS = BASE_FILES_GENERAL + "g1_all_classes_no_comments.shex"

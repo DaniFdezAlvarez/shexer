@@ -3,8 +3,9 @@ from shexer.shaper import Shaper
 from shexer.consts import NT
 from test.const import G1_NT, BASE_FILES, BASE_FILES_GENERAL, default_namespaces
 from test.t_utils import file_vs_str_tunned_comparison
+import os.path as pth
 
-_BASE_DIR = BASE_FILES + "instances_file_input\\"
+_BASE_DIR = BASE_FILES + "instances_file_input" + pth.sep
 
 class TestInstancesFileInput(unittest.TestCase):
 

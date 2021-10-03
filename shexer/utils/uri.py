@@ -41,7 +41,7 @@ def add_corners_if_it_is_an_uri(a_candidate_uri):
     return a_candidate_uri
 
 
-def decide_literal_type(a_literal):
+def decide_literal_type(a_literal, base_namespace=None):
     if there_is_arroba_after_last_quotes(a_literal):
         return LANG_STRING_TYPE
     elif "\"^^" not in a_literal:
@@ -56,11 +56,12 @@ def decide_literal_type(a_literal):
         return OPENGIS_NAMESPACE + a_literal[a_literal.find("geo:") + 4:]
     elif XSD_NAMESPACE in a_literal or RDF_SYNTAX_NAMESPACE in a_literal \
             or DT_NAMESPACE in a_literal or OPENGIS_NAMESPACE in a_literal:
-        # substring = a_literal[a_literal.find("\"^^"):]
-        # return _add_prefix(substring[substring.rfind("#")+1:-1], XSD_PREFIX)
         return a_literal[a_literal.find("\"^^")+4:-1]
     elif a_literal.strip().endswith(">"):
-        return a_literal[a_literal.find("\"^^") + 4:-1]
+        candidate_type = a_literal[a_literal.find("\"^^") + 4:-1]  # plain uri, no corners
+        if base_namespace is not None and not candidate_type.startswith("http"):
+            return base_namespace + candidate_type
+        return candidate_type
     else:
         raise RuntimeError("Unrecognized literal type:" + a_literal)
 
@@ -86,9 +87,10 @@ def there_is_arroba_after_last_quotes(target_str):
     return False
 
 
-def parse_literal(an_elem):
+def parse_literal(an_elem, base_namespace=None):
     content = an_elem[1:an_elem.find('"', 1)]
-    elem_type = decide_literal_type(an_elem)
+    elem_type = decide_literal_type(a_literal=an_elem,
+                                    base_namespace=base_namespace)
     return content, elem_type
 
 def parse_unquoted_literal(an_elem):
@@ -99,8 +101,20 @@ def parse_unquoted_literal(an_elem):
 def unprefixize_uri_if_possible(target_uri, prefix_namespaces_dict):
     for a_prefix in prefix_namespaces_dict:
         if target_uri.startswith(a_prefix+":"):
-            return target_uri.replace(a_prefix+":", prefix_namespaces_dict[a_prefix])
+            result = target_uri.replace(a_prefix+":", prefix_namespaces_dict[a_prefix])
+            if add_corners:
+                result = add_corners(result)
+            return result
     return target_uri
+
+def unprefixize_uri_mandatory(target_uri, prefix_namespaces_dict, include_corners=True):
+    for a_prefix in prefix_namespaces_dict:
+        if target_uri.startswith(a_prefix+":"):
+            result = target_uri.replace(a_prefix+":", prefix_namespaces_dict[a_prefix])
+            if include_corners:
+                result = add_corners(result)
+            return result
+    raise ValueError("Unrecognized prefix in the following element" + target_uri)
 
 
 def prefixize_uri_if_possible(target_uri, namespaces_prefix_dict):

@@ -3,10 +3,10 @@ from shexer.shaper import Shaper
 from test.const import G1, BASE_FILES, default_namespaces
 from shexer.consts import JSON, FIXED_SHAPE_MAP
 from test.t_utils import file_vs_str_tunned_comparison
-
+import os.path as pth
 from shexer.consts import TURTLE
 
-_BASE_DIR = BASE_FILES + "shape_map\\"
+_BASE_DIR = BASE_FILES + "shape_map" + pth.sep
 
 class TestShapeMapFormat(unittest.TestCase):
 
