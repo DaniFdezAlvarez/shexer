@@ -56,7 +56,6 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
             self._process_line(a_line)
             if self._triple_ready:
                 self._triples_count += 1
-                # print("Wue")
                 yield (
                     tune_subj(self._tmp_s),
                     tune_prop(self._tmp_p),
@@ -64,11 +63,6 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
                                base_namespace=self._base,
                                allow_untyped_numbers=self._allow_untyped_numbers)
                 )
-                # print("Wuo!")
-                # print( tune_subj(self._tmp_s),
-                #     tune_prop(self._tmp_p),
-                #     tune_token(self._tmp_o,
-                #                base_namespace=self._base))
                 self._triple_ready = False
 
 
@@ -85,7 +79,7 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
         if '"' not in str_line:  # Comment mark and no literals, trivial case
             return str_line[:str_line.find(" #")]
         # We need to find the begining and end of the literal to avoid erasing
-        # comments whithin literals (actual content)
+        # comments within literals (actual content)
         quotes_indexes = []
         count_down_quotes = 2
         for a_match in _QUOTES_FOR_LITERALS.finditer(str_line):
@@ -238,6 +232,8 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
         elif raw_elem in _RDF_TYPE_CONTRACTED:
             return _RDF_TYPE_URI
         elif ":" in raw_elem:
+            if raw_elem.startswith("_:"):
+                return raw_elem
             return unprefixize_uri_mandatory(target_uri=raw_elem,
                                              prefix_namespaces_dict=self._prefixes)
         elif raw_elem in _BOOLEANS or self._is_num_literal(raw_elem):
