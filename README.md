@@ -13,7 +13,7 @@ sheXer can be installed using pip:
 
     $ pip install shexer
 	
-Iy you want to install sheXer by source, all its external dependencies are listed in the file requirements.txt. Ypu can install them all as well using pip:
+Iy you want to install sheXer by source, all its external dependencies are listed in the file requirements.txt. You can install them all as well using pip:
 
     $ pip install -r requirements.txt
 
@@ -22,26 +22,39 @@ sheXer includes a package to deploy a wer service exposing sheXer with a REST AP
 
 ## Features
 
+* **Process huge sources**. sheXer does not need to load the whole content of the graph in main memory at any time, so big graphs can be processed in average hardware. Currently this is available just for some input formats: n-triples (choose const.NT as for input_format), and turtle (choose const.TURTLE_ITER).
 
 * **Several ways to provide input data**, consisting of a target graph and some target shapes. Tha graph can be provided via raw string content, local/remote file(s), or tracking on the fly some triples from a SPARQL endpoint. There are defined interfaces in case you want to implement some other way to provide input information. 
+
 * **Several ways to select your target shapes**. You may want to generate shapes for each class in the graph or maybe just for some of them. You may want to generate a shape for some custom node agrupations. Or maybe you are extracting some shapes from a big grpah and you just want to explore the neighborhood of some seed nodes.  For custom node aggrupations sheXer supports ShEx's shape maps syntax, and it provides configuration params to target different classes or graph depths. 
+
 * **Valid ShEx and SHACL**. The produced shapes are compilant with the current specification of ShEx2 and SHACL.
+
 * **Threshold of tolerance**. The constraints inferred for each shape may not be compatible with every node associated to the shapes. With this threshold you can indicate the minimun percentage of nodes that should conform with a constraint c. If c does not reach the indicated ratio, its associated information will not appear in the final shape.
+
 * **Informative comments** (just for ShEx, by now). Each constraint inferred is associated to one or more comments. Those comments include different types of information, such as the ratio of nodes that actually conform with a given constraint. You can keep this informative comments or exclude them from the results.
+
 * **Sorted constraints** (just for ShEx, by now). For a given constraint, sheXer keeps the ratio of nodes that conform with it. This is used as a score of trustworthiness. The constraints in a shape are sorted w.r.t. this score.
+
 * **Literals recognition**. All kinds of typed literals are recognized and treated separately when inferring the constraints. In case a literal is not explicitly associated with a type in the original KG, xsd:string is used by default. By default, when sheXer finds an untyped literal it tries to infer its type when it is a number. Support to some other untyped literals, such as geolocated points, may be included in future releases.
+
 * **Shapes interlinkage**: sheXer is able to detect links between shapes when there is a link between two nodes and those nodes are used to extract some shape. When it detects triples linking a node that does not belong to any other shape, then it uses the macro IRI instead.
+
 * **Special treatment of rdf:type** (or the specified instantiation property). When the predicate of a triple is rdf:type, sheXer creates a constraint whose object is a value set containing a single element. This is the actual object of the original triple.
+
 * **Cardinality management**. Some of the triples of a given instance may fit in an infinite number of constraint triples with the same predicate and object but different cardinality. For example, if a given instance has a single label specified by rdfs:label, that makes it fit with infinite triple constraints with the schema {rdfs:label xsd:string C}, where C can be any cardinality that includes the posibility of a single occurrence: {1}, + , {1,2}, {1,3}, {1,4},... Currently, sheXer admints exact cardinalities ({2}, {3}..), kleene closure (\*), positive closure (+), and optional cardinality (?).
+
 * **Configurable priority of cardinalities**. sheXer can be configured to prioritize the less specific cardinality or the most specific one if its trustworthiness score is high enough.
+
 * **All compliant mode**: You can produce shapes that conform with every instance using to extract them. This is done by using cadinalities \* or ? for every constraint extracted that does not conform with EVERY instance. You may prefer to avoid these cardinalities and keep constraints that may not conform with every instance, but include the most frequent features of the instances. Both settings are available in sheXer.
+
 * **Management of empty shapes**. You may get some shapes with no constraints, either because there where no isntances to explore or because the extracted features were not as common as requested with the threshold of tolerance. You can configure sheXer to automatically erase those shapes and every mention to them from the results. 
+
 * **Adaptation to Wikidata model**. sheXer includes configuration params to handle Wikidata's data model regarding qualifiers, so you can automatically extract the schema of qualifier nodes too. You can also produce content where each Wikidata ID is associated with  its label in comments, as sheXer is integrated with [wLighter](https://github.com/DaniFdezAlvarez/wLighter).
 
 ## Experimental results
 
 In the folder [experiments](https://github.com/DaniFdezAlvarez/shexer/tree/develop/experiments), you can see some results of applying this tool over different graphs with different configurations.
-
 
 ## Example code
 
