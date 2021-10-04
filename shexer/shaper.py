@@ -10,6 +10,7 @@ from shexer.utils.factories.shape_map_factory import get_shape_map_if_needed
 from shexer.io.profile.formater.abstract_profile_serializer import AbstractProfileSerializer
 from shexer.utils.factories.shape_serializer_factory import get_shape_serializer
 from shexer.utils.namespaces import find_adequate_prefix_for_shapes_namespaces
+from shexer.utils.log import log_msg
 
 
 class Shaper(object):
@@ -160,12 +161,14 @@ class Shaper(object):
         self._class_shexer = None
         self._shape_list = None
 
-    def profile_graph(self, string_output=False, output_file=None):
+    def profile_graph(self, string_output=False, output_file=None, verbose=False):
         self._check_correct_output_params(string_output, output_file)
         if self._target_classes_dict is None:
-            self._launch_instance_tracker()
+            self._launch_instance_tracker(verbose=verbose)
         if self._profile is None:
-            self._launch_class_profiler()
+            self._launch_class_profiler(verbose=verbose)
+        log_msg(verbose=verbose,
+                msg="Building_output...")
         if string_output:
             return AbstractProfileSerializer(self._profile).get_string_representation()
         return AbstractProfileSerializer(self._profile).write_profile_to_file(target_file=output_file)
@@ -173,23 +176,28 @@ class Shaper(object):
     def shex_graph(self, string_output=False,
                    output_file=None,
                    output_format=SHEXC,
-                   acceptance_threshold=0):
+                   acceptance_threshold=0,
+                   verbose=False):
         """
         :param string_output:
         :param output_file:
         :param output_format:
         :param acceptance_threshold:
+        :param verbose:
         :return:
         """
         self._check_correct_output_params(string_output, output_file)
         self._check_output_format(output_format)
         self._check_aceptance_threshold(acceptance_threshold)
         if self._target_classes_dict is None:
-            self._launch_instance_tracker()
+            self._launch_instance_tracker(verbose=verbose)
         if self._profile is None:
-            self._launch_class_profiler()
+            self._launch_class_profiler(verbose=verbose)
         if self._shape_list is None:
-            self._launch_class_shexer(acceptance_threshold=acceptance_threshold)
+            self._launch_class_shexer(acceptance_threshold=acceptance_threshold,
+                                      verbose=verbose)
+        log_msg(verbose=verbose,
+                msg="Building_output...")
         serializer = self._build_shapes_serializer(target_file=output_file,
                                                    string_return=string_output,
                                                    output_format=output_format)
@@ -200,20 +208,22 @@ class Shaper(object):
         self._namespaces_dict[self._shapes_namespace] = \
             find_adequate_prefix_for_shapes_namespaces(self._namespaces_dict)
 
-    def _launch_class_profiler(self):
+    def _launch_class_profiler(self, verbose=False):
         if self._class_profiler is None:
             self._class_profiler = self._build_class_profiler()
-        self._profile = self._class_profiler.profile_classes()
+        self._profile = self._class_profiler.profile_classes(verbose=verbose)
 
-    def _launch_class_shexer(self, acceptance_threshold):
+    def _launch_class_shexer(self, acceptance_threshold, verbose=False):
         if self._class_shexer is None:
             self._class_shexer = self._build_class_shexer()
-        self._shape_list = self._class_shexer.shex_classes(acceptance_threshold=acceptance_threshold)
+        self._shape_list = self._class_shexer.shex_classes(acceptance_threshold=acceptance_threshold,
+                                                           verbose=verbose)
 
-    def _launch_instance_tracker(self):
+    def _launch_instance_tracker(self, verbose=False):
         if self._instance_tracker is None:
             self._instance_tracker = self._build_instance_tracker()
-        self._target_classes_dict = self._instance_tracker.track_instances()
+            print(type(self._instance_tracker))
+        self._target_classes_dict = self._instance_tracker.track_instances(verbose=verbose)
 
     def _build_class_shexer(self):
         return get_class_shexer(class_instances_target_dict=self._target_classes_dict,

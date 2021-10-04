@@ -4,6 +4,7 @@ from shexer.utils.factories.h_tree import get_basic_h_tree
 from shexer.core.instances.annotators.annotator_func import get_proper_annotator
 from shexer.core.instances.abstract_instance_tracker import AbstractInstanceTracker
 from shexer.consts import SHAPES_DEFAULT_NAMESPACE
+from shexer.utils.log import log_msg
 
 
 
@@ -52,12 +53,15 @@ class InstanceTracker(AbstractInstanceTracker):
     def htree(self):
         return self._htree
 
-    def track_instances(self):
+    def track_instances(self, verbose=False):
+        log_msg(verbose=verbose,
+                msg="Starting instance tracker...")
         self._reset_count()
         for a_revelant_triple in self._yield_relevant_triples():
             self._annotator.annotate_triple(a_revelant_triple)
         self._annotator.annotation_post_parsing()
-
+        log_msg(verbose=verbose,
+                msg="Instance tracker finished. {} instances located".format(len(self._instances_dict)))
         return self._instances_dict
 
     def _yield_relevant_triples(self):

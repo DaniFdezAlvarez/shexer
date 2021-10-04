@@ -9,6 +9,7 @@ from shexer.model.statement import POSITIVE_CLOSURE, KLEENE_CLOSURE, OPT_CARDINA
 from shexer.model.IRI import IRI_ELEM_TYPE
 from shexer.io.shex.formater.statement_serializers.fixed_prop_choice_statement_serializer import FixedPropChoiceStatementSerializer  # TODO: REPFACTOR
 from shexer.model.fixed_prop_choice_statement import FixedPropChoiceStatement
+from shexer.utils.log import log_msg
 
 
 class ClassShexer(object):
@@ -42,12 +43,22 @@ class ClassShexer(object):
                                                                                 shapes_namespace=shapes_namespace)
 
 
-    def shex_classes(self, acceptance_threshold=0):
+    def shex_classes(self, acceptance_threshold=0,
+                     verbose=False):
+        log_msg(verbose=verbose,
+                msg="Starting shape extraction...")
         self._build_shapes(acceptance_threshold)
+        log_msg(verbose=verbose,
+                msg="Shape drafts built. Sorting constraints...")
         self._sort_shapes()
+        log_msg(verbose=verbose,
+                msg="Constraints sorted. Adjusting cardinalities...")
         self._set_valid_constraints_of_shapes()
+        log_msg(verbose=verbose,
+                msg="Cardinalities adjusted. Cleaning empty shapes if needed...")
         self._clean_empty_shapes()
-
+        log_msg(verbose=verbose,
+                msg="No more shapes to clean. {} definitive shapes".format(len(self._shapes_list)))
         return self._shapes_list
 
     def _set_valid_constraints_of_shapes(self):
