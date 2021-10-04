@@ -1,4 +1,5 @@
 from shexer.core.instances.abstract_instance_tracker import AbstractInstanceTracker
+from shexer.utils.log import log_msg
 
 
 class ShapeMapInstanceTracker(AbstractInstanceTracker):
@@ -7,9 +8,13 @@ class ShapeMapInstanceTracker(AbstractInstanceTracker):
         self._shape_map = shape_map
         self._instances_dict = {}
 
-    def track_instances(self):
+    def track_instances(self, verbose=False):
+        log_msg(verbose=verbose,
+                msg="Starting instance tracker...")
         for an_item in self._shape_map.yield_items():
             self._solve_targets_of_an_item(an_item)
+        log_msg(verbose=verbose,
+                msg="Instance tracker finished. {} instances located".format(len(self._instances_dict)))
         return self._instances_dict
 
     def _solve_targets_of_an_item(self, an_item):
