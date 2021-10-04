@@ -1,4 +1,5 @@
 from shexer.core.instances.abstract_instance_tracker import AbstractInstanceTracker
+from shexer.utils.log import log_msg
 
 class MixedInstanceTracker(AbstractInstanceTracker):
 
@@ -7,15 +8,19 @@ class MixedInstanceTracker(AbstractInstanceTracker):
         self._secondary_instance_trackers = [] if len(list_of_instance_trackers) <= 1 else list_of_instance_trackers[1:]
         self._disambiguator_counter = 0
 
-
-    def track_instances(self):
-        reference_instances_dict = self._reference_instance_tracker.track_instances()
+    def track_instances(self, verbose=True):
+        log_msg(verbose=verbose,
+                msg="Starting instance tracking process with a MixedInstance tracker. "
+                    "Several Instance Trackers may be launched...")
+        reference_instances_dict = self._reference_instance_tracker.track_instances(verbose=verbose)
         for a_tracker in self._secondary_instance_trackers:
             self._integrate_dicts(reference_dict=reference_instances_dict,
-                                  new_dict=a_tracker.track_instances(),
+                                  new_dict=a_tracker.track_instances(verbose=verbose),
                                   new_tracker=a_tracker)
+        log_msg(verbose=verbose,
+                msg="Every instance tracker has finished and their results have been integrated."
+                    " {} instances have been located".format(len(reference_instances_dict)))
         return reference_instances_dict
-
 
     def _integrate_dicts(self, reference_dict, new_dict, new_tracker):
         if not self._is_there_key_ambiguity(reference_iterable=reference_dict,
@@ -26,7 +31,6 @@ class MixedInstanceTracker(AbstractInstanceTracker):
             self._integrate_dicts_with_key_ambiguity(reference_dict=reference_dict,
                                                      new_dict=new_dict,
                                                      new_tracker=new_tracker)
-
 
     def _is_there_key_ambiguity(self, reference_iterable, new_iterable):
         """

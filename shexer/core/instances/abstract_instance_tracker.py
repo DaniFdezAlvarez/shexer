@@ -1,7 +1,7 @@
 
 class AbstractInstanceTracker(object):
 
-    def track_instances(self):
+    def track_instances(self, verbose=False):
         raise NotImplementedError()
 
 

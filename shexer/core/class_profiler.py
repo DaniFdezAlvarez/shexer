@@ -6,6 +6,7 @@ from shexer.model.property import Property
 from shexer.model.bnode import BNode
 from shexer.utils.uri import remove_corners
 from shexer.consts import SHAPES_DEFAULT_NAMESPACE
+from shexer.utils.log import log_msg
 
 RDF_TYPE_STR = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 
@@ -39,13 +40,20 @@ class ClassProfiler(object):
 
 
 
-    def profile_classes(self):
+    def profile_classes(self, verbose):
+        log_msg(verbose=verbose,
+                msg="Starting class profiler...")
         self._build_shape_of_instances()
-        # print("Number of relevant triples", self._relevant_triples)
-        # print("Profiler... shape of instances built!")
+        log_msg(verbose=verbose,
+                msg="Instance features annotated. Number of relevant triples computed: {}. "
+                    "Building shape profiles...".format(self._relevant_triples))
+
         self._build_class_profile()
-        # print("Profiler... class profile built!")
+        log_msg(verbose=verbose,
+                msg="Draft shape profiles built. Cleaning shape profiles...")
         self._clean_class_profile()
+        log_msg(verbose=verbose,
+                msg="Shape profiles done. Working with {} shapes.".format(len(self._classes_shape_dict)))
         return self._classes_shape_dict
 
     def get_target_classes_dict(self):

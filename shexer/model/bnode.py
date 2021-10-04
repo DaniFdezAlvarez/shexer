@@ -16,3 +16,7 @@ class BNode(object):
     @property
     def elem_type(self):
         return BNODE_ELEM_TYPE
+
+    @property
+    def iri(self):
+        return self._identifier
