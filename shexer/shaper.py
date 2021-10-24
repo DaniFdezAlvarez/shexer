@@ -158,6 +158,7 @@ class Shaper(object):
         self._target_classes_dict = None
         self._class_profiler = None
         self._profile = None
+        self._class_counts = None
         self._class_shexer = None
         self._shape_list = None
 
@@ -211,7 +212,7 @@ class Shaper(object):
     def _launch_class_profiler(self, verbose=False):
         if self._class_profiler is None:
             self._class_profiler = self._build_class_profiler()
-        self._profile = self._class_profiler.profile_classes(verbose=verbose)
+        self._profile, self._class_counts = self._class_profiler.profile_classes(verbose=verbose)
 
     def _launch_class_shexer(self, acceptance_threshold, verbose=False):
         if self._class_shexer is None:
@@ -222,11 +223,10 @@ class Shaper(object):
     def _launch_instance_tracker(self, verbose=False):
         if self._instance_tracker is None:
             self._instance_tracker = self._build_instance_tracker()
-            print(type(self._instance_tracker))
         self._target_classes_dict = self._instance_tracker.track_instances(verbose=verbose)
 
     def _build_class_shexer(self):
-        return get_class_shexer(class_instances_target_dict=self._target_classes_dict,
+        return get_class_shexer(class_counts=self._class_counts,
                                 class_profile_dict=self._profile,
                                 original_target_classes=self._target_classes,
                                 original_shape_map=self._built_shape_map,
