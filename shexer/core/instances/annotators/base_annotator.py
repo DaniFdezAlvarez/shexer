@@ -27,33 +27,26 @@ class BaseAnnotator(object):
     def is_relevant_triple(self, a_triple):
         return self._strategy_mode.is_relevant_triple(a_triple)
 
-        # if a_triple[_P] != self._instantiation_property:
-        #     return False
-        # elif self._all_classes_mode:
-        #     if a_triple[_O].iri not in self._instances_dict:
-        #         # The next line "shouldnt" be executed here, it fits better in annotation methods.
-        #         # However, doing it here avoid to check in those methods again the conditions in which this class
-        #         # should be added to the instnaceS_dict
-        #         self.add_new_class_to_instances_dict(a_triple[_O].iri)
-        #         return True
-        # elif a_triple[_O].iri not in self._instances_dict:
-        #     return False
-        # return True
-
     def annotate_triple(self, a_triple):
         self._strategy_mode.annotate_triple(a_triple)
 
+    # def add_new_class_to_instances_dict(self, class_uri):
+    #     if class_uri not in self._instances_dict:
+    #         self._instances_dict[class_uri] = set()
 
+    # def annotate_instance(self, a_triple):
+    #     self._instances_dict[a_triple[_O].iri].add(a_triple[_S].iri)
 
-    def add_new_class_to_instances_dict(self, class_uri):
-        if class_uri not in self._instances_dict:
-            self._instances_dict[class_uri] = set()
+    def add_instance_to_instances_dict(self, a_triple):
+        if a_triple[_S].iri not in self._instances_dict:
+            self._instances_dict[a_triple[_S].iri] = []
+
+    def annotate_class(self, a_triple):
+        self._instances_dict[a_triple[_S].iri].append(a_triple[_O].iri)
 
     def annotation_post_parsing(self):
         self._strategy_mode.annotation_post_parsing()
 
-    def annotate_instance(self, a_triple):
-        self._instances_dict[a_triple[_O].iri].add(a_triple[_S].iri)
 
     def _get_proper_strategy(self):
         strategies_list = []

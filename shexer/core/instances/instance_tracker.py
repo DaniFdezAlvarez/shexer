@@ -85,20 +85,20 @@ class InstanceTracker(AbstractInstanceTracker):
 
     @staticmethod
     def _build_instances_dict(target_classes):
-        """
-        If there are target classes, we can build their dictionary now. Otherwise, all_classes_mode or
-        shape_qualifiers_mode will fill the instances dict in future methods
+        # """
+        # If there are target classes, we can build their dictionary now. Otherwise, all_classes_mode or
+        # shape_qualifiers_mode will fill the instances dict in future methods
+        #
+        # :param target_classes:
+        # :return:
+        # """
+        # result = {}
+        # if target_classes is not None:
+        #     for a_class in target_classes:
+        #         result[a_class.iri] = set()
+        # # return result  # In this case, we will add keys on the fly, while parsing the input graph.
 
-        :param target_classes:
-        :return:
-        """
-        result = {}
-        if target_classes is not None:
-            for a_class in target_classes:
-                result[a_class.iri] = set()
-        # return result  # In this case, we will add keys on the fly, while parsing the input graph.
-
-        return result
+        return {}  # Empty in every case. Instances, on the fly, will be the keys
 
     @staticmethod
     def _decide_instantiation_property(instantiation_property):

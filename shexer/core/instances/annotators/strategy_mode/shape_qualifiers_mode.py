@@ -20,21 +20,33 @@ class ShapeQualifiersMode(BaseStrategyMode):
 
 
     def annotate_triple(self, a_triple):
-        self._annotate_qualifier_prop(a_triple[_P])
+        self._annotate_qualifier_shape(a_triple[_P])
+        # self._annotate_qualifier_prop(a_triple[_P])
         self._annotate_instance_of_a_qualifier(a_triple)
 
 
     def _annotate_instance_of_a_qualifier(self, a_triple):
-        self._instances_dict[self._dict_of_qualifier_properties[a_triple[_P].iri]].add(a_triple[_O].iri)
+        if a_triple[_O].iri not in self._instances_dict:
+            self._instances_dict[a_triple[_O].iri] = []
+        self._instances_dict[a_triple[_O].iri].append(self._dict_of_qualifier_properties[a_triple[_P].iri])
+        # self._instances_dict[self._dict_of_qualifier_properties[a_triple[_P].iri]].add(a_triple[_O].iri)
 
 
-    def _annotate_qualifier_prop(self, a_property):
+    def _annotate_qualifier_shape(self, a_property):
         str_prop = a_property.iri
         if str_prop not in self._dict_of_qualifier_properties:
             self._dict_of_qualifier_properties[str_prop] = \
                 build_shape_name_for_qualifier_prop_uri(prop_uri=str_prop,
                                                         shapes_namespace=self._shapes_namespace)
-            self._instances_dict[self._dict_of_qualifier_properties[str_prop]] = set()
+
+
+    # def _annotate_qualifier_prop(self, a_property):
+    #     str_prop = a_property.iri
+    #     if str_prop not in self._dict_of_qualifier_properties:
+    #         self._dict_of_qualifier_properties[str_prop] = \
+    #             build_shape_name_for_qualifier_prop_uri(prop_uri=str_prop,
+    #                                                     shapes_namespace=self._shapes_namespace)
+    #         self._instances_dict[self._dict_of_qualifier_properties[str_prop]] = set()
 
     # def annotation_post_parsing(self):
         # for a_key in self._dict_of_qualifier_properties:

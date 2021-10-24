@@ -110,11 +110,11 @@ class ClassShexer(object):
         for a_statement in original_statements:  # TODO Refactor!!! This is not the place to set the serializer
             self._set_serializer_object_for_statements(a_statement)
 
-        result = []
-        for i in range(0, len(original_statements)):
-            result.append(original_statements[i])
+        # result = []
+        # for i in range(0, len(original_statements)):
+        #     result.append(original_statements[i])
 
-        result = self._group_constraints_with_same_prop_and_obj(result)
+        result = self._group_constraints_with_same_prop_and_obj(original_statements)
         result = self._group_IRI_constraints(result)
         # result = self._group_constraints_with_same_prop_but_different_obj(result)
 
@@ -152,31 +152,62 @@ class ClassShexer(object):
         return result
 
     def _manage_group_to_decide_without_or(self, group_to_decide):
-        result = []
-        to_compose = []
-        for a_statement in group_to_decide:
-            if self._is_an_IRI(a_statement.st_type):
-                to_compose.append(a_statement)
-            else:
-                result.append(a_statement)
-        to_compose.sort(reverse=True, key=lambda x: x.probability)
-        target_sentence = self._get_IRI_statement_in_group(to_compose)
-        self._remove_IRI_statements_if_useles(group_of_statements=to_compose)
-        if len(to_compose) > 1:
-            for a_statement in to_compose:
-                if a_statement.st_type != IRI_ELEM_TYPE:
-                    target_sentence.add_comment(self._turn_statement_into_comment(a_statement))
-            result.append(target_sentence)
-        elif len(to_compose) == 1:
-            result.append(to_compose[0])
-        # else  # No sentences to join
+        """
+        At this point, the candidate sentences can sahere prop, but no obj.
+        This is, every sentence in group_to_decide has an unique obj.
 
-        return result
+        if len(group_to_decide) > 2 --> IRI should be picked, everything else to comments.
+        if len(group_to_decide) == 2 --> IRI if it has higher trustworthiness, the specific obj otherwhise
+
+        :param group_to_decide:
+        :return:
+        """
+        # iri_sentence = self._get_IRI_statement_in_group(group_to_decide)
+        iri_sentence, specific_sentences = self._split_in_iri_and_group_of_specific_sentences(group_to_decide)
+        if len(specific_sentences) > 1 or iri_sentence.probability > specific_sentences[0].probability :
+            for a_statement in specific_sentences:
+                iri_sentence.add_comment(self._turn_statement_into_comment(a_statement))
+                return [iri_sentence]
+        #else --> iri_sentence.probability == specific_sentences[0].probability and len(specific_sentences) == 1:
+        return specific_sentences
+
+        # result = []
+        # to_compose = []
+        # for a_statement in group_to_decide:
+        #     if self._is_an_IRI(a_statement.st_type):
+        #         to_compose.append(a_statement)
+        #     else:
+        #         result.append(a_statement)
+        # to_compose.sort(reverse=True, key=lambda x: x.probability)
+        # target_sentence = self._get_IRI_statement_in_group(to_compose)
+        # self._remove_IRI_statements_if_useles(group_of_statements=to_compose)
+        # if len(to_compose) > 1:
+        #     for a_statement in to_compose:
+        #         if a_statement.st_type != IRI_ELEM_TYPE:
+        #             target_sentence.add_comment(self._turn_statement_into_comment(a_statement))
+        #     result.append(target_sentence)
+        # elif len(to_compose) == 1:
+        #     result.append(to_compose[0])
+        # else  # No sentences to join
+        #
+        # return result
 
     def _get_IRI_statement_in_group(self, group_of_statements):
         for a_statement in group_of_statements:
             if a_statement.st_type == IRI_ELEM_TYPE:
                 return a_statement
+
+    def _split_in_iri_and_group_of_specific_sentences(self, group_of_statements):
+        iri = None
+        specifics = []
+        for a_statement in group_of_statements:
+            if a_statement.st_type == IRI_ELEM_TYPE:
+                iri = a_statement
+            else:
+                specifics.append(a_statement)
+        specifics.sort(reverse=True, key=lambda x:x.probability)
+        return iri, specifics
+
 
     def _manage_group_to_decide_with_or(self, group_to_decide):
         if not self._group_contains_IRI_statements(group_to_decide):
