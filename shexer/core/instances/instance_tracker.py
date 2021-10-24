@@ -37,8 +37,7 @@ class InstanceTracker(AbstractInstanceTracker):
         self._annotator = get_proper_annotator(track_hierarchies=track_hierarchies,
                                                instance_tracker_ref=self)
 
-    @property
-    def disambiguator_prefix(self):
+    def _specific_disambiguator_prefix(self):
         return "class_"
 
     @property

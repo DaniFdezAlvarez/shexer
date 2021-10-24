@@ -92,9 +92,11 @@ class ClassProfiler(object):
         :return:
         """
         # self._classes_shape_dict
-        for a_class in self._original_raw_target_classes:
-            self._classes_shape_dict[a_class] = {}
-            self._class_counts[a_class] = 0
+        self._init_original_targets()
+        self._init_annotated_targets()
+
+
+    def _init_annotated_targets(self):
         for an_instance, class_list in self._target_classes_dict.items():
             for a_class in class_list:
                 if a_class not in self._classes_shape_dict:
@@ -102,6 +104,11 @@ class ClassProfiler(object):
                     self._class_counts[a_class] = 0
                 self._class_counts[a_class] += 1
 
+    def _init_original_targets(self):
+        if self._original_raw_target_classes:
+            for a_class in self._original_raw_target_classes:
+                self._classes_shape_dict[a_class] = {}
+                self._class_counts[a_class] = 0
 
     def _infer_3tuple_features(self, an_instance):
         result = []

@@ -223,7 +223,6 @@ class Shaper(object):
     def _launch_instance_tracker(self, verbose=False):
         if self._instance_tracker is None:
             self._instance_tracker = self._build_instance_tracker()
-            print(type(self._instance_tracker))
         self._target_classes_dict = self._instance_tracker.track_instances(verbose=verbose)
 
     def _build_class_shexer(self):

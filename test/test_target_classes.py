@@ -15,7 +15,6 @@ class TestTargetClasses(unittest.TestCase):
                         input_format="turtle",
                         disable_comments=True)
         str_result = shaper.shex_graph(string_output=True)
-        print(str_result)
         self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "one_target.shex",
                                                       str_target=str_result))
 

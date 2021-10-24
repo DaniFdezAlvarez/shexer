@@ -162,35 +162,35 @@ class ClassShexer(object):
         :param group_to_decide:
         :return:
         """
-        # iri_sentence = self._get_IRI_statement_in_group(group_to_decide)
-        iri_sentence, specific_sentences = self._split_in_iri_and_group_of_specific_sentences(group_to_decide)
-        if len(specific_sentences) > 1 or iri_sentence.probability > specific_sentences[0].probability :
-            for a_statement in specific_sentences:
-                iri_sentence.add_comment(self._turn_statement_into_comment(a_statement))
-                return [iri_sentence]
-        #else --> iri_sentence.probability == specific_sentences[0].probability and len(specific_sentences) == 1:
-        return specific_sentences
+        # # iri_sentence = self._get_IRI_statement_in_group(group_to_decide)
+        # iri_sentence, specific_sentences = self._split_in_iri_and_group_of_specific_sentences(group_to_decide)
+        # if len(specific_sentences) > 1 or iri_sentence.probability > specific_sentences[0].probability :
+        #     for a_statement in specific_sentences:
+        #         iri_sentence.add_comment(self._turn_statement_into_comment(a_statement))
+        #         return [iri_sentence]
+        # #else --> iri_sentence.probability == specific_sentences[0].probability and len(specific_sentences) == 1:
+        # return specific_sentences
 
-        # result = []
-        # to_compose = []
-        # for a_statement in group_to_decide:
-        #     if self._is_an_IRI(a_statement.st_type):
-        #         to_compose.append(a_statement)
-        #     else:
-        #         result.append(a_statement)
-        # to_compose.sort(reverse=True, key=lambda x: x.probability)
-        # target_sentence = self._get_IRI_statement_in_group(to_compose)
-        # self._remove_IRI_statements_if_useles(group_of_statements=to_compose)
-        # if len(to_compose) > 1:
-        #     for a_statement in to_compose:
-        #         if a_statement.st_type != IRI_ELEM_TYPE:
-        #             target_sentence.add_comment(self._turn_statement_into_comment(a_statement))
-        #     result.append(target_sentence)
-        # elif len(to_compose) == 1:
-        #     result.append(to_compose[0])
+        result = []
+        to_compose = []
+        for a_statement in group_to_decide:
+            if self._is_an_IRI(a_statement.st_type):
+                to_compose.append(a_statement)
+            else:
+                result.append(a_statement)
+        to_compose.sort(reverse=True, key=lambda x: x.probability)
+        target_sentence = self._get_IRI_statement_in_group(to_compose)
+        self._remove_IRI_statements_if_useles(group_of_statements=to_compose)
+        if len(to_compose) > 1:
+            for a_statement in to_compose:
+                if a_statement.st_type != IRI_ELEM_TYPE:
+                    target_sentence.add_comment(self._turn_statement_into_comment(a_statement))
+            result.append(target_sentence)
+        elif len(to_compose) == 1:
+            result.append(to_compose[0])
         # else  # No sentences to join
-        #
-        # return result
+
+        return result
 
     def _get_IRI_statement_in_group(self, group_of_statements):
         for a_statement in group_of_statements:

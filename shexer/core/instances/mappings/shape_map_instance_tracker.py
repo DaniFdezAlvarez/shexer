@@ -24,6 +24,6 @@ class ShapeMapInstanceTracker(AbstractInstanceTracker):
             self._instances_dict[a_node].append(an_item.shape_label)
         # self._instances_dict[an_item.shape_label] = an_item.node_selector.get_target_nodes()
 
-    @property
-    def disambiguator_prefix(self):
+
+    def _specific_disambiguator_prefix(self):
         return "custom_"

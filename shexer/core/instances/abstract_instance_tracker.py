@@ -1,4 +1,6 @@
 
+_TRACKERS_DISAM_COUNT = 0
+
 class AbstractInstanceTracker(object):
 
     def track_instances(self, verbose=False):
@@ -12,8 +14,9 @@ class AbstractInstanceTracker(object):
         that may be integrated with other instance dicts and there should be any key colission.
         :return:
         """
-        raise NotImplementedError()
+        global _TRACKERS_DISAM_COUNT
+        _TRACKERS_DISAM_COUNT += 1
+        return self._specific_disambiguator_prefix() + str(_TRACKERS_DISAM_COUNT )
 
-    @property
-    def disambiguator_prefix(self):
-        return "mixed_"
+    def _specific_disambiguator_prefix(self):
+        raise NotImplementedError()
