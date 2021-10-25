@@ -1,5 +1,5 @@
 from shexer.utils.factories.triple_yielders_factory import get_triple_yielder
-from shexer.core.class_profiler import ClassProfiler
+from shexer.core.profiling.class_profiler import ClassProfiler
 
 
 def get_class_profiler(target_classes_dict, source_file, list_of_source_files, input_format,
@@ -47,7 +47,7 @@ def get_class_profiler(target_classes_dict, source_file, list_of_source_files, i
                                  limit_remote_instances=limit_remote_instances)
 
     return ClassProfiler(triples_yielder=yielder,
-                         target_classes_dict=target_classes_dict,
+                         instances_dict=target_classes_dict,
                          instantiation_property_str=instantiation_property_str,
                          original_target_classes=target_classes,
                          original_shape_map=built_shape_map,

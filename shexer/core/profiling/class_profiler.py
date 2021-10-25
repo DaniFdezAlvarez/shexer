@@ -1,31 +1,22 @@
-from shexer.model.IRI import IRI_ELEM_TYPE
-from shexer.utils.shapes import build_shapes_name_for_class_uri
 from shexer.utils.target_elements import determine_original_target_nodes_if_needed
 from shexer.model.property import Property
-from shexer.model.IRI import IRI
 from shexer.utils.uri import remove_corners
 from shexer.consts import SHAPES_DEFAULT_NAMESPACE
 from shexer.utils.log import log_msg
+from shexer.core.profiling.strategy.direct_features_strategy import DirectFeaturesStrategy
+from shexer.core.profiling.consts import _S, _P, _O, _ONE_TO_MANY, _POS_CLASSES, \
+    _POS_FEATURES_DIRECT, RDF_TYPE_STR
 
-RDF_TYPE_STR = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 
-_POS_CLASSES = 0
-_POS_FEATURES = 1
-
-_ONE_TO_MANY = "+"
-
-_S = 0
-_P = 1
-_O = 2
 
 
 class ClassProfiler(object):
 
-    def __init__(self, triples_yielder, target_classes_dict, instantiation_property_str=RDF_TYPE_STR,
+    def __init__(self, triples_yielder, instances_dict, instantiation_property_str=RDF_TYPE_STR,
                  remove_empty_shapes=True, original_target_classes=None, original_shape_map=None,
                  shapes_namespace=SHAPES_DEFAULT_NAMESPACE):
         self._triples_yielder = triples_yielder
-        self._target_classes_dict = target_classes_dict  # TODO  refactor: change name once working again
+        self._instances_dict = instances_dict  # TODO  refactor: change name once working again
         # self._instances_shape_dict = {}
         self._shapes_namespace = shapes_namespace
         self._shape_names_dict = {}  # Will be filled during execution
@@ -39,16 +30,17 @@ class ClassProfiler(object):
                                                                                 original_target_classes=original_target_classes,
                                                                                 original_shape_map=original_shape_map,
                                                                                 shapes_namespace=shapes_namespace)
+        self._strategy = DirectFeaturesStrategy(class_profiler=self)
 
 
     def profile_classes(self, verbose):
         log_msg(verbose=verbose,
                 msg="Starting class profiler...")
-        self._init_class_counts_and_shape_dict()
+        self._init_class_counts_and_shape_dict()  # Done here
         log_msg(verbose=verbose,
                 msg="Instance counts completed. Annotating instance features...")
-        self._adapt_instances_dict()
-        self._build_shape_of_instances()
+        self._adapt_instances_dict()  # Done here
+        self._build_shape_of_instances()  # Done here
         log_msg(verbose=verbose,
                 msg="Instance features annotated. Number of relevant triples computed: {}. "
                     "Building shape profiles...".format(self._relevant_triples))
@@ -62,7 +54,7 @@ class ClassProfiler(object):
         return self._classes_shape_dict, self._class_counts
 
     def get_target_classes_dict(self):
-        return self._target_classes_dict
+        return self._instances_dict
 
     @staticmethod
     def _decide_instantiation_property(instantiation_property_str):
@@ -78,7 +70,7 @@ class ClassProfiler(object):
 
     # def _build_shape_names_dict(self):
     #     result = {}
-    #     for a_class in self._target_classes_dict:
+    #     for a_class in self._instances_dict:
     #         name = build_shapes_name_for_class_uri(class_uri=a_class,
     #                                                shapes_namespace=self._shapes_namespace)
     #         result[a_class] = name
@@ -97,7 +89,7 @@ class ClassProfiler(object):
 
 
     def _init_annotated_targets(self):
-        for an_instance, class_list in self._target_classes_dict.items():
+        for an_instance, class_list in self._instances_dict.items():
             for a_class in class_list:
                 if a_class not in self._classes_shape_dict:
                     self._classes_shape_dict[a_class] = {}
@@ -112,10 +104,10 @@ class ClassProfiler(object):
 
     def _infer_3tuple_features(self, an_instance):
         result = []
-        for a_prop in self._target_classes_dict[an_instance][_POS_FEATURES]:
-            for a_type in self._target_classes_dict[an_instance][_POS_FEATURES][a_prop]:
+        for a_prop in self._instances_dict[an_instance][_POS_FEATURES_DIRECT]:
+            for a_type in self._instances_dict[an_instance][_POS_FEATURES_DIRECT][a_prop]:
                 for a_valid_cardinality in self._infer_valid_cardinalities(a_prop,
-                                                                           self._target_classes_dict[an_instance][_POS_FEATURES][a_prop][a_type]):
+                                                                           self._instances_dict[an_instance][_POS_FEATURES_DIRECT][a_prop][a_type]):
                     result.append( (a_prop, a_type, a_valid_cardinality) )
         return result
 
@@ -137,10 +129,10 @@ class ClassProfiler(object):
 
 
     def _build_class_profile(self):
-        for an_instance in self._target_classes_dict:
+        for an_instance in self._instances_dict:
             feautres_3tuple = self._infer_3tuple_features(an_instance)
 
-            for a_class in self._target_classes_dict[an_instance][_POS_CLASSES]:
+            for a_class in self._instances_dict[an_instance][_POS_CLASSES]:
                 self._annotate_instance_features_for_class(a_class, feautres_3tuple)
 
     def _clean_class_profile(self):
@@ -198,97 +190,26 @@ class ClassProfiler(object):
             self._classes_shape_dict[a_class][str_prop][str_type][cardinality] = 0
 
 
-
-
     def _build_shape_of_instances(self):
         for a_triple in self._yield_relevant_triples():
             self._relevant_triples += 1
             self._annotate_feature_of_target_instance(a_triple)
 
-
     def _annotate_feature_of_target_instance(self, a_triple):
-        str_subj = a_triple[_S].iri
-        str_prop = a_triple[_P].iri
-        type_obj = self._decide_type_obj(a_triple[_O], str_prop)
-
-        obj_shapes = [] if type_obj != IRI_ELEM_TYPE else self._decide_shapes_obj(a_triple[_O].iri)
-
-        self._introduce_needed_elements_in_shape_instances_dict(str_subj=str_subj,
-                                                                str_prop=str_prop,
-                                                                type_obj=type_obj,
-                                                                obj_shapes=obj_shapes)
-
-        self._target_classes_dict[str_subj][_POS_FEATURES][str_prop][type_obj] += 1
-        for a_shape in obj_shapes:
-            self._target_classes_dict[str_subj][_POS_FEATURES][str_prop][a_shape] += 1
-
-    def _decide_type_obj(self, original_object, str_prop):
-        """
-        Special traetment for self._instantiation_property_str property. We look for ValueSets instead of types when this property appears.
-
-        :param original_object:
-        :param str_prop:
-        :return:
-        """
-        if str_prop != self._instantiation_property_str:
-            return original_object.elem_type
-        return original_object.iri
-
-
-    def _introduce_needed_elements_in_shape_instances_dict(self, str_subj, str_prop, type_obj, obj_shapes):
-
-        if str_prop not in self._target_classes_dict[str_subj][_POS_FEATURES]:
-            self._target_classes_dict[str_subj][_POS_FEATURES][str_prop] = {}
-        if type_obj not in self._target_classes_dict[str_subj][_POS_FEATURES][str_prop]:
-            self._target_classes_dict[str_subj][_POS_FEATURES][str_prop][type_obj] = 0
-        for a_shape in obj_shapes:
-            if a_shape not in self._target_classes_dict[str_subj][_POS_FEATURES][str_prop]:
-                self._target_classes_dict[str_subj][_POS_FEATURES][str_prop][a_shape] = 0
-
+        self._strategy.annotate_triple_features(a_triple)
 
     def _adapt_instances_dict(self):
-        for a_subj_key in self._target_classes_dict:
-            self._target_classes_dict[a_subj_key] = (self._target_classes_dict[a_subj_key], {})
+        self._strategy.adapt_instances_dict()
 
     def _adapt_entry_dict_if_needed(self, str_subj):
-        if type(self._target_classes_dict[str_subj]) == list:
-            self._target_classes_dict[str_subj] = (self._target_classes_dict[str_subj], {})
-
-    def _decide_shapes_obj(self, str_obj):
-        if str_obj not in self._target_classes_dict:
-            return []
-        return [self._get_shape_name_for_a_class(a_class) for a_class in self._target_classes_dict[str_obj][_POS_CLASSES]]
-
-
-    def _get_shape_name_for_a_class(self, a_class):
-        self._assign_shape_name_if_needed(a_class)
-        return self._shape_names_dict[a_class]
-
-    def _assign_shape_name_if_needed(self, a_class):
-        if a_class in self._shape_names_dict:
-            return
-        self._shape_names_dict[a_class] = build_shapes_name_for_class_uri(class_uri=a_class,
-                                                                          shapes_namespace=self._shapes_namespace)
-
+        if type(self._instances_dict[str_subj]) == list:
+            self._instances_dict[str_subj] = (self._instances_dict[str_subj], {})
 
     def _yield_relevant_triples(self):
         for a_triple in self._triples_yielder.yield_triples():
-            if self._is_a_relevant_triple(a_triple):
+            if self._strategy.is_a_relevant_triple(a_triple):
                 yield a_triple
 
-    def _is_a_relevant_triple(self, a_triple):
-        """
-        The subject of the triple must be an instance of at least one of the target classes.
-        If it is, it returns True. False in the opposite case
 
-        :param a_triple:
-        :return: bool
-        """
-        return True if self._is_subject_in_target_classes(a_triple) else False
 
-    def _is_subject_in_target_classes(self, a_triple):
-        subj = a_triple[_S]
-        if not isinstance(subj, IRI):
-            return False
-        return subj.iri in self._target_classes_dict
 

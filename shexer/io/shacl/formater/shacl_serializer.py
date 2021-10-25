@@ -1,4 +1,4 @@
-from shexer.core.class_profiler import RDF_TYPE_STR
+from shexer.core.profiling.class_profiler import RDF_TYPE_STR
 from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 from rdflib import Graph, Namespace, URIRef, RDF, BNode, XSD, Literal
 from shexer.model.statement import POSITIVE_CLOSURE, KLEENE_CLOSURE, OPT_CARDINALITY

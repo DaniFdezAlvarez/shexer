@@ -1,4 +1,4 @@
-from shexer.core.class_profiler import RDF_TYPE_STR
+from shexer.core.profiling.class_profiler import RDF_TYPE_STR
 
 from shexer.model.property import Property
 from shexer.utils.uri import remove_corners
