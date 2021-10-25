@@ -110,13 +110,10 @@ class ClassShexer(object):
         for a_statement in original_statements:  # TODO Refactor!!! This is not the place to set the serializer
             self._set_serializer_object_for_statements(a_statement)
 
-        # result = []
-        # for i in range(0, len(original_statements)):
-        #     result.append(original_statements[i])
 
         result = self._group_constraints_with_same_prop_and_obj(original_statements)
         result = self._group_IRI_constraints(result)
-        # result = self._group_constraints_with_same_prop_but_different_obj(result)
+
 
         result.sort(reverse=True, key=lambda x: x.probability)  # Restoring order completly
         return result

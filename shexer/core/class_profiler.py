@@ -198,10 +198,6 @@ class ClassProfiler(object):
             self._classes_shape_dict[a_class][str_prop][str_type][cardinality] = 0
 
 
-    # def _is_instance_of_class(self, an_instance_str, a_class_str):
-    #     if an_instance_str in self._target_classes_dict[a_class_str]:
-    #         return True
-    #     return False
 
 
     def _build_shape_of_instances(self):
@@ -221,8 +217,7 @@ class ClassProfiler(object):
                                                                 str_prop=str_prop,
                                                                 type_obj=type_obj,
                                                                 obj_shapes=obj_shapes)
-                                                                # obj=a_triple[_O])#,
-                                                                #obj_shapes=obj_shapes)
+
         self._target_classes_dict[str_subj][_POS_FEATURES][str_prop][type_obj] += 1
         for a_shape in obj_shapes:
             self._target_classes_dict[str_subj][_POS_FEATURES][str_prop][a_shape] += 1
@@ -241,7 +236,7 @@ class ClassProfiler(object):
 
 
     def _introduce_needed_elements_in_shape_instances_dict(self, str_subj, str_prop, type_obj, obj_shapes):
-        # self._adapt_entry_dict_if_needed(str_subj)
+
         if str_prop not in self._target_classes_dict[str_subj][_POS_FEATURES]:
             self._target_classes_dict[str_subj][_POS_FEATURES][str_prop] = {}
         if type_obj not in self._target_classes_dict[str_subj][_POS_FEATURES][str_prop]:
@@ -249,17 +244,7 @@ class ClassProfiler(object):
         for a_shape in obj_shapes:
             if a_shape not in self._target_classes_dict[str_subj][_POS_FEATURES][str_prop]:
                 self._target_classes_dict[str_subj][_POS_FEATURES][str_prop][a_shape] = 0
-        # if str_subj not in self._instances_shape_dict:
-        #     self._instances_shape_dict[str_subj] = {}
-        # if str_prop not in self._instances_shape_dict[str_subj]:
-        #     self._instances_shape_dict[str_subj][str_prop] = {}
 
-        # if type_obj not in self._instances_shape_dict[str_subj][str_prop]:
-        #     self._instances_shape_dict[str_subj][str_prop][type_obj] = 0
-
-        # for a_shape in obj_shapes:
-        #     if a_shape not in self._instances_shape_dict[str_subj][str_prop]:
-        #         self._instances_shape_dict[str_subj][str_prop][a_shape] = 0
 
     def _adapt_instances_dict(self):
         for a_subj_key in self._target_classes_dict:
@@ -273,12 +258,7 @@ class ClassProfiler(object):
         if str_obj not in self._target_classes_dict:
             return []
         return [self._get_shape_name_for_a_class(a_class) for a_class in self._target_classes_dict[str_obj][_POS_CLASSES]]
-        # return self._target_classes_dict[str_obj][_POS_CLASSES]
-        # result = []
-        # for class_key in self._target_classes_dict:
-        #     if str_obj in self._target_classes_dict[class_key]:
-        #         result.append(self._shape_names_dict[class_key])
-        # return result
+
 
     def _get_shape_name_for_a_class(self, a_class):
         self._assign_shape_name_if_needed(a_class)
@@ -311,12 +291,4 @@ class ClassProfiler(object):
         if not isinstance(subj, IRI):
             return False
         return subj.iri in self._target_classes_dict
-
-        # if not isinstance(subj, BNode):
-        #     return False
-        # str_subj = subj.iri
-        # for class_key in self._target_classes_dict:
-        #     if str_subj in self._target_classes_dict[class_key]:
-        #         return True
-        # return False
 
