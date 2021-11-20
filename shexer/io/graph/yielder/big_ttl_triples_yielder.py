@@ -57,11 +57,13 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
             if self._triple_ready:
                 self._triples_count += 1
                 yield (
-                    tune_subj(self._tmp_s),
+                    tune_subj(self._tmp_s,
+                              raise_error_if_no_corners=False),
                     tune_prop(self._tmp_p),
                     tune_token(self._tmp_o,
                                base_namespace=self._base,
-                               allow_untyped_numbers=self._allow_untyped_numbers)
+                               allow_untyped_numbers=self._allow_untyped_numbers,
+                               raise_error_if_no_corners=False)
                 )
                 self._triple_ready = False
 
