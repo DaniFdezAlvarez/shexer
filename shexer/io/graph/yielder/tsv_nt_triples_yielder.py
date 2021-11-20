@@ -54,7 +54,7 @@ class TsvNtTriplesYielder(BaseTriplesYielder):
         self._triples_count = 0
 
     # def yield_triples(self):
-    #     self._reset_count()
+    #     self._reset_parsing()
     #     for a_line in self._line_reader.read_lines():
     #         tokens = self._look_for_tokens(a_line.strip())
     #         if len(tokens) != 3:
@@ -74,7 +74,7 @@ class TsvNtTriplesYielder(BaseTriplesYielder):
     #                 print("Reading..." + self._triples_count)
 
     # def _yield_triples_excluding_namespaces(self):
-    #     self._reset_count()
+    #     self._reset_parsing()
     #     for a_line in self._line_reader.read_lines():
     #         tokens = self._look_for_tokens(a_line.strip())
     #         if len(tokens) != 3:
