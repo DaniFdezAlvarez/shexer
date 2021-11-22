@@ -68,7 +68,8 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
                 yield (
                     tune_subj(a_triple[_S],
                               raise_error_if_no_corners=False),
-                    tune_prop(a_triple[_P]),
+                    tune_prop(a_triple[_P],
+                              raise_error_if_no_corners=False),
                     tune_token(a_triple[_O],
                                base_namespace=self._base,
                                allow_untyped_numbers=self._allow_untyped_numbers,
@@ -136,10 +137,10 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
             if next_token == ",":
                 yield self._current_triple()
                 self._state = _WAITING_FOR_OBJ
-            if next_token == ";":
+            elif next_token == ";":
                 yield self._current_triple()
                 self._state = _WAITING_FOR_PRED
-            if next_token == ".":
+            elif next_token == ".":
                 yield self._current_triple()
                 self._state = _WAITING_FOR_SUBJ
             else:
@@ -150,13 +151,13 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
         return self._tmp_s, self._tmp_p, self._tmp_o
 
     def _assing_tmp_element_and_promote_state(self, token):
-        if _WAITING_FOR_SUBJ:
+        if self._state == _WAITING_FOR_SUBJ:
             self._tmp_s = token
             self._state = _WAITING_FOR_PRED
-        elif _WAITING_FOR_PRED:
+        elif self._state == _WAITING_FOR_PRED:
             self._tmp_p = token
             self._state = _WAITING_FOR_OBJ
-        elif _WAITING_FOR_OBJ:
+        elif self._state == _WAITING_FOR_OBJ:
             self._tmp_o = token
             self._state = _NOT_WAITING
         else:
@@ -164,7 +165,7 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
 
 
     def _next_line_token(self, a_line, start_index):
-        while(a_line[start_index] == " " and start_index < len(a_line)):
+        while(start_index < len(a_line) and a_line[start_index] == " "):
             start_index += 1
         if start_index >= len(a_line):
             return None, None
@@ -174,7 +175,7 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
             end_index = a_line.find(">", start_index)
             return self._parse_cornered_element(cornered_element=a_line[start_index:end_index+1]), end_index + 1
         elif a_line[start_index] == '"':
-            end_index = self._find_next_unescaped_quotes(a_line, start_index)
+            end_index = self._find_next_quoted_literal_ending(a_line, start_index)
             return a_line[start_index:end_index+1], end_index + 1
         else:  # could be a prefixed element, a bnode, a non-string literal... find the next blank anyway
             end_index = self._find_next_blank(a_line, start_index)
@@ -185,6 +186,7 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
         pos = target_str.find(" ", start_index)
         return len(target_str)-1 if pos == -1 else pos
 
+
     def _find_next_unescaped_quotes(self, target_str, start_index):
         pos = target_str.find('"', start_index)
         while pos != -1:
@@ -194,6 +196,16 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
                 return pos  # the scape is scaped, so not escaped
         if pos == -1:
             raise ValueError("Is this line malformed? Can`t find quotes matching: " + target_str)
+
+    def _find_next_quoted_literal_ending(self, target_str, start_index):
+        next_quotes = self._find_next_unescaped_quotes(target_str=target_str,
+                                                       start_index=start_index+1)
+        if next_quotes +1 > len(target_str) or target_str[next_quotes + 1] == " ":
+            return next_quotes
+        elif target_str[next_quotes + 1] == "^":
+            return self._find_next_blank(target_str, next_quotes) -1
+        else:
+            raise ValueError("Malformed literal? It seems like there si a problem of unmatching quotes: " + target_str)
 
     def _process_line(self, str_line):
         str_line = self._clean_line(str_line)
