@@ -72,7 +72,7 @@ target_classes = [
 namespaces_dict = {"http://www.w3.org/1999/02/22-rdf-syntax-ns#": "rdf",
                    "http://example.org/": "ex",
                    "http://weso.es/shapes/": "",
-                   "http://www.w3.org/2001/XMLSchema#": "xml"
+                   "http://www.w3.org/2001/XMLSchema#": "xsd"
                    }
 
 raw_graph = """
