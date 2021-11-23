@@ -27,19 +27,13 @@ def tune_subj(a_token, raise_error_if_no_corners=True):
     if a_token.startswith("<"):
         return IRI(remove_corners(a_uri=a_token,
                                   raise_error_if_no_corners=raise_error_if_no_corners))
-    elif a_token.startswith('"'):
-        content, elem_type = parse_literal(a_token)
-        return Literal(content=content,
-                       elem_type=elem_type)
     elif a_token.startswith("_:"):
         return BNode(identifier=a_token[2:])
     elif a_token.strip() == "[]":
         return BNode(identifier=a_token)
 
     else:  # ???
-        content, elem_type = parse_unquoted_literal(a_token)
-        return Literal(content=content,
-                       elem_type=elem_type)
+        raise ValueError("Unrecognized token in subject position: " + a_token)
 
 
 def tune_token(a_token, allow_untyped_numbers=False, raise_error_if_no_corners=True, base_namespace=None):
@@ -75,6 +69,7 @@ def _is_integer(float_number):
     if float_number % 1.0 == 0:
         return True
     return False
+
 
 def tune_prop(a_token, raise_error_if_no_corners=True):
     return Property(remove_corners(a_uri=a_token,
