@@ -1,5 +1,5 @@
 from shexer.utils.shapes import build_shapes_name_for_class_uri
-from shexer.core.profiling.consts import _POS_CLASSES, _S, _P, _O, _POS_FEATURES_DIRECT, _ONE_TO_MANY, _POS_FEATURES_INVERSE
+from shexer.core.profiling.consts import POS_CLASSES, _S, _P, _O, POS_FEATURES_DIRECT, _ONE_TO_MANY, POS_FEATURES_INVERSE
 from shexer.model.IRI import IRI_ELEM_TYPE, IRI
 
 class AbstractStrategy(object):
@@ -40,15 +40,15 @@ class AbstractStrategy(object):
     def _annotate_direct_instance_features(self, an_instance):
         direct_feautres_3tuple = self._infer_direct_3tuple_features(an_instance)
 
-        for a_class in self._i_dict[an_instance][_POS_CLASSES]:
+        for a_class in self._i_dict[an_instance][POS_CLASSES]:
             self._annotate_direct_instance_features_for_class(a_class, direct_feautres_3tuple)
 
     def _infer_direct_3tuple_features(self, an_instance):
         result = []
-        for a_prop in self._i_dict[an_instance][_POS_FEATURES_DIRECT]:
-            for a_type in self._i_dict[an_instance][_POS_FEATURES_DIRECT][a_prop]:
+        for a_prop in self._i_dict[an_instance][POS_FEATURES_DIRECT]:
+            for a_type in self._i_dict[an_instance][POS_FEATURES_DIRECT][a_prop]:
                 for a_valid_cardinality in self._infer_valid_cardinalities(a_prop,
-                                                                           self._i_dict[an_instance][_POS_FEATURES_DIRECT][a_prop][a_type]):
+                                                                           self._i_dict[an_instance][POS_FEATURES_DIRECT][a_prop][a_type]):
                     result.append( (a_prop, a_type, a_valid_cardinality) )
         return result
 
@@ -104,7 +104,7 @@ class AbstractStrategy(object):
         if str_elem not in self._i_dict:
             return []
         return [self._get_shape_name_for_a_class(a_class)
-                for a_class in self._i_dict[str_elem][_POS_CLASSES]]
+                for a_class in self._i_dict[str_elem][POS_CLASSES]]
 
     def _get_shape_name_for_a_class(self, a_class):
         self._assign_shape_name_if_needed(a_class)
@@ -128,16 +128,16 @@ class AbstractStrategy(object):
                                                                          str_prop=str_prop,
                                                                          type_obj=type_obj,
                                                                          obj_shapes=obj_shapes)
-        self._i_dict[str_subj][_POS_FEATURES_DIRECT][str_prop][type_obj] += 1
+        self._i_dict[str_subj][POS_FEATURES_DIRECT][str_prop][type_obj] += 1
         for a_shape in obj_shapes:
-            self._i_dict[str_subj][_POS_FEATURES_DIRECT][str_prop][a_shape] += 1
+            self._i_dict[str_subj][POS_FEATURES_DIRECT][str_prop][a_shape] += 1
 
 
     def _introduce_needed_elements_in_shape_instances_dict_for_subj(self, str_subj, str_prop, type_obj, obj_shapes):
-        if str_prop not in self._i_dict[str_subj][_POS_FEATURES_DIRECT]:
-            self._i_dict[str_subj][_POS_FEATURES_DIRECT][str_prop] = {}
-        if type_obj not in self._i_dict[str_subj][_POS_FEATURES_DIRECT][str_prop]:
-            self._i_dict[str_subj][_POS_FEATURES_DIRECT][str_prop][type_obj] = 0
+        if str_prop not in self._i_dict[str_subj][POS_FEATURES_DIRECT]:
+            self._i_dict[str_subj][POS_FEATURES_DIRECT][str_prop] = {}
+        if type_obj not in self._i_dict[str_subj][POS_FEATURES_DIRECT][str_prop]:
+            self._i_dict[str_subj][POS_FEATURES_DIRECT][str_prop][type_obj] = 0
         for a_shape in obj_shapes:
-            if a_shape not in self._i_dict[str_subj][_POS_FEATURES_DIRECT][str_prop]:
-                self._i_dict[str_subj][_POS_FEATURES_DIRECT][str_prop][a_shape] = 0
+            if a_shape not in self._i_dict[str_subj][POS_FEATURES_DIRECT][str_prop]:
+                self._i_dict[str_subj][POS_FEATURES_DIRECT][str_prop][a_shape] = 0

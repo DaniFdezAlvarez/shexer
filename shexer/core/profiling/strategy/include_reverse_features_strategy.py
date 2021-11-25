@@ -1,5 +1,5 @@
 from shexer.core.profiling.strategy.abstract_strategy import AbstractStrategy
-from shexer.core.profiling.consts import _S, _P, _O, _POS_FEATURES_INVERSE, _POS_CLASSES
+from shexer.core.profiling.consts import _S, _P, _O, POS_FEATURES_INVERSE, POS_CLASSES
 from shexer.model.IRI import IRI_ELEM_TYPE
 
 _C_MAP_POS_DIRECT = 0
@@ -51,20 +51,20 @@ class IncludeReverseFeaturesStrategy(AbstractStrategy):
 
     def _annotate_2d_direct_instance_features(self, an_instance):
         direct_feautres_3tuple = self._infer_direct_3tuple_features(an_instance)
-        for a_class in self._i_dict[an_instance][_POS_CLASSES]:
+        for a_class in self._i_dict[an_instance][POS_CLASSES]:
             self._annotate_2d_direct_instance_features_for_class(a_class, direct_feautres_3tuple)
 
     def _annotate_2d_inverse_instance_features(self, an_instance):
         inverse_feautres_3tuple = self._infer_inverse_3tuple_features(an_instance)
-        for a_class in self._i_dict[an_instance][_POS_CLASSES]:
+        for a_class in self._i_dict[an_instance][POS_CLASSES]:
             self._annotate_2d_inverse_instance_features_for_class(a_class, inverse_feautres_3tuple)
 
     def _infer_inverse_3tuple_features(self, an_instance):
         result = []
-        for a_prop in self._i_dict[an_instance][_POS_FEATURES_INVERSE]:
-            for a_type in self._i_dict[an_instance][_POS_FEATURES_INVERSE][a_prop]:
+        for a_prop in self._i_dict[an_instance][POS_FEATURES_INVERSE]:
+            for a_type in self._i_dict[an_instance][POS_FEATURES_INVERSE][a_prop]:
                 for a_valid_cardinality in self._infer_valid_cardinalities(a_prop,
-                                                                           self._i_dict[an_instance][_POS_FEATURES_INVERSE][a_prop][a_type]):
+                                                                           self._i_dict[an_instance][POS_FEATURES_INVERSE][a_prop][a_type]):
                     result.append( (a_prop, a_type, a_valid_cardinality) )
         return result
 
@@ -114,19 +114,19 @@ class IncludeReverseFeaturesStrategy(AbstractStrategy):
                                                                         str_prop=str_prop,
                                                                         type_subj=type_subj,
                                                                         subj_shapes=subj_shapes)
-        self._i_dict[str_obj][_POS_FEATURES_INVERSE][str_prop][type_subj] += 1
+        self._i_dict[str_obj][POS_FEATURES_INVERSE][str_prop][type_subj] += 1
         for a_shape in subj_shapes:
-            self._i_dict[str_obj][_POS_FEATURES_INVERSE][str_prop][a_shape] += 1
+            self._i_dict[str_obj][POS_FEATURES_INVERSE][str_prop][a_shape] += 1
 
 
     def _introduce_needed_elements_in_shape_instances_dict_for_obj(self, str_obj, str_prop, type_subj, subj_shapes):
-        if str_prop not in self._i_dict[str_obj][_POS_FEATURES_INVERSE]:
-            self._i_dict[str_obj][_POS_FEATURES_INVERSE][str_prop] = {}
-        if type_subj not in self._i_dict[str_obj][_POS_FEATURES_INVERSE][str_prop]:
-            self._i_dict[str_obj][_POS_FEATURES_INVERSE][str_prop][type_subj] = 0
+        if str_prop not in self._i_dict[str_obj][POS_FEATURES_INVERSE]:
+            self._i_dict[str_obj][POS_FEATURES_INVERSE][str_prop] = {}
+        if type_subj not in self._i_dict[str_obj][POS_FEATURES_INVERSE][str_prop]:
+            self._i_dict[str_obj][POS_FEATURES_INVERSE][str_prop][type_subj] = 0
         for a_shape in subj_shapes:
-            if a_shape not in self._i_dict[str_obj][_POS_FEATURES_INVERSE][str_prop]:
-                self._i_dict[str_obj][_POS_FEATURES_INVERSE][str_prop][a_shape] = 0
+            if a_shape not in self._i_dict[str_obj][POS_FEATURES_INVERSE][str_prop]:
+                self._i_dict[str_obj][POS_FEATURES_INVERSE][str_prop][a_shape] = 0
 
 
 

@@ -310,13 +310,13 @@ class ShaclSerializer(object):
             return self._produce_wikidata_annotation_output()
         # destination = None if self._string_return else self._target_file
         if self._string_return:
-            return self._g_shapes.serialize(format="turtle").decode("utf-8")
+            return self._g_shapes.serialize(format="turtle")
         else:
             self._g_shapes.serialize(destination=self._target_file, format="turtle")
 
 
     def _produce_wikidata_annotation_output(self):
-        result = self._g_shapes.serialize(format="turtle").decode("utf-8")
+        result = self._g_shapes.serialize(format="turtle")
         result = wikidata_annotation(raw_input=result,
                                      string_return=self._string_return,
                                      out_file=self._target_file,

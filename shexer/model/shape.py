@@ -3,11 +3,11 @@ STARTING_CHAR_FOR_SHAPE_NAME = "@"
 
 class Shape(object):
 
-    def __init__(self, name, class_uri, statements, inverse_statemetns=None):
+    def __init__(self, name, class_uri, statements, inverse_statements=None):
         self._name = name
         self._class_uri = class_uri
         self._statements = statements
-        self._inverse_statements = inverse_statemetns if inverse_statemetns is None else []
+        self._inverse_statements = inverse_statements if inverse_statements is not None else []
         self._sorting_callback = None
 
     @property
@@ -20,7 +20,15 @@ class Shape(object):
 
     @property
     def n_statements(self):
+        return len(self._statements) + len(self._inverse_statements)
+
+    @property
+    def n_direct_statements(self):
         return len(self._statements)
+
+    @property
+    def n_inverse_statements(self):
+        return len(self._inverse_statements)
 
     @property
     def statements(self):
@@ -87,4 +95,4 @@ class Shape(object):
 
     def sort_statements(self, callback, reverse=False):
         self._statements.sort(key=lambda x :callback(x), reverse=reverse)
-        self.inverse_statements.sort(key=lambda x: callback(x), reverse=reverse)
+        self._inverse_statements.sort(key=lambda x: callback(x), reverse=reverse)

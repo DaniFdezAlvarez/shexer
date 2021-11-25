@@ -11,6 +11,16 @@ class DirectShexingStrategy(AbstractShexingStrategy):
         self._shapes_namespace = self._class_shexer._shapes_namespace
         self._class_counts_dict = self._class_shexer._class_counts_dict
 
+    def remove_statements_to_gone_shapes(self, shape, shape_names_to_remove):
+        shape.statements = self._statements_without_shapes_to_remove(original_statements=shape.statements,
+                                                                     shape_names_to_remove=shape_names_to_remove)
+
+    def set_valid_shape_constraints(self, shape):
+        valid_statements = self._select_valid_statements_of_shape(shape.statements)
+        self._tune_list_of_valid_statements(valid_statements=valid_statements)
+        shape.statements = valid_statements
+
+
     def yield_base_shapes(self, acceptance_threshold):
         for a_class_key in self._class_profile_dict:
             name = build_shapes_name_for_class_uri(class_uri=a_class_key,
