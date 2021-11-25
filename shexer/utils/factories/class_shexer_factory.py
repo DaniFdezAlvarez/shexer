@@ -1,6 +1,4 @@
-from shexer.core.class_shexer import ClassShexer
-from shexer.utils.target_elements import tune_target_classes_if_needed
-from shexer.utils.dict import reverse_keys_and_values
+from shexer.core.shexing.class_shexer import ClassShexer
 
 
 def get_class_shexer(class_counts,

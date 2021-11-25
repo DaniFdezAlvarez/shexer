@@ -1,8 +1,6 @@
 import json
-from shexer.model.statement import Statement
-from shexer.model.shape import Shape
+
 from shexer.consts import RDF_TYPE, SHAPES_DEFAULT_NAMESPACE
-from shexer.utils.shapes import build_shapes_name_for_class_uri
 from shexer.utils.target_elements import determine_original_target_nodes_if_needed
 from shexer.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer
 from shexer.model.statement import POSITIVE_CLOSURE, KLEENE_CLOSURE, OPT_CARDINALITY
@@ -41,6 +39,7 @@ class ClassShexer(object):
                                                                                 original_target_classes=original_target_classes,
                                                                                 original_shape_map=original_shape_map,
                                                                                 shapes_namespace=shapes_namespace)
+        self._strategy = None  # TODO: INITIALIZE THIS OBJ
 
 
     def shex_classes(self, acceptance_threshold=0,
@@ -54,6 +53,7 @@ class ClassShexer(object):
         log_msg(verbose=verbose,
                 msg="Constraints sorted. Adjusting cardinalities...")
         self._set_valid_constraints_of_shapes()
+
         log_msg(verbose=verbose,
                 msg="Cardinalities adjusted. Cleaning empty shapes if needed...")
         self._clean_empty_shapes()
@@ -364,30 +364,9 @@ class ClassShexer(object):
 
 
     def _build_shapes(self, acceptance_threshold):
-        for a_class_key in self._class_profile_dict:
-            name = build_shapes_name_for_class_uri(class_uri=a_class_key,
-                                                   shapes_namespace=self._shapes_namespace)
-            number_of_instances = float(self._class_counts_dict[a_class_key])
-            statements = []
-            for a_prop_key in self._class_profile_dict[a_class_key]:
-                for a_type_key in self._class_profile_dict[a_class_key][a_prop_key]:
-                    for a_cardinality in self._class_profile_dict[a_class_key][a_prop_key][a_type_key]:
-                        frequency = self._compute_frequency(number_of_instances,
-                                                            self._class_profile_dict
-                                                            [a_class_key]
-                                                            [a_prop_key]
-                                                            [a_type_key]
-                                                            [a_cardinality])
-                        if frequency >= acceptance_threshold:
-                            statements.append(Statement(st_property=a_prop_key,
-                                                        st_type=a_type_key,
-                                                        cardinality=a_cardinality,
-                                                        probability=frequency))
-
-            a_shape = Shape(name=name,
-                            class_uri=a_class_key,
-                            statements=statements)
+        for a_shape in self._strategy.yield_base_shapes(acceptance_threshold=acceptance_threshold):
             self._shapes_list.append(a_shape)
+
 
     def _sort_shapes(self):
         for a_shape in self._shapes_list:
@@ -433,8 +412,6 @@ class ClassShexer(object):
     def _value_to_compare_statements(self, a_statement):
         return a_statement.probability
 
-    def _compute_frequency(self, number_of_instances, n_ocurrences_statement):
-        return float(n_ocurrences_statement) / number_of_instances
 
     @staticmethod
     def _load_class_profile_dict_from_file(source_file):

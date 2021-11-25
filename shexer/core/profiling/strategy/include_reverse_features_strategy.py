@@ -47,7 +47,7 @@ class IncludeReverseFeaturesStrategy(AbstractStrategy):
         if shape_label not in self._c_shapes_dict:
             return False
         return len(self._c_shapes_dict[shape_label][_C_MAP_POS_DIRECT]) > 0 or \
-               len(self._c_shapes_dict[shape_label][_C_MAP_POS_DIRECT]) > 0
+               len(self._c_shapes_dict[shape_label][_C_MAP_POS_INVERSE]) > 0
 
     def _annotate_2d_direct_instance_features(self, an_instance):
         direct_feautres_3tuple = self._infer_direct_3tuple_features(an_instance)
