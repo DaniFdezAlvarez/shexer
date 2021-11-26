@@ -1,22 +1,23 @@
 from shexer.core.shexing.class_shexer import ClassShexer
+from shexer.consts import RDF_TYPE, SHAPES_DEFAULT_NAMESPACE
 
 
 def get_class_shexer(class_counts,
                      class_profile_dict,
-                     remove_empty_shapes,
-                     original_target_classes,
-                     original_shape_map,
-                     discard_useless_constraints_with_positive_closure,
-                     keep_less_specific,
-                     all_compliant_mode,
-                     instantiation_property,
-                     disable_or_statements,
-                     disable_comments,
-                     namespaces_dict,
-                     allow_opt_cardinality,
-                     disable_exact_cardinality,
-                     shapes_namespace):
-
+                     remove_empty_shapes=True,
+                     original_target_classes=None,
+                     original_shape_map=None,
+                     discard_useless_constraints_with_positive_closure=True,
+                     keep_less_specific=True,
+                     all_compliant_mode=True,
+                     instantiation_property=RDF_TYPE,
+                     disable_or_statements=True,
+                     disable_comments=False,
+                     namespaces_dict=None,
+                     allow_opt_cardinality=True,
+                     disable_exact_cardinality=False,
+                     shapes_namespace=SHAPES_DEFAULT_NAMESPACE,
+                     inverse_paths=False):
 
     return ClassShexer(
         class_counts_dict=class_counts,
@@ -35,4 +36,5 @@ def get_class_shexer(class_counts,
         allow_opt_cardinality=allow_opt_cardinality,
         disable_exact_cardinality=disable_exact_cardinality,
         shapes_namespace=shapes_namespace,
+        inverse_paths=inverse_paths
     )

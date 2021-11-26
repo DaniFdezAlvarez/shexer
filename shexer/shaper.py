@@ -50,7 +50,8 @@ class Shaper(object):
                  disable_exact_cardinality=False,
                  shapes_namespace=SHAPES_DEFAULT_NAMESPACE,
                  limit_remote_instances=-1,
-                 wikidata_annotation=False
+                 wikidata_annotation=False,
+                 inverse_paths=False
                  ):
         """
 
@@ -121,6 +122,7 @@ class Shaper(object):
         self._disable_exact_cardinality = disable_exact_cardinality
         self._limit_remote_instances = limit_remote_instances
         self._wikidata_annotation = wikidata_annotation
+        self._inverse_paths = inverse_paths
 
         self._depth_for_building_subgraph = depth_for_building_subgraph
         self._track_classes_for_entities_at_last_depth_level = track_classes_for_entities_at_last_depth_level
@@ -241,7 +243,8 @@ class Shaper(object):
                                 namespaces_dict=self._namespaces_dict,
                                 allow_opt_cardinality=self._allow_opt_cardinality,
                                 disable_exact_cardinality=self._disable_exact_cardinality,
-                                shapes_namespace=self._shapes_namespace
+                                shapes_namespace=self._shapes_namespace,
+                                inverse_paths=self._inverse_paths
                                 )
 
     def _build_shapes_serializer(self, target_file, string_return, output_format):
@@ -278,7 +281,8 @@ class Shaper(object):
                                   built_remote_graph=self._built_remote_graph,
                                   built_shape_map=self._built_shape_map,
                                   remove_empty_shapes=self._remove_empty_shapes,
-                                  limit_remote_instances=self._limit_remote_instances)
+                                  limit_remote_instances=self._limit_remote_instances,
+                                  inverse_paths=self._inverse_paths)
 
 
     def _build_instance_tracker(self):

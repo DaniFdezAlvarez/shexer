@@ -4,6 +4,7 @@ from shexer.utils.uri import remove_corners
 from shexer.consts import SHAPES_DEFAULT_NAMESPACE
 from shexer.utils.log import log_msg
 from shexer.core.profiling.strategy.direct_features_strategy import DirectFeaturesStrategy
+from shexer.core.profiling.strategy.include_reverse_features_strategy import IncludeReverseFeaturesStrategy
 from shexer.core.profiling.consts import RDF_TYPE_STR
 
 
@@ -13,7 +14,7 @@ class ClassProfiler(object):
 
     def __init__(self, triples_yielder, instances_dict, instantiation_property_str=RDF_TYPE_STR,
                  remove_empty_shapes=True, original_target_classes=None, original_shape_map=None,
-                 shapes_namespace=SHAPES_DEFAULT_NAMESPACE):
+                 shapes_namespace=SHAPES_DEFAULT_NAMESPACE, inverse_paths=False):
         self._triples_yielder = triples_yielder
         self._instances_dict = instances_dict  # TODO  refactor: change name once working again
         # self._instances_shape_dict = {}
@@ -29,7 +30,8 @@ class ClassProfiler(object):
                                                                                 original_target_classes=original_target_classes,
                                                                                 original_shape_map=original_shape_map,
                                                                                 shapes_namespace=shapes_namespace)
-        self._strategy = DirectFeaturesStrategy(class_profiler=self)
+        self._strategy = DirectFeaturesStrategy(class_profiler=self) if not inverse_paths \
+            else IncludeReverseFeaturesStrategy(class_profiler=self)
 
 
     def profile_classes(self, verbose):

@@ -2,8 +2,8 @@ import json
 
 from shexer.consts import RDF_TYPE, SHAPES_DEFAULT_NAMESPACE
 from shexer.core.shexing.strategy.direct_shexing_strategy import DirectShexingStrategy
+from shexer.core.shexing.strategy.direct_and_inverse_shexing_strategy import DirectAndInverseShexingStrategy
 from shexer.utils.target_elements import determine_original_target_nodes_if_needed
-from shexer.model.IRI import IRI_ELEM_TYPE
 from shexer.utils.log import log_msg
 
 
@@ -15,7 +15,7 @@ class ClassShexer(object):
                  all_compliant_mode=True, instantiation_property=RDF_TYPE, disable_or_statements=True,
                  disable_comments=False, namespaces_dict=None, tolerance_to_keep_similar_rules=0,
                  allow_opt_cardinality=True, disable_exact_cardinality=False,
-                 shapes_namespace=SHAPES_DEFAULT_NAMESPACE):
+                 shapes_namespace=SHAPES_DEFAULT_NAMESPACE, inverse_paths=False):
         self._class_counts_dict = class_counts_dict
         self._class_profile_dict = class_profile_dict if class_profile_dict is not None else self._load_class_profile_dict_from_file(
             class_profile_json_file)
@@ -37,7 +37,8 @@ class ClassShexer(object):
                                                                                 original_target_classes=original_target_classes,
                                                                                 original_shape_map=original_shape_map,
                                                                                 shapes_namespace=shapes_namespace)
-        self._strategy = DirectShexingStrategy(self)
+        self._strategy = DirectShexingStrategy(self) if not inverse_paths \
+            else DirectAndInverseShexingStrategy(self)
 
     def shex_classes(self, acceptance_threshold=0,
                      verbose=False):
