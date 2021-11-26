@@ -3,12 +3,14 @@ STARTING_CHAR_FOR_SHAPE_NAME = "@"
 
 class Shape(object):
 
-    def __init__(self, name, class_uri, statements, inverse_statements=None):
+    def __init__(self, name, class_uri, statements):
         self._name = name
         self._class_uri = class_uri
-        self._statements = statements
-        self._inverse_statements = inverse_statements if inverse_statements is not None else []
+        self._statements = statements if statements is not None else []
+        # self._inverse_statements = inverse_statements if inverse_statements is not None else []
         self._sorting_callback = lambda x: x.probability
+        self._n_direct_statements = self._count_direct_statements(statements)
+        self._n_inverse_statements = len(statements) - self._n_direct_statements
 
     @property
     def name(self):
@@ -20,65 +22,71 @@ class Shape(object):
 
     @property
     def n_statements(self):
-        return len(self._statements) + len(self._inverse_statements)
-
-    @property
-    def n_direct_statements(self):
         return len(self._statements)
 
     @property
+    def n_direct_statements(self):
+        return self._n_direct_statements
+
+    @property
     def n_inverse_statements(self):
-        return len(self._inverse_statements)
+        return self._n_inverse_statements
 
     @property
     def statements(self):
         return self._statements
 
     @property
+    def direct_statements(self):
+        return [a_statement for a_statement in self._statements if not a_statement.is_inverse]
+
+    @property
     def inverse_statements(self):
-        return self._inverse_statements
+        return [a_statement for a_statement in self._statements if a_statement.is_inverse]
 
     @statements.setter
-    def statements(self, statements):
-        self._statements = statements
+    def statements(self, value):
+        self._statements = value
+
+    @direct_statements.setter
+    def direct_statements(self, statements):
+        self._statements = [a_statement for a_statement in self._statements if a_statement.is_inverse]
+        for a_statement in statements:
+            self._statements.append(a_statement)
 
     @inverse_statements.setter
     def inverse_statements(self, inverse_statements):
-        self._inverse_statements = inverse_statements
+        self._statements = [a_statement for a_statement in self._statements if not a_statement.is_inverse]
+        for a_statement in inverse_statements:
+            self._statements.append(a_statement)
 
-    def yield_statements(self, just_direct=True, sorted=True, reverse=True):
+    def yield_direct_statements(self):
+        for a_statement in self._statements:
+            if not a_statement.is_inverse:
+                yield a_statement
+
+    def yield_inverse_statements(self):
+        for a_statement in self._statements:
+            if a_statement.is_inverse:
+                yield a_statement
+
+    def sort_statements(self, callback, reverse=False):
+        self._statements.sort(key=lambda x: callback(x), reverse=reverse)
+
+
+    def yield_statements(self, just_direct=False):
         if just_direct:
             for a_statement in self.yield_direct_statements():
                 yield a_statement
         else:
-            for a_statement in self._yield_direct_and_inverse_statements(sorted=sorted, reverse=reverse):
+            for a_statement in self._statements:
                 yield a_statement
 
-    def _yield_direct_and_inverse_statements(self, sorted, reverse):
-        if not sorted:
-            for a_statement in self.yield_direct_statements():
-                yield a_statement
-            for a_statement in self.yield_inverse_statements():
-                yield a_statement
-        else:
-            for a_statement in self._yield_sorted_direct_and_inverse_statements(reverse=reverse):
-                yield a_statement
+    @staticmethod
+    def _count_direct_statements(statements):
+        counter = 0
+        for a_statement in statements:
+            if not a_statement.is_inverse:
+                counter += 1
+        return counter
 
-    def _yield_sorted_direct_and_inverse_statements(self, reverse):
-        to_yield = self._statements + self._inverse_statements
-        to_yield.sort(key=lambda x: self._sorting_callback(x), reverse=reverse)
-        for a_statement in to_yield:
-            yield a_statement
-
-    def yield_direct_statements(self):
-        for a_statement in self._statements:
-            yield a_statement
-
-    def yield_inverse_statements(self):
-        for a_statement in self._inverse_statements:
-            yield a_statement
-
-    def sort_statements(self, callback, reverse=False):
-        self._sorting_callback = callback
-        self._statements.sort(key=lambda x :callback(x), reverse=reverse)
-        self._inverse_statements.sort(key=lambda x: callback(x), reverse=reverse)

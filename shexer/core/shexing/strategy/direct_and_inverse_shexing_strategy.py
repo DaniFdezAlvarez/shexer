@@ -16,8 +16,8 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
         self._class_counts_dict = self._class_shexer._class_counts_dict
 
     def remove_statements_to_gone_shapes(self, shape, shape_names_to_remove):
-        shape.statements = self._statements_without_shapes_to_remove(
-            original_statements=shape.statements,
+        shape.direct_statements = self._statements_without_shapes_to_remove(
+            original_statements=shape.direct_statements,
             shape_names_to_remove=shape_names_to_remove)
         shape.inverse_statements = self._statements_without_shapes_to_remove(
             original_statements=shape.inverse_statements,
@@ -36,23 +36,13 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
                                                                      number_of_instances=number_of_instances)
             yield Shape(name=name,
                         class_uri=a_class_key,
-                        statements=direct_statements,
-                        inverse_statements=inverse_statements)
+                        statements=direct_statements + inverse_statements)
 
     def set_valid_shape_constraints(self, shape):
-        self._set_valid_direct_constraints(shape)
-        self._set_valid_inverse_constraints(shape)
-
-
-    def _set_valid_direct_constraints(self, shape):
-        direct_valid_statements = self._select_valid_statements_of_shape(shape.statements)
-        self._tune_list_of_valid_statements(valid_statements=direct_valid_statements)
-        shape.statements = direct_valid_statements
-
-    def _set_valid_inverse_constraints(self, shape):
-        inverse_valid_statements = self._select_valid_statements_of_shape(shape.inverse_statements)
-        self._tune_list_of_valid_statements(valid_statements=inverse_valid_statements)
-        shape.inverse_statements = inverse_valid_statements
+        valid_statements = self._select_valid_statements_of_shape(shape.direct_statements)
+        valid_statements += self._select_valid_statements_of_shape(shape.inverse_statements)
+        self._tune_list_of_valid_statements(valid_statements=valid_statements)
+        shape.statements = valid_statements
 
     def _build_base_inverse_statements(self, acceptance_threshold, class_key, number_of_instances):
         result = []

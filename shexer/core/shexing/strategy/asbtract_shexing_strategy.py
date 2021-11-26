@@ -36,6 +36,9 @@ class AbstractShexingStrategy(object):
         :return:
         """
         if not len(valid_statements) == 0:
+            valid_statements.sort(reverse=True, key=lambda x: x.probability)  # Restoring order completly
+                                                                              # before changing cardinalities
+
             if self._all_compliant_mode:
                 self._modify_cardinalities_of_statements_non_compliant_with_all_instances(valid_statements)
 
@@ -55,7 +58,6 @@ class AbstractShexingStrategy(object):
         result = self._group_constraints_with_same_prop_and_obj(original_statements)
         result = self._group_IRI_constraints(result)
 
-        result.sort(reverse=True, key=lambda x: x.probability)  # Restoring order completly
         return result
 
     def _compute_frequency(self, number_of_instances, n_ocurrences_statement):
