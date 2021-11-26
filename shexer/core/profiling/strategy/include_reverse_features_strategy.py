@@ -78,7 +78,7 @@ class IncludeReverseFeaturesStrategy(AbstractStrategy):
         for a_feature_3tuple in features_3tuple:
             self._introduce_needed_inverse_elements_in_2d_shape_classes_dict(a_class, a_feature_3tuple)
             # 3tuple: 0->str_prop, 1->str_type, 2->cardinality
-            self._c_shapes_dict[a_class][_C_MAP_POS_DIRECT][a_feature_3tuple[0]][a_feature_3tuple[1]][a_feature_3tuple[2]] += 1
+            self._c_shapes_dict[a_class][_C_MAP_POS_INVERSE][a_feature_3tuple[0]][a_feature_3tuple[1]][a_feature_3tuple[2]] += 1
 
     def _introduce_needed_direct_elements_in_2d_shape_classes_dict(self, a_class, a_feature_3tuple):
         str_prop = a_feature_3tuple[0]
@@ -104,7 +104,7 @@ class IncludeReverseFeaturesStrategy(AbstractStrategy):
 
 
     def _annotate_target_object(self, a_triple):  # TODO: refactor here, place this in superclass and parametrize positions
-        str_obj = a_triple[_S].iri
+        str_obj = a_triple[_O].iri
         str_prop = a_triple[_P].iri
         type_subj = self._decide_type_elem(a_triple[_S], str_prop)
 
@@ -117,7 +117,6 @@ class IncludeReverseFeaturesStrategy(AbstractStrategy):
         self._i_dict[str_obj][POS_FEATURES_INVERSE][str_prop][type_subj] += 1
         for a_shape in subj_shapes:
             self._i_dict[str_obj][POS_FEATURES_INVERSE][str_prop][a_shape] += 1
-
 
     def _introduce_needed_elements_in_shape_instances_dict_for_obj(self, str_obj, str_prop, type_subj, subj_shapes):
         if str_prop not in self._i_dict[str_obj][POS_FEATURES_INVERSE]:
