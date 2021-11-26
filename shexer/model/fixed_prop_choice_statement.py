@@ -3,13 +3,14 @@ from shexer.model.statement import Statement
 class FixedPropChoiceStatement(Statement):
 
     def __init__(self, st_property, st_types, cardinality, probability, comments=None,
-                 serializer_object=None):
+                 serializer_object=None, is_inverse=False):
         super(FixedPropChoiceStatement, self).__init__(st_property=st_property,
                                                        st_type=None,
                                                        cardinality=cardinality,
                                                        probability=probability,
                                                        comments=comments,
-                                                       serializer_object=serializer_object)
+                                                       serializer_object=serializer_object,
+                                                       is_inverse=is_inverse)
         self._st_types = st_types
 
     @property

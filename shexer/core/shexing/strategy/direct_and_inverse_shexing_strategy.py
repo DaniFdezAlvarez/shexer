@@ -36,7 +36,6 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
             inverse_statements = self._build_base_inverse_statements(acceptance_threshold=acceptance_threshold,
                                                                      class_key=a_class_key,
                                                                      number_of_instances=number_of_instances)
-
             yield Shape(name=name,
                         class_uri=a_class_key,
                         statements=direct_statements,
@@ -72,7 +71,8 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
                         result.append(Statement(st_property=a_prop_key,
                                                 st_type=a_type_key,
                                                 cardinality=a_cardinality,
-                                                probability=frequency))
+                                                probability=frequency,
+                                                is_inverse=True))
         return result
 
     def _build_base_direct_statements(self, acceptance_threshold, class_key, number_of_instances):
@@ -91,7 +91,8 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
                         result.append(Statement(st_property=a_prop_key,
                                                 st_type=a_type_key,
                                                 cardinality=a_cardinality,
-                                                probability=frequency))
+                                                probability=frequency,
+                                                is_inverse=False))
         return result
 
     def _set_serializer_object_for_statements(self, statement):

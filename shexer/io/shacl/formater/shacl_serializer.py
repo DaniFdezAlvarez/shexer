@@ -19,6 +19,7 @@ _R_SHACL_PROPERTY_SHAPE_URI = URIRef(_SHACL_NAMESPACE + "PropertyShape")
 
 _R_SHACL_TARGET_CLASS_PROP = URIRef(_SHACL_NAMESPACE + "targetClass")
 _R_SHACL_PATH_PROP = URIRef(_SHACL_NAMESPACE + "path")
+_R_SHACL_INVERSE_PATH_PROP = URIRef(_SHACL_NAMESPACE + "inversePath")
 _R_SHACL_MIN_COUNT_PROP = URIRef(_SHACL_NAMESPACE + "minCount")
 _R_SHACL_MAX_COUNT_PROP = URIRef(_SHACL_NAMESPACE + "maxCount")
 
@@ -154,8 +155,8 @@ class ShaclSerializer(object):
         r_constraint_node = self._generate_bnode()
         self._add_bnode_property(r_shape_uri=r_shape_uri,
                                  r_constraint_node=r_constraint_node)
-        self._add_path(statement=statement,
-                       r_constraint_node=r_constraint_node)
+        self._add_direct_path(statement=statement,
+                              r_constraint_node=r_constraint_node)
         self._add_exactly_one_cardinality(r_constraint_node=r_constraint_node)
         self._add_in_instance(statement=statement,
                               r_constraint_node=r_constraint_node)
@@ -164,16 +165,30 @@ class ShaclSerializer(object):
         r_constraint_node = self._generate_bnode()
         self._add_bnode_property(r_shape_uri=r_shape_uri,
                                  r_constraint_node=r_constraint_node)
-        self._add_path(statement=statement,
-                       r_constraint_node=r_constraint_node)
         self._add_node_type(statement=statement,
                             r_constraint_node=r_constraint_node)
         self._add_cardinality(statement=statement,
                               r_constraint_node=r_constraint_node)
+        self._add_path(statement=statement,
+                       r_constraint_node=r_constraint_node)
 
     def _add_path(self, statement, r_constraint_node):
+        if not statement.is_inverse:
+            self._add_direct_path(statement=statement,
+                                  r_constraint_node=r_constraint_node)
+        else:
+            self._add_inverse_path(statement=statement,
+                                   r_constraint_node=r_constraint_node)
+
+    def _add_direct_path(self, statement, r_constraint_node):
         r_property_uri = self._generate_r_uri_for_str_uri(statement.st_property)
         self._add_triple(r_constraint_node, _R_SHACL_PATH_PROP, r_property_uri)
+
+    def _add_inverse_path(self, statement, r_constraint_node):
+        r_property_uri = self._generate_r_uri_for_str_uri(statement.st_property)
+        inverse_path_node = self._generate_bnode()
+        self._add_triple(r_constraint_node, _R_SHACL_PROPERTY_PROP, inverse_path_node)
+        self._add_triple(inverse_path_node, _R_SHACL_INVERSE_PATH_PROP, r_property_uri)
 
     def _generate_r_uri_for_str_uri(self, property_str):
         if property_str.startswith("<") and property_str.endswith(">"):

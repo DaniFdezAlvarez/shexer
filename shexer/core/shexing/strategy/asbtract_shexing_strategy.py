@@ -275,7 +275,8 @@ class AbstractShexingStrategy(object):
                                                           st_types=[a_statement.st_type for a_statement in to_compose],
                                                           cardinality=POSITIVE_CLOSURE,
                                                           probability=target_probability,
-                                                          serializer_object=self._get_serializer_for_choice_statement()
+                                                          serializer_object=self._get_serializer_for_choice_statement(),
+                                                          is_inverse=to_compose[0].is_inverse
                                                           )
             for a_statement in to_compose:
                 if a_statement.st_type != IRI_ELEM_TYPE:
