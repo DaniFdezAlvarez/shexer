@@ -1,12 +1,10 @@
 from shexer.core.shexing.strategy.asbtract_shexing_strategy import AbstractShexingStrategy
-from shexer.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer
-from shexer.io.shex.formater.statement_serializers.inverse_statement_serializer import InverseStatementSerializer
-from shexer.io.shex.formater.statement_serializers.fixed_prop_choice_statement_serializer import \
-    FixedPropChoiceStatementSerializer  # TODO: REPFACTOR
 from shexer.utils.shapes import build_shapes_name_for_class_uri
 from shexer.model.statement import Statement
 from shexer.model.shape import Shape
-from shexer.core.profiling.consts import POS_FEATURES_DIRECT, POS_FEATURES_INVERSE
+
+_POS_FEATURES_DIRECT = 0
+_POS_FEATURES_INVERSE = 1
 
 
 class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
@@ -45,6 +43,7 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
         self._set_valid_direct_constraints(shape)
         self._set_valid_inverse_constraints(shape)
 
+
     def _set_valid_direct_constraints(self, shape):
         direct_valid_statements = self._select_valid_statements_of_shape(shape.statements)
         self._tune_list_of_valid_statements(valid_statements=direct_valid_statements)
@@ -57,13 +56,13 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
 
     def _build_base_inverse_statements(self, acceptance_threshold, class_key, number_of_instances):
         result = []
-        for a_prop_key in self._class_profile_dict[class_key]:
-            for a_type_key in self._class_profile_dict[class_key][POS_FEATURES_INVERSE][a_prop_key]:
-                for a_cardinality in self._class_profile_dict[class_key][POS_FEATURES_INVERSE][a_prop_key][a_type_key]:
+        for a_prop_key in self._class_profile_dict[class_key][_POS_FEATURES_INVERSE]:
+            for a_type_key in self._class_profile_dict[class_key][_POS_FEATURES_INVERSE][a_prop_key]:
+                for a_cardinality in self._class_profile_dict[class_key][_POS_FEATURES_INVERSE][a_prop_key][a_type_key]:
                     frequency = self._compute_frequency(number_of_instances,
                                                         self._class_profile_dict
                                                         [class_key]
-                                                        [POS_FEATURES_INVERSE]
+                                                        [_POS_FEATURES_INVERSE]
                                                         [a_prop_key]
                                                         [a_type_key]
                                                         [a_cardinality])
@@ -77,13 +76,13 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
 
     def _build_base_direct_statements(self, acceptance_threshold, class_key, number_of_instances):
         result = []
-        for a_prop_key in self._class_profile_dict[class_key]:
-            for a_type_key in self._class_profile_dict[class_key][POS_FEATURES_DIRECT][a_prop_key]:
-                for a_cardinality in self._class_profile_dict[class_key][POS_FEATURES_DIRECT][a_prop_key][a_type_key]:
+        for a_prop_key in self._class_profile_dict[class_key][_POS_FEATURES_DIRECT]:
+            for a_type_key in self._class_profile_dict[class_key][_POS_FEATURES_DIRECT][a_prop_key]:
+                for a_cardinality in self._class_profile_dict[class_key][_POS_FEATURES_DIRECT][a_prop_key][a_type_key]:
                     frequency = self._compute_frequency(number_of_instances,
                                                         self._class_profile_dict
                                                         [class_key]
-                                                        [POS_FEATURES_DIRECT]
+                                                        [_POS_FEATURES_DIRECT]
                                                         [a_prop_key]
                                                         [a_type_key]
                                                         [a_cardinality])
@@ -95,14 +94,14 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
                                                 is_inverse=False))
         return result
 
-    def _set_serializer_object_for_statements(self, statement):
-        statement.serializer_object = InverseStatementSerializer(
-            BaseStatementSerializer(
-                instantiation_property_str=self._instantiation_property_str,
-                disable_comments=self._disable_comments))
-
-    def _get_serializer_for_choice_statement(self):
-        return InverseStatementSerializer(
-            FixedPropChoiceStatementSerializer(
-                instantiation_property_str=self._instantiation_property_str,
-                disable_comments=self._disable_comments))
+    # def _set_serializer_object_for_statements(self, statement):
+    #     statement.serializer_object = BaseStatementSerializer(
+    #         instantiation_property_str=self._instantiation_property_str,
+    #         disable_comments=self._disable_comments,
+    #         is_inverse=statement.is_inverse)
+    #
+    # def _get_serializer_for_choice_statement(self):
+    #     return FixedPropChoiceStatementSerializer(
+    #         instantiation_property_str=self._instantiation_property_str,
+    #         disable_comments=self._disable_comments,
+    #         is_inverse=statement.is_inverse)

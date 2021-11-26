@@ -51,7 +51,6 @@ class ClassShexer(object):
         log_msg(verbose=verbose,
                 msg="Constraints sorted. Adjusting cardinalities...")
         self._set_valid_constraints_of_shapes()
-
         log_msg(verbose=verbose,
                 msg="Cardinalities adjusted. Cleaning empty shapes if needed...")
         self._clean_empty_shapes()

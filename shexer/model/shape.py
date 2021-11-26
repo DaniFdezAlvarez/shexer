@@ -8,7 +8,7 @@ class Shape(object):
         self._class_uri = class_uri
         self._statements = statements
         self._inverse_statements = inverse_statements if inverse_statements is not None else []
-        self._sorting_callback = None
+        self._sorting_callback = lambda x: x.probability
 
     @property
     def name(self):
@@ -65,25 +65,10 @@ class Shape(object):
                 yield a_statement
 
     def _yield_sorted_direct_and_inverse_statements(self, reverse):
-        d_pos = i_pos = 0
-        next_direct = self._statements[d_pos] if d_pos < len(self._statements) else None
-        next_inverse = self._inverse_statements[d_pos] if i_pos < len(self._inverse_statements) else None
-        while next_direct is not None or next_inverse is not None:
-            if next_inverse is None:
-                yield next_direct
-                d_pos += 1
-            elif next_direct is None:
-                yield next_inverse
-                i_pos += 1
-            else:
-                d_score = self._sorting_callback(next_direct)
-                i_score = self._sorting_callback(next_inverse)
-                if (d_score >= i_score and reverse) or (d_score <= i_score and not reverse):
-                    yield next_direct
-                    d_pos += 1
-                else:
-                    yield next_inverse
-                    i_pos += 1
+        to_yield = self._statements + self._inverse_statements
+        to_yield.sort(key=lambda x: self._sorting_callback(x), reverse=reverse)
+        for a_statement in to_yield:
+            yield a_statement
 
     def yield_direct_statements(self):
         for a_statement in self._statements:
@@ -94,5 +79,6 @@ class Shape(object):
             yield a_statement
 
     def sort_statements(self, callback, reverse=False):
+        self._sorting_callback = callback
         self._statements.sort(key=lambda x :callback(x), reverse=reverse)
         self._inverse_statements.sort(key=lambda x: callback(x), reverse=reverse)
