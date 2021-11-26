@@ -34,8 +34,6 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
 
         for a_comment in a_statement.comments:
             tuples_line_indent.append((a_comment, 4))
-        a = 3 + 1
-
         return tuples_line_indent
 
 

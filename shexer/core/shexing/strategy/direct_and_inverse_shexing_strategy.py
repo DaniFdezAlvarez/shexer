@@ -1,4 +1,8 @@
 from shexer.core.shexing.strategy.asbtract_shexing_strategy import AbstractShexingStrategy
+from shexer.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer
+from shexer.io.shex.formater.statement_serializers.inverse_statement_serializer import InverseStatementSerializer
+from shexer.io.shex.formater.statement_serializers.fixed_prop_choice_statement_serializer import \
+    FixedPropChoiceStatementSerializer  # TODO: REPFACTOR
 from shexer.utils.shapes import build_shapes_name_for_class_uri
 from shexer.model.statement import Statement
 from shexer.model.shape import Shape
@@ -89,3 +93,15 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
                                                 cardinality=a_cardinality,
                                                 probability=frequency))
         return result
+
+    def _set_serializer_object_for_statements(self, statement):
+        statement.serializer_object = InverseStatementSerializer(
+            BaseStatementSerializer(
+                instantiation_property_str=self._instantiation_property_str,
+                disable_comments=self._disable_comments))
+
+    def _get_serializer_for_choice_statement(self):
+        return InverseStatementSerializer(
+            FixedPropChoiceStatementSerializer(
+                instantiation_property_str=self._instantiation_property_str,
+                disable_comments=self._disable_comments))

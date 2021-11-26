@@ -1,8 +1,5 @@
 from shexer.model.statement import POSITIVE_CLOSURE, KLEENE_CLOSURE, OPT_CARDINALITY
-from shexer.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer
 from shexer.model.IRI import IRI_ELEM_TYPE
-from shexer.io.shex.formater.statement_serializers.fixed_prop_choice_statement_serializer import \
-    FixedPropChoiceStatementSerializer  # TODO: REPFACTOR
 from shexer.model.fixed_prop_choice_statement import FixedPropChoiceStatement
 
 class AbstractShexingStrategy(object):
@@ -88,9 +85,7 @@ class AbstractShexingStrategy(object):
             a_statement.remove_comments()
 
     def _set_serializer_object_for_statements(self, statement):
-        statement.serializer_object = BaseStatementSerializer(
-            instantiation_property_str=self._instantiation_property_str,
-            disable_comments=self._disable_comments)
+        raise NotImplementedError()
 
     def _group_constraints_with_same_prop_and_obj(self, candidate_statements):
         result = []
@@ -280,9 +275,7 @@ class AbstractShexingStrategy(object):
                                                           st_types=[a_statement.st_type for a_statement in to_compose],
                                                           cardinality=POSITIVE_CLOSURE,
                                                           probability=target_probability,
-                                                          serializer_object=FixedPropChoiceStatementSerializer(
-                                                              instantiation_property_str=self._instantiation_property_str,
-                                                              disable_comments=self._disable_comments)
+                                                          serializer_object=self._get_serializer_for_choice_statement()
                                                           )
             for a_statement in to_compose:
                 if a_statement.st_type != IRI_ELEM_TYPE:
@@ -292,6 +285,9 @@ class AbstractShexingStrategy(object):
             result.append(to_compose[0])
         # else  # No sentences to join
         return result
+
+    def _get_serializer_for_choice_statement(self):
+        raise NotImplementedError()
 
     def _get_probability_of_IRI_statement_in_group(self, group_of_statements):
         for a_statement in group_of_statements:

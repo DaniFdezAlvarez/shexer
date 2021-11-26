@@ -1,4 +1,7 @@
 from shexer.core.shexing.strategy.asbtract_shexing_strategy import AbstractShexingStrategy
+from shexer.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer
+from shexer.io.shex.formater.statement_serializers.fixed_prop_choice_statement_serializer import \
+    FixedPropChoiceStatementSerializer  # TODO: REPFACTOR
 from shexer.utils.shapes import build_shapes_name_for_class_uri
 from shexer.model.statement import Statement
 from shexer.model.shape import Shape
@@ -45,3 +48,13 @@ class DirectShexingStrategy(AbstractShexingStrategy):
             yield Shape(name=name,
                         class_uri=a_class_key,
                         statements=statements)
+
+    def _set_serializer_object_for_statements(self, statement):
+        statement.serializer_object = BaseStatementSerializer(
+            instantiation_property_str=self._instantiation_property_str,
+            disable_comments=self._disable_comments)
+
+    def _get_serializer_for_choice_statement(self):
+        return FixedPropChoiceStatementSerializer(
+            instantiation_property_str=self._instantiation_property_str,
+            disable_comments=self._disable_comments)
