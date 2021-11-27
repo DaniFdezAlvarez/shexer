@@ -312,7 +312,8 @@ class Shaper(object):
                                     built_remote_graph=self._built_remote_graph,
                                     built_shape_map=self._built_shape_map,
                                     shapes_namespace=self._shapes_namespace,
-                                    limit_remote_instances=self._limit_remote_instances)
+                                    limit_remote_instances=self._limit_remote_instances,
+                                    inverse_paths=self._inverse_paths)
 
 
     @staticmethod

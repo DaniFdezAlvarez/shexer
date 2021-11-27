@@ -45,7 +45,8 @@ def get_class_profiler(target_classes_dict, source_file, list_of_source_files, i
                                  file_target_classes=file_target_classes,
                                  built_remote_graph=built_remote_graph,
                                  built_shape_map=built_shape_map,
-                                 limit_remote_instances=limit_remote_instances)
+                                 limit_remote_instances=limit_remote_instances,
+                                 inverse_paths=inverse_paths)
 
     return ClassProfiler(triples_yielder=yielder,
                          instances_dict=target_classes_dict,
