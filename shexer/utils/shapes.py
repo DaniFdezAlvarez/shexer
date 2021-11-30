@@ -5,16 +5,19 @@ from shexer.io.shex.formater.consts import SHAPE_LINK_CHAR
 def build_shapes_name_for_class_uri(class_uri, shapes_namespace):
     if class_uri.startswith("<") and class_uri.endswith(">"):
         return STARTING_CHAR_FOR_SHAPE_NAME + class_uri
-    last_piece = None
-    if "#" in class_uri and class_uri[-1] != "#":
-        last_piece = class_uri[class_uri.rfind("#") + 1:]
-    if "/" in class_uri:
-        if class_uri[-1] != "/":
-            last_piece = class_uri[class_uri.rfind("/") + 1:]
+    last_piece = class_uri
+    if "#" in last_piece and last_piece[-1] != "#":
+        last_piece = last_piece[last_piece.rfind("#") + 1:]
+
+    if "/" in last_piece:
+        if last_piece[-1] != "/":
+            last_piece = last_piece[last_piece.rfind("/") + 1:]
         else:
-            last_piece = class_uri[class_uri[:-1].rfind("/") + 1:]
-    if last_piece is not None and last_piece.endswith(">"):
+            last_piece = last_piece[last_piece[:-1].rfind("/") + 1:]
+    if last_piece.endswith(">"):
         last_piece = last_piece[:-1]
+    if last_piece.startswith("<"):
+        last_piece = last_piece[1:]
     return STARTING_CHAR_FOR_SHAPE_NAME + "<" + shapes_namespace + last_piece + ">" if last_piece is not None else class_uri
         # return class_uri
 
