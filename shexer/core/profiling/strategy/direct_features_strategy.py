@@ -26,8 +26,15 @@ class DirectFeaturesStrategy(AbstractStrategy):
     def init_annotated_targets(self):
         self._init_annotated_direct_features()
 
+    def init_original_targets(self):
+        if self._original_raw_target_classes:
+            for a_class in self._original_raw_target_classes:
+                self._c_shapes_dict[a_class] = {}
+                self._c_counts[a_class] = 0
+
     def has_shape_annotated_features(self, shape_label):
         if shape_label not in self._c_shapes_dict:
             return False
         return len(self._c_shapes_dict[shape_label]) > 0
+
 

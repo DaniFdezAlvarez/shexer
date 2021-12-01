@@ -10,6 +10,7 @@ class AbstractStrategy(object):
         self._c_shapes_dict = self._class_profiler._classes_shape_dict
         self._c_counts = self._class_profiler._class_counts
         self._shape_names_dict = self._class_profiler._shape_names_dict
+        self._original_raw_target_classes = self._class_profiler._original_raw_target_classes
 
     def adapt_instances_dict(self):
         raise NotImplementedError()
@@ -21,6 +22,9 @@ class AbstractStrategy(object):
         raise NotImplementedError()
 
     def annotate_instance_features(self, an_instance):
+        raise NotImplementedError()
+
+    def init_original_targets(self):
         raise NotImplementedError()
 
     def init_annotated_targets(self):

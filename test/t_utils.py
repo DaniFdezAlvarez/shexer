@@ -73,15 +73,28 @@ def get_namespaces_and_shapes_from_str_with_or(str_target):
     return namespaces, shapes
 
 
-
 def unordered_lists_match(list1, list2):
     return set(list1) == set(list2)
+
+
+def ordered_lists_match(list1, list2):
+    return list1 == list2
+
 
 def unordered_sets_match(sets1, sets2):
     for a_set1 in sets1:
         if a_set1 not in sets2:
             return False
     return True
+
+def ordered_sets_match(sets1, sets2):
+    if len(sets1) != len(sets2):
+        return False
+    for i in range (len(sets1)):
+        if sets1[i] != sets2[i]:
+            return False
+    return True
+
 
 def simple_and_or_str_constraints(str_constraints):  # TODO Fix here. Receive a dict, not a list. check call to this method
     simple_c = []
@@ -93,6 +106,15 @@ def simple_and_or_str_constraints(str_constraints):  # TODO Fix here. Receive a 
             simple_c.append(a_c)
     return simple_c, or_c
 
+
+def ordered_or_constraints_match(or_list_1, or_list_2):
+    if len(or_list_1) != len(or_list_2):
+        return False
+    for i in range(len(or_list_1)):
+        or_list_1[i] = set(or_list_1[i].split(_OR))
+        or_list_2[i] = set(or_list_2[i].split(_OR))
+    return ordered_sets_match(or_list_1, or_list_2)
+
 def unordered_or_constraints_match(or_list_1, or_list_2):
     if len(or_list_1) != len(or_list_2):
         return False
@@ -102,16 +124,22 @@ def unordered_or_constraints_match(or_list_1, or_list_2):
     return unordered_sets_match(or_list_1, or_list_2)
 
 
-def or_shapes_comparison(shapes1, shapes2):
+def or_shapes_comparison(shapes1, shapes2, check_order):
     for a_key_label in shapes1:
         if a_key_label not in shapes2:
             return False
         simple_constraints1, or_constraints1 = simple_and_or_str_constraints(shapes1[a_key_label])
         simple_constraints2, or_constraints2 = simple_and_or_str_constraints(shapes2[a_key_label])
-        if not unordered_lists_match(simple_constraints1, simple_constraints2):
-            return False
-        if not unordered_or_constraints_match(or_constraints1, or_constraints2):
-            return False
+        if not check_order:
+            if not unordered_lists_match(simple_constraints1, simple_constraints2):
+                return False
+            if not unordered_or_constraints_match(or_constraints1, or_constraints2):
+                return False
+        else:
+            if not ordered_lists_match(simple_constraints1, simple_constraints2):
+                return False
+            if not ordered_or_constraints_match(or_constraints1, or_constraints2):
+                return False
     return True
 
 
@@ -119,11 +147,7 @@ def namespaces_match(names1, names2):
     return unordered_lists_match(names1, names2)
 
 
-def shapes_match(shapes1, shapes2, or_shapes=False):
-    if len(shapes1) != len(shapes2):
-        return False
-    if or_shapes:
-        return or_shapes_comparison(shapes1, shapes2)
+def unsorted_constraints_comparison(shapes1, shapes2):
     for a_key_label in shapes1:
         if a_key_label not in shapes2:
             return False
@@ -131,14 +155,35 @@ def shapes_match(shapes1, shapes2, or_shapes=False):
             return False
     return True
 
+def sorted_constraints_comparison(shapes1, shapes2):
+    for a_key_label in shapes1:
+        if a_key_label not in shapes2:
+            return False
+        if not ordered_lists_match(shapes1[a_key_label], shapes2[a_key_label]):
+            return False
+    return True
 
-def complex_shape_comparison(str1, str2, or_shapes=False):
+def simple_constraints_comparison(shapes1, shapes2, check_order=False):
+    if not check_order:
+        return unsorted_constraints_comparison(shapes1, shapes2)
+    else:
+        return sorted_constraints_comparison(shapes1, shapes2)
+
+def shapes_match(shapes1, shapes2, or_shapes=False, check_order=False):
+    if len(shapes1) != len(shapes2):
+        return False
+    if or_shapes:
+        return or_shapes_comparison(shapes1, shapes2, check_order)
+    return simple_constraints_comparison(shapes1, shapes2, check_order)
+
+
+def complex_shape_comparison(str1, str2, or_shapes=False, check_order=False):
     namespaces1, shapes1 = get_namespaces_and_shapes_from_str(str1, or_shapes)
     namespaces2, shapes2 = get_namespaces_and_shapes_from_str(str2, or_shapes)
 
     if not namespaces_match(namespaces1, namespaces2):
         return False
-    return shapes_match(shapes1, shapes2, or_shapes)
+    return shapes_match(shapes1, shapes2, or_shapes, check_order)
 
 
 def normalize_str(str_target):
@@ -147,16 +192,17 @@ def normalize_str(str_target):
     return _LINE_JUMPS.sub(result, "\n")
 
 
-def tunned_str_comparison(str1, str2, or_shapes=False):
+def tunned_str_comparison(str1, str2, or_shapes=False, check_order=False):
+
     if normalize_str(str1) == normalize_str(str2):
         return True
     else:
-        return complex_shape_comparison(str1, str2, or_shapes)
+        return complex_shape_comparison(str1, str2, or_shapes, check_order)
 
-def file_vs_str_tunned_comparison(file_path, str_target, or_shapes=False):
+def file_vs_str_tunned_comparison(file_path, str_target, or_shapes=False, check_order=False):
     with open(file_path, "r") as in_stream:
         content = in_stream.read()
-    return tunned_str_comparison(content, str_target, or_shapes)
+    return tunned_str_comparison(content, str_target, or_shapes, check_order)
 
 def file_vs_str_exact_comparison(file_path, target_str):
     with open(file_path, "r") as in_stream:

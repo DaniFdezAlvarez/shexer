@@ -1,6 +1,7 @@
 from shexer.utils.target_elements import determine_original_target_nodes_if_needed
 from shexer.model.property import Property
 from shexer.utils.uri import remove_corners
+from shexer.utils.target_elements import tune_target_classes_if_needed
 from shexer.consts import SHAPES_DEFAULT_NAMESPACE
 from shexer.utils.log import log_msg
 from shexer.core.profiling.strategy.direct_features_strategy import DirectFeaturesStrategy
@@ -84,10 +85,7 @@ class ClassProfiler(object):
         self._strategy.init_annotated_targets()
 
     def _init_original_targets(self):
-        if self._original_raw_target_classes:
-            for a_class in self._original_raw_target_classes:
-                self._classes_shape_dict[a_class] = {}
-                self._class_counts[a_class] = 0
+        self._strategy.init_original_targets()
 
     def _build_class_profile(self):
         for an_instance in self._instances_dict:

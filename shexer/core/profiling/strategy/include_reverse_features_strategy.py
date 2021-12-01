@@ -39,6 +39,12 @@ class IncludeReverseFeaturesStrategy(AbstractStrategy):
                     self._c_counts[a_class] = 0
                 self._c_counts[a_class] += 1
 
+    def init_original_targets(self):
+        if self._original_raw_target_classes:
+            for a_class in self._original_raw_target_classes:
+                self._c_shapes_dict[a_class] = ({}, {})
+                self._c_counts[a_class] = 0
+
     def annotate_instance_features(self, an_instance):
         self._annotate_2d_direct_instance_features(an_instance)
         self._annotate_2d_inverse_instance_features(an_instance)

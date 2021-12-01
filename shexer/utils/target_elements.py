@@ -9,7 +9,8 @@ def tune_target_classes_if_needed(list_target_classes, prefix_namespaces_dict):
             result.append(remove_corners(a_uri=a_original_class))
         else:
             result.append(unprefixize_uri_if_possible(target_uri=a_original_class,
-                                                      prefix_namespaces_dict=prefix_namespaces_dict))
+                                                      prefix_namespaces_dict=prefix_namespaces_dict,
+                                                      include_corners=False))
     return result
 
 def determine_original_target_nodes_if_needed(remove_empty_shapes, original_target_classes, original_shape_map, shapes_namespace):
