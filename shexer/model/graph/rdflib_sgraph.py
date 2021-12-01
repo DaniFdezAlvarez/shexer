@@ -32,13 +32,19 @@ class RdflibSgraph(SGraph):
         self._rdflib_graph.serialize(destination=path,
                                      format=format)
 
-
     def yield_p_o_triples_of_an_s(self, target_node):
         for s, p ,o in self._rdflib_graph.triples((URIRef(remove_corners(a_uri=target_node,
                                                                          raise_error_if_no_corners=False)),
                                                    None,
                                                    None)):
             yield str(s), str(p), self._add_lang_if_needed(o)
+
+    def yield_s_p_triples_of_an_o(self, target_node):
+        for s, p, o in self._rdflib_graph.triples((None,
+                                                   None,
+                                                   URIRef(remove_corners(a_uri=target_node,
+                                                                         raise_error_if_no_corners=False)))):
+            yield str(s), str(p), str(o)
 
 
     def yield_class_triples_of_an_s(self, target_node, instantiation_property):

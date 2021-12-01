@@ -1,8 +1,14 @@
-from shexer.io.sparql.query import query_endpoint_po_of_an_s, query_endpoint_single_variable
+from shexer.io.sparql.query import \
+    query_endpoint_po_of_an_s, \
+    query_endpoint_single_variable, \
+    query_endpoint_sp_of_an_o
 from shexer.model.graph.abstract_sgraph import SGraph
 from shexer.model.graph.rdflib_sgraph import RdflibSgraph
 from shexer.utils.uri import remove_corners
 from rdflib import Graph
+
+_DEF_SUBJ_VARIABLE = "?s"
+_DEF_SUBJ_ID = "s"
 
 _DEF_PRED_VARIABLE = "?p"
 _DEF_PRED_ID = "p"
@@ -18,6 +24,7 @@ class EndpointSGraph(SGraph):
         self._store_locally = store_locally
         self._local_sgraph = RdflibSgraph(rdflib_graph=Graph()) if store_locally else None
         self._subjects_tracked = set() if store_locally else None
+        self._objects_tracked = set() if store_locally else None
 
 
 
@@ -60,14 +67,20 @@ class EndpointSGraph(SGraph):
             yield a_triple
 
 
-
-
     def yield_p_o_triples_of_an_s(self, target_node):
         if not self._store_locally:
             for a_triple in self._yield_remote_p_o_triples_of_an_s(target_node):
                 yield a_triple
         else:
             for a_triple in self._yield_local_p_o_triples_of_an_s(target_node):
+                yield a_triple
+
+    def yield_s_p_triples_of_an_o(self, target_node):
+        if not self._store_locally:
+            for a_triple in self._yield_remote_s_p_triples_of_an_o(target_node):
+                yield a_triple
+        else:
+            for a_triple in self._yield_local_s_p_triples_of_an_o(target_node):
                 yield a_triple
 
 
@@ -80,8 +93,18 @@ class EndpointSGraph(SGraph):
                                                     str_query=str_query,
                                                     p_id=_DEF_PRED_ID,
                                                     o_id=_DEF_OBJ_ID):
-
             yield target_node, a_tuple_po[0], a_tuple_po[1]
+
+    def _yield_remote_s_p_triples_of_an_o(self, target_node):
+        str_query = "SELECT {0} {1} WHERE {{ {0} {1} <{2}> .}}".format(_DEF_SUBJ_VARIABLE,
+                                                                       _DEF_PRED_VARIABLE,
+                                                                       remove_corners(a_uri=target_node,
+                                                                                      raise_error_if_no_corners=False))
+        for a_tuple_sp in query_endpoint_sp_of_an_o(endpoint_url=self._endpoint_url,
+                                                    str_query=str_query,
+                                                    p_id=_DEF_PRED_ID,
+                                                    s_id=_DEF_SUBJ_ID):
+            yield a_tuple_sp[0], a_tuple_sp[1], target_node
 
 
     def _yield_local_p_o_triples_of_an_s(self, target_node):
@@ -90,6 +113,14 @@ class EndpointSGraph(SGraph):
                 self._store_triple_locally(a_triple)
             self._subjects_tracked.add(target_node)
         for a_triple in self._local_sgraph.yield_p_o_triples_of_an_s(target_node):
+            yield a_triple
+
+    def _yield_local_s_p_triples_of_an_o(self, target_node):
+        if target_node not in self._objects_tracked:
+            for a_triple in self._yield_remote_s_p_triples_of_an_o(target_node):
+                self._store_triple_locally(a_triple)
+            self._objects_tracked.add(target_node)
+        for a_triple in self._local_sgraph.yield_s_p_triples_of_an_o(target_node):
             yield a_triple
 
     def _store_triple_locally(self, a_triple):

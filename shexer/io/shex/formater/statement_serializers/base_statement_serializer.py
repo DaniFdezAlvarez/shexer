@@ -4,12 +4,14 @@ from shexer.model.IRI import IRI_ELEM_TYPE
 from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 from shexer.utils.shapes import prefixize_shape_name_if_possible
 
+_INVERSE_SENSE_SHEXC = "^"
 
 class BaseStatementSerializer(object):
 
-    def __init__(self, instantiation_property_str, disable_comments=False):
+    def __init__(self, instantiation_property_str, disable_comments=False, is_inverse=False):
         self._instantiation_property_str = instantiation_property_str
         self._disable_comments = disable_comments
+        self._is_inverse = is_inverse
 
     def serialize_statement_with_indent_level(self, a_statement, is_last_statement_of_shape, namespaces_dict):
         tuples_line_indent = []
@@ -21,7 +23,7 @@ class BaseStatementSerializer(object):
             cardinality=a_statement.cardinality,
             statement=a_statement,
             out_of_comment=True)
-        result = st_property + SPACES_GAP_BETWEEN_TOKENS + st_target_element + SPACES_GAP_BETWEEN_TOKENS + \
+        result = self._sense_flag() + st_property + SPACES_GAP_BETWEEN_TOKENS + st_target_element + SPACES_GAP_BETWEEN_TOKENS + \
                  cardinality + BaseStatementSerializer.closure_of_statement(is_last_statement_of_shape)
 
         if a_statement.cardinality not in [KLEENE_CLOSURE, OPT_CARDINALITY] and not self._disable_comments:
@@ -118,3 +120,6 @@ class BaseStatementSerializer(object):
                " obj: " + BaseStatementSerializer.tune_token(statement.st_type,
                                                              namespaces_dict) + \
                ". Cardinality: " + statement.cardinality_representation()
+
+    def _sense_flag(self):
+        return "" if not self._is_inverse else _INVERSE_SENSE_SHEXC + SPACES_GAP_BETWEEN_TOKENS

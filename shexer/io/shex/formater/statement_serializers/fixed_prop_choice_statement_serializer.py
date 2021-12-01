@@ -4,9 +4,10 @@ from shexer.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, KLEENE_CLO
 
 class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
 
-    def __init__(self, instantiation_property_str, disable_comments=False):
+    def __init__(self, instantiation_property_str, disable_comments=False, is_inverse=False):
         super(FixedPropChoiceStatementSerializer, self).__init__(instantiation_property_str=instantiation_property_str,
-                                                                 disable_comments=disable_comments)
+                                                                 disable_comments=disable_comments,
+                                                                 is_inverse=is_inverse)
 
     def serialize_statement_with_indent_level(self, a_statement, is_last_statement_of_shape, namespaces_dict):
         tuples_line_indent = []
@@ -17,7 +18,7 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
                                                                  st_property=a_statement.st_property,
                                                                  namespaces_dict=namespaces_dict))
 
-        tuples_line_indent.append(FixedPropChoiceStatementSerializer._opening_tuple_line_of_choice())
+        tuples_line_indent.append(self._opening_tuple_line_of_choice())
 
         tuples_line_indent.append(FixedPropChoiceStatementSerializer.
                                   _statement_in_choice_no_cardinality(st_property,
@@ -34,8 +35,6 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
 
         for a_comment in a_statement.comments:
             tuples_line_indent.append((a_comment, 4))
-        a = 3 + 1
-
         return tuples_line_indent
 
 
@@ -51,13 +50,12 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
                        BaseStatementSerializer.probability_representation(a_statement.probability)
         return str_res, 1
 
+    def _opening_tuple_line_of_choice(self):
+        return self._sense_flag() + "(", 1
+
     @staticmethod
     def _tuple_of_disjunction():
         return "|", 2
-
-    @staticmethod
-    def _opening_tuple_line_of_choice():
-        return "(", 1
 
     @staticmethod
     def _statement_in_choice_no_cardinality(st_property, st_type):
