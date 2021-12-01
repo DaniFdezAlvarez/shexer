@@ -8,7 +8,7 @@ from shexer.consts import TURTLE, SHAPES_DEFAULT_NAMESPACE
 _BASE_DIR = BASE_FILES + "sort" + pth.sep # We just need something with another instantiation property
 
 
-class TestShapesNamespaces(unittest.TestCase):
+class TestSort(unittest.TestCase):
 
     def test_outgoing_links(self):
         shaper = Shaper(

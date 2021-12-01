@@ -199,6 +199,7 @@ def tunned_str_comparison(str1, str2, or_shapes=False, check_order=False):
     else:
         return complex_shape_comparison(str1, str2, or_shapes, check_order)
 
+
 def file_vs_str_tunned_comparison(file_path, str_target, or_shapes=False, check_order=False):
     with open(file_path, "r") as in_stream:
         content = in_stream.read()
@@ -262,3 +263,10 @@ def text_contains_lines(text, list_lines):
             return False
         return True
 
+
+def no_sharp_in_shepe_names(str_shapes):
+    _, shapes = get_namespaces_and_shapes_from_str(str_shapes, or_shapes=False)
+    for a_key_label in shapes:
+        if '#' in a_key_label:
+            return False
+    return True
