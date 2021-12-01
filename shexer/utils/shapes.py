@@ -3,12 +3,14 @@ from shexer.utils.uri import prefixize_uri_if_possible
 from shexer.io.shex.formater.consts import SHAPE_LINK_CHAR
 
 def build_shapes_name_for_class_uri(class_uri, shapes_namespace):
+
+    if class_uri.startswith("@"): # special shape case
+        return class_uri
     if class_uri.startswith("<") and class_uri.endswith(">"):
         return STARTING_CHAR_FOR_SHAPE_NAME + class_uri
     last_piece = class_uri
     if "#" in last_piece and last_piece[-1] != "#":
         last_piece = last_piece[last_piece.rfind("#") + 1:]
-
     if "/" in last_piece:
         if last_piece[-1] != "/":
             last_piece = last_piece[last_piece.rfind("/") + 1:]
