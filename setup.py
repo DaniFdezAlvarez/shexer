@@ -23,9 +23,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Intended Audience :: Science/Research",
         "Intended Audience :: Information Technology",
-        "Intended Audience :: Semantic Web",
-        "Intended Audience :: ShEx community",
-		"Intended Audience :: SHACL community"
+        "Topic :: Software Development :: Libraries :: Python Modules"
     ],
   install_requires=[            
           'Flask',
