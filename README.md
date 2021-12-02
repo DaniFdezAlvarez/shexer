@@ -4,8 +4,9 @@ This library can be used to perform automatic extraction of shape expressions (S
 
 There is an online demo available at: [http://shexer.weso.es/](http://shexer.weso.es/) . This demo may not include some of the sheXer's features. Install the library to try every feautre.
 
-Language: Python 3
+Language:
 
+[![Pyversions](https://img.shields.io/pypi/pyversions/shexer.svg)](https://pypi.python.org/pypi/shexer)
 
 ## Installation
 
