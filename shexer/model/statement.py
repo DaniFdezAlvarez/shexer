@@ -5,13 +5,14 @@ OPT_CARDINALITY = "?"
 class Statement(object):
 
     def __init__(self, st_property, st_type, cardinality, probability,
-                 comments=None, serializer_object=None):
+                 comments=None, serializer_object=None, is_inverse=False):
         self._st_property = st_property
         self._st_type = st_type
         self._cardinality = cardinality
         self._probability = probability
         self._serializer_object = serializer_object
         self._comments = [] if comments is None else comments
+        self._is_inverse = is_inverse
 
     def get_tuples_to_serialize_line_indent_level(self, is_last_statement_of_shape, namespaces_dict):
         return self._serializer_object.\
@@ -36,7 +37,6 @@ class Statement(object):
 
     def remove_comments(self):
         self._comments = []
-
 
 
     @property
@@ -74,3 +74,11 @@ class Statement(object):
     @serializer_object.setter
     def serializer_object(self, value):
         self._serializer_object = value
+
+    @property
+    def is_inverse(self):
+        return self._is_inverse
+
+    @is_inverse.setter
+    def is_inverse(self, value):
+        self._is_inverse = value

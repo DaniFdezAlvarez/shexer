@@ -20,7 +20,7 @@ class InstanceTracker(AbstractInstanceTracker):
                  shapes_namespace=SHAPES_DEFAULT_NAMESPACE):
         self._target_classes = target_classes
         self._all_classes_mode = all_classes_mode
-        self._instances_dict = self._build_instances_dict(self._target_classes)
+        self._instances_dict = self._build_instances_dict()
         self._triples_yielder = triples_yielder
         self._instantiation_property = self._decide_instantiation_property(instantiation_property)
         self._relevant_triples = 0
@@ -83,20 +83,7 @@ class InstanceTracker(AbstractInstanceTracker):
         return a_property == self._subclass_property
 
     @staticmethod
-    def _build_instances_dict(target_classes):
-        # """
-        # If there are target classes, we can build their dictionary now. Otherwise, all_classes_mode or
-        # shape_qualifiers_mode will fill the instances dict in future methods
-        #
-        # :param target_classes:
-        # :return:
-        # """
-        # result = {}
-        # if target_classes is not None:
-        #     for a_class in target_classes:
-        #         result[a_class.iri] = set()
-        # # return result  # In this case, we will add keys on the fly, while parsing the input graph.
-
+    def _build_instances_dict():
         return {}  # Empty in every case. Instances, on the fly, will be the keys
 
     @staticmethod
@@ -109,37 +96,6 @@ class InstanceTracker(AbstractInstanceTracker):
             return Property(remove_corners(a_uri=instantiation_property,
                                            raise_error_if_no_corners=False))
         raise ValueError("Unrecognized param type to define instantiation property")
-
-    # def _anotate_direct_children_of_IRI(self):
-    #     for a_key_class in self._instances_dict:
-    #         self._classes_considered_in_htree.add(a_key_class)
-    #     iri_node = self._htree.iri_node
-    #     for a_key_class in self._classes_considered_in_htree:
-    #         a_class_node = self._get_appropiate_iri_node_and_add_to_htree_if_needed(a_key_class)
-    #         if not a_class_node.has_parents():
-    #             a_class_node.add_parent(iri_node)
-
-    #
-    # def _anotate_instance(self, a_triple):
-    #     self._instances_dict[a_triple[_O].iri].add(a_triple[_S].iri)
-
-    # def _is_a_relevant_triple(self, a_triple):
-    #     """
-    #     It returns True if the triple has rdf:type as predicate and one of the target classes as object
-    #
-    #     :return: bool
-    #     """
-    #     if self._track_hierarchies and a_triple[_P] == self._subclass_property:
-    #         return True
-    #     elif a_triple[_P] != self._instantiation_property:
-    #         return False
-    #     elif self._all_classes_mode:
-    #         if a_triple[_O].iri not in self._instances_dict:
-    #             self.add_new_class_to_instances_dict(a_triple[_O].iri)
-    #             return True
-    #     elif a_triple[_O].iri not in self._instances_dict:
-    #         return False
-    #     return True
 
 
 
