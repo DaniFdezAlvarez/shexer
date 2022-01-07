@@ -2,11 +2,14 @@
 
 This library can be used to perform automatic extraction of shape expressions (ShEx) or Shapes Constraint Language (SHACL) for a target RDF grpah. Please, feel free to add an issue to this repository if you find any bug in sheXer or if you have a feature request.
 
-There is an online demo available at: [http://shexer.weso.es/](http://shexer.weso.es/) . This demo may not include some of the sheXer's features. Install the library to try every feautre.
 
 Language:
 
 [![Pyversions](https://img.shields.io/pypi/pyversions/shexer.svg)](https://pypi.python.org/pypi/shexer)
+
+## Citation
+
+Use this work in case you want to cite this software: [Automatic extraction of shapes using sheXer](https://doi.org/10.1016/j.knosys.2021.107975)
 
 ## Installation
 
