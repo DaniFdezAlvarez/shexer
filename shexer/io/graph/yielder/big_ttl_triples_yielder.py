@@ -152,13 +152,13 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
 
     def _assing_tmp_element_and_promote_state(self, token):
         if self._state == _WAITING_FOR_SUBJ:
-            self._tmp_s = token
+            self._tmp_s = self._parse_elem(token)
             self._state = _WAITING_FOR_PRED
         elif self._state == _WAITING_FOR_PRED:
-            self._tmp_p = token
+            self._tmp_p = self._parse_elem(token)
             self._state = _WAITING_FOR_OBJ
         elif self._state == _WAITING_FOR_OBJ:
-            self._tmp_o = token
+            self._tmp_o = self._parse_elem(token)
             self._state = _NOT_WAITING
         else:
             raise ValueError("Malformed file. Processing an unexpected token: " + token)
@@ -342,6 +342,8 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
             return self._parse_cornered_element(raw_elem)
         elif raw_elem in _RDF_TYPE_CONTRACTED:
             return _RDF_TYPE_URI
+        elif raw_elem.startswith('"'):  # it's a literal, will be better parsed later
+            return raw_elem
         elif ":" in raw_elem:
             if raw_elem.startswith("_:"):
                 return raw_elem

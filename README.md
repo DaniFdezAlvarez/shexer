@@ -2,10 +2,16 @@
 
 This library can be used to perform automatic extraction of shape expressions (ShEx) or Shapes Constraint Language (SHACL) for a target RDF grpah. Please, feel free to add an issue to this repository if you find any bug in sheXer or if you have a feature request.
 
-There is an online demo available at: [http://shexer.weso.es/](http://shexer.weso.es/) . This demo may not include some of the sheXer's features. Install the library to try every feautre.
 
-Language: Python 3
+Language:
 
+[![Pyversions](https://img.shields.io/pypi/pyversions/shexer.svg)](https://pypi.python.org/pypi/shexer)
+
+## Citation
+
+Use this work in case you want to cite this software: [Automatic extraction of shapes using sheXer](https://doi.org/10.1016/j.knosys.2021.107975).
+
+If you want to read the paper but cannot access the full-content using the previous link, there is a [preprint available in Researchgate](https://www.researchgate.net/publication/357146819_Automatic_extraction_of_shapes_using_sheXer).
 
 ## Installation
 
@@ -44,6 +50,8 @@ sheXer includes a package to deploy a wer service exposing sheXer with a REST AP
 
 * **Cardinality management**. Some of the triples of a given instance may fit in an infinite number of constraint triples with the same predicate and object but different cardinality. For example, if a given instance has a single label specified by rdfs:label, that makes it fit with infinite triple constraints with the schema {rdfs:label xsd:string C}, where C can be any cardinality that includes the posibility of a single occurrence: {1}, + , {1,2}, {1,3}, {1,4},... Currently, sheXer admints exact cardinalities ({2}, {3}..), kleene closure (\*), positive closure (+), and optional cardinality (?).
 
+* **Inverse paths**. sheXer can extract constraints related to incomming links. Shapes are usually described using contraints realted to outgoing links, i.d., triples in which the node is the subject. However, sheXer can extract also constraints where the node is the object.
+
 * **Configurable priority of cardinalities**. sheXer can be configured to prioritize the less specific cardinality or the most specific one if its trustworthiness score is high enough.
 
 * **All compliant mode**: You can produce shapes that conform with every instance using to extract them. This is done by using cadinalities \* or ? for every constraint extracted that does not conform with EVERY instance. You may prefer to avoid these cardinalities and keep constraints that may not conform with every instance, but include the most frequent features of the instances. Both settings are available in sheXer.
@@ -72,7 +80,7 @@ target_classes = [
 namespaces_dict = {"http://www.w3.org/1999/02/22-rdf-syntax-ns#": "rdf",
                    "http://example.org/": "ex",
                    "http://weso.es/shapes/": "",
-                   "http://www.w3.org/2001/XMLSchema#": "xml"
+                   "http://www.w3.org/2001/XMLSchema#": "xsd"
                    }
 
 raw_graph = """
@@ -186,8 +194,9 @@ All this parameters have a default value so you do not need to use any of them. 
 * disable_or_statements (default True): when set to False, sheXer tries to infer constraints with the operator oneOf (|) in case there are constraints with the same property but different object. By default, sheXer groups those constraint in a isngle one having the less general object possible. For instance, when the objects are different shapes, it merges the constraints a single one whose object is IRI.
 * allow_opt_cardinality (default True). When all-compliant mode is active, if there is a constraint which does not conform with every isntance but its maximun cardinality for any instance is {1}, it uses the optional cardinality (?). When set to False, it uses Kleene closure instead.
 * disable_opt_cardinality (dafault False). When set to True, it prevents any constraint to have a higher cardinality higher than one, even if every instance has that cardinality. For example, a constraint such as *ex:alias xsd:string {3}* will be changed to *ex:alias xsd:string +*.
-* shape_qualifiers_mode (default False). When set to True, it assumes a data model similar to Wikidata's one, where entity nodes are linked with qualifiers (BNodes) instead of the actual object meant by the triple. It is used to produce legible shapes for those special BNodes.
+* shape_qualifiers_mode (default False). When it is set to True, it assumes a data model similar to Wikidata's one, where entity nodes are linked with qualifiers (BNodes) instead of the actual object meant by the triple. It is used to produce legible shapes for those special BNodes.
 * namespaces_for_qualifier_props (default None). Provide here a list of namespace in which the indirect properties used to link an entity with a qualifier node can be found. A reasonable configuration for Wikidata is namespaces_for_qualifier_props = \["http://www.wikidata.org/prop/"\] .
+* inverse_paths (default False). When it is set to True, sheXer will produce constraints with inverse_paths too. This is, constraints referring to triples in which the target node acst as object. Direct and inverse paths will be sorted in the final results w.r.t. their trutsworthiness score.
 
 
 #### Params to tune some features of the output

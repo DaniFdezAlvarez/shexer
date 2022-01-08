@@ -35,7 +35,8 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                          built_remote_graph=None,
                          built_shape_map=None,
                          shapes_namespace=SHAPES_DEFAULT_NAMESPACE,
-                         limit_remote_instances=-1
+                         limit_remote_instances=-1,
+                         inverse_paths=False
                          ):
     """
 
@@ -67,7 +68,7 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
     """
 
     prefix_namespaces_dict = reverse_keys_and_values(namespaces_dict)
-    instance_yielder = None
+    instance_yielder = None  # Old-schooler
     if instances_file_input is not None:
         instance_yielder = get_triple_yielder(source_file=instances_file_input,
                                               input_format=input_format,
@@ -90,7 +91,8 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                                               file_target_classes=file_target_classes,
                                               built_remote_graph=built_remote_graph,
                                               built_shape_map=built_shape_map,
-                                              limit_remote_instances=limit_remote_instances
+                                              limit_remote_instances=limit_remote_instances,
+                                              inverse_paths=inverse_paths
                                               )
     else:
         instance_yielder = get_triple_yielder(source_file=graph_file_input,
@@ -114,7 +116,8 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                                               file_target_classes=file_target_classes,
                                               built_remote_graph=built_remote_graph,
                                               built_shape_map=built_shape_map,
-                                              limit_remote_instances=limit_remote_instances
+                                              limit_remote_instances=limit_remote_instances,
+                                              inverse_paths=inverse_paths
                                               )
 
     selectors_tracker = None
