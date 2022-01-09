@@ -391,7 +391,8 @@ def _call_shaper(target_classes, graph, input_fotmat, instantiation_prop,
                     depth_for_building_subgraph=query_depth,
                     disable_comments=disable_comments,
                     namespaces_for_qualifier_props=namespaces_for_qualifier_props,
-                    shape_qualifiers_mode=shape_qualifiers_mode
+                    shape_qualifiers_mode=shape_qualifiers_mode,
+                    wikidata_annotation=True
                     )
     result = shaper.shex_graph(acceptance_threshold=threshold, string_output=True)
     return _jsonize_response(result)
@@ -511,7 +512,7 @@ def shexer():
 def run():
     port = 80 if len(sys.argv) < 2 else int(sys.argv[1])
     CORS(app)
-    app.run(port=port, host=HOST)
+    app.run(port=port, host=HOST, ssl_context='adhoc')
 
 if __name__ == "__main__":
     run()

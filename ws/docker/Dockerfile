@@ -5,11 +5,11 @@ FROM python:3.9
 RUN  apt-get install -y git
 
 # Clone repo
-RUN git clone https://github.com/DaniFdezAlvarez/shexer.git shexer
+RUN git clone https://github.com/DaniFdezAlvarez/shexer.git shexerr
 
 
 # Base repo file as base dir
-WORKDIR shexer
+WORKDIR shexerr
 
 # Install project dependencies (if any)
 RUN pip install -r requirements.txt
@@ -19,4 +19,4 @@ RUN pip install -r requirements.txt
 ENV PORT=8080
 
 # Execute feature extraction
-ENTRYPOINT python -m  shexer.shexer_rest $PORT
+ENTRYPOINT python -m  ws.shexer_rest $PORT

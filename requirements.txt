@@ -3,4 +3,4 @@ Flask-Cors==3.0.9
 rdflib==6.0.2
 SPARQLWrapper==1.8.4
 wlighter==1.0.1
-
+pyopenssl
