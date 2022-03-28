@@ -5,11 +5,11 @@ FROM python:3.9
 RUN  apt-get install -y git
 
 # Clone repo
-RUN git clone https://github.com/DaniFdezAlvarez/shexer.git shexerr
+RUN git clone https://github.com/DaniFdezAlvarez/shexer.git shexer_dir
 
 
 # Base repo file as base dir
-WORKDIR shexerr
+WORKDIR shexer_dir
 
 # Install project dependencies (if any)
 RUN pip install -r requirements.txt
