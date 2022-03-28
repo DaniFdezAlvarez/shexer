@@ -1,0 +1,44 @@
+@prefix : <http://weso.es/shapes/> .
+@prefix ex: <http://example.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:Person a sh:NodeShape ;
+    sh:property [ a sh:PropertyShape ;
+            sh:dataType xsd:date ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path ex:foo5 ],
+        [ a sh:PropertyShape ;
+            sh:dataType xsd:int ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path ex:foo ],
+        [ a sh:PropertyShape ;
+            sh:dataType xsd:integer ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path foaf:age ],
+        [ a sh:PropertyShape ;
+            sh:dataType xsd:integer ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path ex:foo2 ],
+        [ a sh:PropertyShape ;
+            sh:in ( foaf:Person ) ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path rdf:type ],
+        [ a sh:PropertyShape ;
+            sh:dataType xsd:boolean ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path ex:foo3 ],
+        [ a sh:PropertyShape ;
+            sh:dataType xsd:string ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path ex:foo4 ] ;
+    sh:targetClass foaf:Person .

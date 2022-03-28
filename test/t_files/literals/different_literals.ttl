@@ -1,0 +1,22 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:Jimmy rdf:type foaf:Person ;
+	foaf:age "23"^^xsd:integer ;
+	ex:foo "24"^^xsd:int ;
+	ex:foo2 25 ;
+	ex:foo3 true ;
+	ex:foo4 "word" ;
+	ex:foo5 "12/12/2021"^^xsd:date .
+
+ex:Susan rdf:type foaf:Person ;
+	foaf:age "23"^^xsd:integer ;
+	ex:foo "24"^^xsd:int ;
+	ex:foo2 25 ;
+	ex:foo3 true ;
+	ex:foo4 "word" ;
+	ex:foo5 "12/12/2021"^^xsd:date .
+

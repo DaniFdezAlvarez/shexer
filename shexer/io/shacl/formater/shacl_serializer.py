@@ -207,19 +207,19 @@ class ShaclSerializer(object):
         return target_type in _MACRO_MAPPING
 
     def _add_dataType_literal(self, r_constraint_node, target_type):
-        if target_type == LANG_STRING_TYPE:
-            type_node = _R_LANG_STRING
-        elif target_type.endswith("integer"):
-            type_node = XSD.integer
-        elif target_type.endswith("float"):
-            type_node = XSD.float
-        elif target_type.endswith("string"):
-            type_node = XSD.string
-        else:
-            raise ValueError("Check here:" + target_type)
+        # if target_type == LANG_STRING_TYPE:
+        #     type_node = _R_LANG_STRING
+        # elif target_type.endswith("integer"):
+        #     type_node = XSD.integer
+        # elif target_type.endswith("float"):
+        #     type_node = XSD.float
+        # elif target_type.endswith("string"):
+        #     type_node = XSD.string
+        # else:
+        #     raise ValueError("Unexpected literal type:" + target_type)
         self._add_triple(r_constraint_node,
                          _R_SHACL_DATATYPE_PROP,
-                         type_node)
+                         URIRef(target_type))
 
     def _add_node_shape(self, r_constraint_node, target_type):
         self._add_triple(r_constraint_node,
