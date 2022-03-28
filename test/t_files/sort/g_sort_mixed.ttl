@@ -1,0 +1,28 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:Jimmy a foaf:Person  ;
+    foaf:familyName "Juarez" ;
+    foaf:name "Jimmy" .
+
+ex:Sarah a foaf:Person ;
+    foaf:familyName "Simba" ;
+    foaf:name "Sarah" .
+
+ex:Bella a foaf:Person ;
+    foaf:name "Bella" .
+
+ex:David a foaf:Person .
+
+ex:Laura a foaf:Person .
+
+ex:NoOne a ex:NoThing ;
+    ex:knows ex:Jimmy ;
+    ex:knows ex:Sarah ;
+    ex:knows ex:Bella ;
+    ex:knows ex:David ;
+    ex:asksForCookies ex:Jimmy .
+

@@ -1,4 +1,4 @@
-from shexer.core.class_profiler import RDF_TYPE_STR
+from shexer.core.profiling.class_profiler import RDF_TYPE_STR
 from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 from rdflib import Graph, Namespace, URIRef, RDF, BNode, XSD, Literal
 from shexer.model.statement import POSITIVE_CLOSURE, KLEENE_CLOSURE, OPT_CARDINALITY
@@ -19,6 +19,7 @@ _R_SHACL_PROPERTY_SHAPE_URI = URIRef(_SHACL_NAMESPACE + "PropertyShape")
 
 _R_SHACL_TARGET_CLASS_PROP = URIRef(_SHACL_NAMESPACE + "targetClass")
 _R_SHACL_PATH_PROP = URIRef(_SHACL_NAMESPACE + "path")
+_R_SHACL_INVERSE_PATH_PROP = URIRef(_SHACL_NAMESPACE + "inversePath")
 _R_SHACL_MIN_COUNT_PROP = URIRef(_SHACL_NAMESPACE + "minCount")
 _R_SHACL_MAX_COUNT_PROP = URIRef(_SHACL_NAMESPACE + "maxCount")
 
@@ -154,8 +155,8 @@ class ShaclSerializer(object):
         r_constraint_node = self._generate_bnode()
         self._add_bnode_property(r_shape_uri=r_shape_uri,
                                  r_constraint_node=r_constraint_node)
-        self._add_path(statement=statement,
-                       r_constraint_node=r_constraint_node)
+        self._add_direct_path(statement=statement,
+                              r_constraint_node=r_constraint_node)
         self._add_exactly_one_cardinality(r_constraint_node=r_constraint_node)
         self._add_in_instance(statement=statement,
                               r_constraint_node=r_constraint_node)
@@ -164,16 +165,30 @@ class ShaclSerializer(object):
         r_constraint_node = self._generate_bnode()
         self._add_bnode_property(r_shape_uri=r_shape_uri,
                                  r_constraint_node=r_constraint_node)
-        self._add_path(statement=statement,
-                       r_constraint_node=r_constraint_node)
         self._add_node_type(statement=statement,
                             r_constraint_node=r_constraint_node)
         self._add_cardinality(statement=statement,
                               r_constraint_node=r_constraint_node)
+        self._add_path(statement=statement,
+                       r_constraint_node=r_constraint_node)
 
     def _add_path(self, statement, r_constraint_node):
+        if not statement.is_inverse:
+            self._add_direct_path(statement=statement,
+                                  r_constraint_node=r_constraint_node)
+        else:
+            self._add_inverse_path(statement=statement,
+                                   r_constraint_node=r_constraint_node)
+
+    def _add_direct_path(self, statement, r_constraint_node):
         r_property_uri = self._generate_r_uri_for_str_uri(statement.st_property)
         self._add_triple(r_constraint_node, _R_SHACL_PATH_PROP, r_property_uri)
+
+    def _add_inverse_path(self, statement, r_constraint_node):
+        r_property_uri = self._generate_r_uri_for_str_uri(statement.st_property)
+        inverse_path_node = self._generate_bnode()
+        self._add_triple(r_constraint_node, _R_SHACL_PROPERTY_PROP, inverse_path_node)
+        self._add_triple(inverse_path_node, _R_SHACL_INVERSE_PATH_PROP, r_property_uri)
 
     def _generate_r_uri_for_str_uri(self, property_str):
         if property_str.startswith("<") and property_str.endswith(">"):
@@ -192,19 +207,19 @@ class ShaclSerializer(object):
         return target_type in _MACRO_MAPPING
 
     def _add_dataType_literal(self, r_constraint_node, target_type):
-        if target_type == LANG_STRING_TYPE:
-            type_node = _R_LANG_STRING
-        elif target_type.endswith("integer"):
-            type_node = XSD.integer
-        elif target_type.endswith("float"):
-            type_node = XSD.float
-        elif target_type.endswith("string"):
-            type_node = XSD.string
-        else:
-            raise ValueError("Check here:" + target_type)
+        # if target_type == LANG_STRING_TYPE:
+        #     type_node = _R_LANG_STRING
+        # elif target_type.endswith("integer"):
+        #     type_node = XSD.integer
+        # elif target_type.endswith("float"):
+        #     type_node = XSD.float
+        # elif target_type.endswith("string"):
+        #     type_node = XSD.string
+        # else:
+        #     raise ValueError("Unexpected literal type:" + target_type)
         self._add_triple(r_constraint_node,
                          _R_SHACL_DATATYPE_PROP,
-                         type_node)
+                         URIRef(target_type))
 
     def _add_node_shape(self, r_constraint_node, target_type):
         self._add_triple(r_constraint_node,
@@ -310,13 +325,13 @@ class ShaclSerializer(object):
             return self._produce_wikidata_annotation_output()
         # destination = None if self._string_return else self._target_file
         if self._string_return:
-            return self._g_shapes.serialize(format="turtle").decode("utf-8")
+            return self._g_shapes.serialize(format="turtle")
         else:
             self._g_shapes.serialize(destination=self._target_file, format="turtle")
 
 
     def _produce_wikidata_annotation_output(self):
-        result = self._g_shapes.serialize(format="turtle").decode("utf-8")
+        result = self._g_shapes.serialize(format="turtle")
         result = wikidata_annotation(raw_input=result,
                                      string_return=self._string_return,
                                      out_file=self._target_file,

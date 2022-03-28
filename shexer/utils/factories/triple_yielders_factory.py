@@ -49,7 +49,7 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
                        track_classes_for_entities_at_last_depth_level=True, depth_for_building_subgraph=1,
                        url_endpoint=None, instantiation_property=None, strict_syntax_with_corners=False,
                        target_classes=None, file_target_classes=None, built_remote_graph=None,
-                       built_shape_map=None, limit_remote_instances=-1):
+                       built_shape_map=None, limit_remote_instances=-1, inverse_paths=False):
     result = None
     if url_endpoint is not None:
         sgrpah = built_remote_graph if built_remote_graph is not None else EndpointSGraph(endpoint_url=url_endpoint)
@@ -70,7 +70,8 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
                                                   classes_at_last_level=track_classes_for_entities_at_last_depth_level,
                                                   instantiation_property=instantiation_property,
                                                   strict_syntax_with_corners=strict_syntax_with_corners,
-                                                  allow_untyped_numbers=allow_untyped_numbers
+                                                  allow_untyped_numbers=allow_untyped_numbers,
+                                                  inverse_paths=inverse_paths
                                                   )
     elif url_input is not None or list_of_url_input is not None:  # Always use rdflib to parse remote graphs
         if url_input:

@@ -1,4 +1,4 @@
-from shexer.core.class_profiler import RDF_TYPE_STR
+from shexer.core.profiling.class_profiler import RDF_TYPE_STR
 
 from shexer.model.property import Property
 from shexer.utils.uri import remove_corners
@@ -112,7 +112,7 @@ class ShexSerializer(object):
     def _serialize_shape_rules(self, a_shape):
         if a_shape.n_statements == 0:
             return
-        statements = a_shape.statements
+        statements = [a_statement for a_statement in a_shape.yield_statements()]
         for i in range(0, len(statements) - 1):
             for line_indent_tuple in statements[i]. \
                     get_tuples_to_serialize_line_indent_level(is_last_statement_of_shape=False,

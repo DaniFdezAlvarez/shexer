@@ -30,13 +30,6 @@ class BaseAnnotator(object):
     def annotate_triple(self, a_triple):
         self._strategy_mode.annotate_triple(a_triple)
 
-    # def add_new_class_to_instances_dict(self, class_uri):
-    #     if class_uri not in self._instances_dict:
-    #         self._instances_dict[class_uri] = set()
-
-    # def annotate_instance(self, a_triple):
-    #     self._instances_dict[a_triple[_O].iri].add(a_triple[_S].iri)
-
     def add_instance_to_instances_dict(self, a_triple):
         if a_triple[_S].iri not in self._instances_dict:
             self._instances_dict[a_triple[_S].iri] = []

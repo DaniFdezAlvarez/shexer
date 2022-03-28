@@ -1,0 +1,35 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex: <http://example.org/> .
+@prefix ex2: <http://otherexample.org#> .
+@prefix ex3: <http://otherexample.org/other#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:Jimmy a foaf:Person ;  # Complete
+	foaf:age "23"^^xsd:integer ;
+	foaf:name "Jimmy" ;
+	foaf:familyName "Jones" .
+
+ex:Sarah a ex2:Person2 ;  # Complete implicit type for age
+	foaf:age 22 ;
+	foaf:name "Sarah" ;
+	foaf:familyName "Salem" .
+
+ex:Bella a ex3:Person3 ;  # Missing familyName
+	foaf:age "56"^^xsd:integer ;
+	foaf:name "Isabella" .
+
+ex:David a <http://something#Person4> ;  # Missing age and use knows
+	foaf:name "David" ;
+	foaf:familyName "Doulofeau" ;
+	foaf:knows ex:Sarah .
+
+ex:HumanLike a <something#Person5> ;
+    foaf:name "Person" ;  # foaf properties, but not explicit type.
+	foaf:familyName "Maybe" ;
+	foaf:age 99 ;
+	foaf:knows ex:David .
+
+
+

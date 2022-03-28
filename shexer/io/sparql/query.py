@@ -36,33 +36,53 @@ def query_endpoint_single_variable(endpoint_url, str_query, variable_id, max_ret
     :param variable_id:
     :return:
     """
-    first_failure = True
-    sparql = SPARQLWrapper(endpoint_url)
-    if fake_user_agent:
-        sparql.agent = _FAKE_USER_AGENT
-    sparql.setQuery(str_query)
-    sparql.setReturnFormat(JSON)
-    last_error = None
-    while max_retries > 0:
-        try:
-            result_query = sparql.query().convert()
-            result = []
-            for row in result_query[_RESULTS_KEY][_BINDINGS_KEY]:
-                # an_elem = _add_corners_if_needed(row[variable_id][_VALUE_KEY], row[variable_id][_TYPE_KEY])
-                an_elem = row[variable_id][_VALUE_KEY]
-                result.append(an_elem)
-            return result
-        except (HTTPError, EndPointInternalError) as e:
-            max_retries -= 1
-            sleep(sleep_time)
-            last_error = e
-            if first_failure and not fake_user_agent:
-                sparql.agent = _FAKE_USER_AGENT
-                first_failure = not first_failure
-    last_error.msg = "Max number of attempts reached, it is not possible to perform the query. Msg:\n" + last_error.msg
+    result_query = _query_endpoint_json_result(endpoint_url=endpoint_url,
+                                               str_query=str_query,
+                                               max_retries=max_retries,
+                                               sleep_time=sleep_time,
+                                               fake_user_agent=fake_user_agent)
+    result = []
+    for row in result_query[_RESULTS_KEY][_BINDINGS_KEY]:
+        an_elem = row[variable_id][_VALUE_KEY]
+        result.append(an_elem)
+    return result
+
+
+def query_endpoint_sp_of_an_o(endpoint_url, str_query, s_id, p_id, max_retries=5, sleep_time=2, fake_user_agent=True):
+    result_query = _query_endpoint_json_result(endpoint_url=endpoint_url,
+                                               str_query=str_query,
+                                               max_retries=max_retries,
+                                               sleep_time=sleep_time,
+                                               fake_user_agent=fake_user_agent)
+    result = []
+    for row in result_query[_RESULTS_KEY][_BINDINGS_KEY]:
+        p_value = _add_corners_if_needed(target_elem=row[p_id][_VALUE_KEY],
+                                         elem_type=row[p_id][_TYPE_KEY])
+        s_value = _add_corners_if_needed(target_elem=_add_lang_if_needed(row[s_id]),
+                                         elem_type=row[s_id][_TYPE_KEY])
+        result.append((s_value, p_value))
+    return result
 
 
 def query_endpoint_po_of_an_s(endpoint_url, str_query, p_id, o_id, max_retries=5, sleep_time=2, fake_user_agent=True):
+
+    result_query = _query_endpoint_json_result(endpoint_url=endpoint_url,
+                                               str_query=str_query,
+                                               max_retries=max_retries,
+                                               sleep_time=sleep_time,
+                                               fake_user_agent=fake_user_agent)
+    result = []
+    for row in result_query[_RESULTS_KEY][_BINDINGS_KEY]:
+        p_value = _add_corners_if_needed(target_elem=row[p_id][_VALUE_KEY],
+                                         elem_type=row[p_id][_TYPE_KEY])
+        o_value = _add_corners_if_needed(target_elem=_add_lang_if_needed(row[o_id]),
+                                         elem_type=row[o_id][_TYPE_KEY])
+        result.append((p_value, o_value))
+    return result
+
+
+
+def _query_endpoint_json_result(endpoint_url, str_query, max_retries=5, sleep_time=2, fake_user_agent=True):
     first_failure = True
     sparql = SPARQLWrapper(endpoint_url)
     if fake_user_agent:
@@ -72,17 +92,7 @@ def query_endpoint_po_of_an_s(endpoint_url, str_query, p_id, o_id, max_retries=5
     last_error = None
     while max_retries > 0:
         try:
-            result_query = sparql.query().convert()
-            result = []
-            for row in result_query[_RESULTS_KEY][_BINDINGS_KEY]:
-                # p_value = row[p_id][_VALUE_KEY]
-                p_value = _add_corners_if_needed(target_elem=row[p_id][_VALUE_KEY],
-                                                 elem_type=row[p_id][_TYPE_KEY])
-                # o_value = _add_lang_if_needed(row[o_id])
-                o_value = _add_corners_if_needed(target_elem=_add_lang_if_needed(row[o_id]),
-                                                 elem_type=row[o_id][_TYPE_KEY])
-                result.append((p_value, o_value))
-            return result
+            return sparql.query().convert()
         except (HTTPError, EndPointInternalError) as e:
             max_retries -= 1
             sleep(sleep_time)

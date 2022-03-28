@@ -98,11 +98,11 @@ def parse_unquoted_literal(an_elem):
     return an_elem, elem_type
 
 
-def unprefixize_uri_if_possible(target_uri, prefix_namespaces_dict):
+def unprefixize_uri_if_possible(target_uri, prefix_namespaces_dict, include_corners=True):
     for a_prefix in prefix_namespaces_dict:
         if target_uri.startswith(a_prefix+":"):
             result = target_uri.replace(a_prefix+":", prefix_namespaces_dict[a_prefix])
-            if add_corners:
+            if include_corners:
                 result = add_corners(result)
             return result
     return target_uri
