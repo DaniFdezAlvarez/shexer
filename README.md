@@ -139,6 +139,8 @@ print("Done!")
 
 ```
 
+You can also find some examples of how to process Wikidata with sheXer in [this Jupyter notebook](https://github.com/DaniFdezAlvarez/shexer/tree/develop/shexer_wikidata_tutorial.ipynb).
+
 
 ## The Class Shaper
 
