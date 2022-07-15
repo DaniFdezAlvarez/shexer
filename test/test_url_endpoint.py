@@ -37,3 +37,16 @@ class TestUrlEndpoint(unittest.TestCase):
                         all_classes_mode=False)
         str_result = shaper.shex_graph(string_output=True)
         self.assertTrue(number_of_shapes(str_result) == 1)
+
+    def test_all_classes_mode(self):
+        # shape_map_raw = "SPARQL'select ?s where {?s a <http://dbpedia.org/ontology/Person>} LIMIT 1'@<Flag>"
+        shaper = Shaper(all_classes_mode=True,
+                        url_endpoint="https://agrovoc.fao.org/sparql",
+                        namespaces_dict=default_namespaces(),
+                        disable_comments=True,
+                        depth_for_building_subgraph=1,
+                        track_classes_for_entities_at_last_depth_level=False,
+                        limit_remote_instances=5)
+        str_result = shaper.shex_graph(string_output=True)
+        self.assertTrue(number_of_shapes(str_result) > 2)
+        pass  #

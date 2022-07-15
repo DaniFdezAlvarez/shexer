@@ -6,6 +6,7 @@ from shexer.model.graph.abstract_sgraph import SGraph
 from shexer.model.graph.rdflib_sgraph import RdflibSgraph
 from shexer.utils.uri import remove_corners
 from rdflib import Graph
+from shexer.consts import RDF_TYPE
 
 _DEF_SUBJ_VARIABLE = "?s"
 _DEF_SUBJ_ID = "s"
@@ -47,6 +48,19 @@ class EndpointSGraph(SGraph):
             for a_triple in self._yield_local_class_triples_of_an_s(target_node, instantiation_property):
                 yield a_triple
 
+    def yield_classes_with_instances(self, instantiation_property=RDF_TYPE):
+        str_query = "SELECT distinct {0} where {{ {1} <{2}> {0} . }}".format(_DEF_OBJ_VARIABLE,
+                                                                             _DEF_SUBJ_VARIABLE,
+                                                                              remove_corners(
+                                                                                  a_uri=instantiation_property,
+                                                                                  raise_error_if_no_corners=False)
+                                                                              )
+        for an_elem in query_endpoint_single_variable(endpoint_url=self._endpoint_url,
+                                                      str_query=str_query,
+                                                      variable_id=_DEF_OBJ_ID):
+            yield str(an_elem)
+
+
     def _yield_remote_class_triples_of_an_s(self, target_node, instantiation_property):
         str_query = "SELECT {0} WHERE {{ <{1}> <{2}> {0} . }}".format(_DEF_OBJ_VARIABLE,
                                                                       remove_corners(a_uri=target_node,
@@ -57,6 +71,7 @@ class EndpointSGraph(SGraph):
                                                       str_query=str_query,
                                                       variable_id=_DEF_OBJ_ID):
             yield (target_node, instantiation_property, an_elem)
+
 
     def _yield_local_class_triples_of_an_s(self, target_node, instantiation_property):
         if target_node not in self._subjects_tracked:
