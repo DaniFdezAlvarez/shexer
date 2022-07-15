@@ -120,6 +120,15 @@ class SGraph(object):
                                                                          instantiation_property=instantiation_property):
                             yield a_triple
 
+    def yield_classes_with_instances(self, instantiation_property=RDF_TYPE):
+        """
+        It yields every class URI that has at least a declared instance
+        :param instantiation_property:
+        :return:
+        """
+        raise NotImplementedError()
+
+
 
     def _is_an_unprefixed_iri(self, an_iri, strict_syntax_with_uri_corners=True):
         if strict_syntax_with_uri_corners:

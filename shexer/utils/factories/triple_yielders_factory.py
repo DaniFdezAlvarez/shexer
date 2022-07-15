@@ -20,7 +20,7 @@ from shexer.consts import NT, TSV_SPO, N3, TURTLE, RDF_XML, FIXED_SHAPE_MAP, JSO
 def produce_shape_map_according_to_input(sm_format, sgraph, namespaces_prefix_dict, target_classes,
                                          file_target_classes, shape_map_file, shape_map_raw,
                                          instantiation_property, shape_map_already_built=None,
-                                         limit_remote_instances=-1):
+                                         limit_remote_instances=-1, all_classes_mode=False):
     if shape_map_already_built is not None:
         return shape_map_already_built
     prefix_namespaces_dict = reverse_keys_and_values(namespaces_prefix_dict)
@@ -34,14 +34,23 @@ def produce_shape_map_according_to_input(sm_format, sgraph, namespaces_prefix_di
     else:
         translator = ListOfClassesToShapeMap(sgraph=sgraph,
                                              prefix_namespaces_dict=prefix_namespaces_dict)
-        target_classes = tune_target_classes_if_needed(list_target_classes=target_classes,
-                                                       prefix_namespaces_dict=prefix_namespaces_dict) \
-            if target_classes is not None \
-            else read_target_classes_from_file(file_target_classes=file_target_classes,
-                                               prefix_namespaces_dict=prefix_namespaces_dict)
-        return translator.str_class_list_to_shape_map_sparql_selectors(str_list=target_classes,
-                                                                       instantiation_property=instantiation_property,
-                                                                       limit_remote_instances=limit_remote_instances)
+        if all_classes_mode:
+            return translator.str_class_list_to_shape_map_sparql_selectors(str_list=[a_class for
+                                                                                     a_class in
+                                                                                     sgraph.yield_classes_with_instances()],
+                                                                           instantiation_property=instantiation_property,
+                                                                           limit_remote_instances=limit_remote_instances)
+        else:
+            target_classes = tune_target_classes_if_needed(list_target_classes=target_classes,
+                                                           prefix_namespaces_dict=prefix_namespaces_dict) \
+                if target_classes is not None \
+                else read_target_classes_from_file(file_target_classes=file_target_classes,
+                                                   prefix_namespaces_dict=prefix_namespaces_dict)
+
+
+            return translator.str_class_list_to_shape_map_sparql_selectors(str_list=target_classes,
+                                                                           instantiation_property=instantiation_property,
+                                                                           limit_remote_instances=limit_remote_instances)
 
 def get_triple_yielder(source_file=None, list_of_source_files=None, input_format=NT, namespaces_to_ignore=None,
                        allow_untyped_numbers=False, raw_graph=None, namespaces_dict=None, url_input=None,
@@ -49,7 +58,7 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
                        track_classes_for_entities_at_last_depth_level=True, depth_for_building_subgraph=1,
                        url_endpoint=None, instantiation_property=None, strict_syntax_with_corners=False,
                        target_classes=None, file_target_classes=None, built_remote_graph=None,
-                       built_shape_map=None, limit_remote_instances=-1, inverse_paths=False):
+                       built_shape_map=None, limit_remote_instances=-1, inverse_paths=False, all_classes_mode=False):
     result = None
     if url_endpoint is not None:
         sgrpah = built_remote_graph if built_remote_graph is not None else EndpointSGraph(endpoint_url=url_endpoint)
@@ -64,7 +73,8 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
                                                              shape_map_file=shape_map_file,
                                                              shape_map_raw=shape_map_raw,
                                                              instantiation_property=instantiation_property,
-                                                             limit_remote_instances=limit_remote_instances)
+                                                             limit_remote_instances=limit_remote_instances,
+                                                             all_classes_mode=all_classes_mode)
         result = SgraphFromSelectorsTripleYielder(shape_map=shape_map,
                                                   depth=depth_for_building_subgraph,
                                                   classes_at_last_level=track_classes_for_entities_at_last_depth_level,

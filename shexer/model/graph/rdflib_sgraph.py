@@ -7,6 +7,8 @@ from shexer.model.IRI import IRI as ModelIRI
 from shexer.model.property import Property as ModelProperty
 from shexer.model.Literal import Literal as ModelLiteral
 from shexer.model.bnode import BNode as ModelBnode
+from shexer.consts import RDF_TYPE
+
 
 
 class RdflibSgraph(SGraph):
@@ -72,6 +74,17 @@ class RdflibSgraph(SGraph):
         self._rdflib_graph.add((self._turn_obj_into_rdflib_element(subj),
                                 self._turn_obj_into_rdflib_element(prop),
                                 self._turn_obj_into_rdflib_element(obj)))
+
+    def yield_classes_with_instances(self, instantiation_property=RDF_TYPE):
+        result = set()
+        for s ,_, _ in self._rdflib_graph.triples((None,
+                                                   URIRef(remove_corners(a_uri=instantiation_property,
+                                                                         raise_error_if_no_corners=False)),
+                                                   None)):
+            result.add(str(s))
+        for elem in result:
+            yield elem
+
 
     def _turn_obj_into_rdflib_element(self, model_elem):
         if type(model_elem) == ModelIRI or type(model_elem) == ModelProperty:

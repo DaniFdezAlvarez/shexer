@@ -282,7 +282,8 @@ class Shaper(object):
                                   built_shape_map=self._built_shape_map,
                                   remove_empty_shapes=self._remove_empty_shapes,
                                   limit_remote_instances=self._limit_remote_instances,
-                                  inverse_paths=self._inverse_paths)
+                                  inverse_paths=self._inverse_paths,
+                                  all_classes_mode=self._all_classes_mode)
 
 
     def _build_instance_tracker(self):
