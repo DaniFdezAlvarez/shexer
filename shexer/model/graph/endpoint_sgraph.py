@@ -51,13 +51,13 @@ class EndpointSGraph(SGraph):
     def yield_classes_with_instances(self, instantiation_property=RDF_TYPE):
         str_query = "SELECT distinct {0} where {{ {1} <{2}> {0} . }}".format(_DEF_OBJ_VARIABLE,
                                                                              _DEF_SUBJ_VARIABLE,
-                                                                                  remove_corners(
-                                                                                      a_uri=instantiation_property,
-                                                                                      raise_error_if_no_corners=False)
-                                                                                  )
+                                                                              remove_corners(
+                                                                                  a_uri=instantiation_property,
+                                                                                  raise_error_if_no_corners=False)
+                                                                              )
         for an_elem in query_endpoint_single_variable(endpoint_url=self._endpoint_url,
                                                       str_query=str_query,
-                                                      variable_id=_DEF_OBJ_VARIABLE):
+                                                      variable_id=_DEF_OBJ_ID):
             yield str(an_elem)
 
 
