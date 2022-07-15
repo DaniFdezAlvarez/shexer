@@ -25,3 +25,17 @@ class TestGraphFileInput(unittest.TestCase):
         str_result = shaper.shex_graph(string_output=True)
         self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "g1_all_classes_no_comments.shex",
                                                       str_target=str_result))
+
+    def test_all_classes_mode(self):
+        a_g = Graph()
+        a_g.parse(G1, format="turtle")
+
+        shaper = Shaper(all_classes_mode=True,
+                        rdflib_graph=a_g,
+                        namespaces_dict=default_namespaces(),
+                        input_format=TURTLE,
+                        disable_comments=True)
+        str_result = shaper.shex_graph(string_output=True)
+        self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "g1_all_classes_no_comments.shex",
+                                                      str_target=str_result))
+

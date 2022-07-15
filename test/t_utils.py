@@ -259,7 +259,6 @@ def text_contains_lines(text, list_lines):
     for a_line in list_lines:
         a_line = _BLANKS.sub(" ", a_line)
         if a_line not in text:
-            print(a_line)
             return False
         return True
 
