@@ -6,14 +6,17 @@ from shexer.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
 
 class TsvNtTriplesYielder(BaseTriplesYielder):
 
-    def __init__(self, source_file, allow_untyped_numbers=False, raw_graph=None):
+    def __init__(self, source_file, allow_untyped_numbers=False, raw_graph=None,
+                 compression_mode=None, zip_base_archive=None):
         super(TsvNtTriplesYielder, self).__init__()
         self._source_file = source_file
         self._triples_count = 0
         self._error_triples = 0
         self._allow_untyped_numbers = allow_untyped_numbers
         self._line_reader = self._decide_line_reader(source_file=source_file,
-                                                     raw_graph=raw_graph)
+                                                     raw_graph=raw_graph,
+                                                     compression_mode=compression_mode,
+                                                     zip_base_archive=zip_base_archive)
         # self.yield_triples = self._yield_triples_not_excluding_namespaces if namespaces_to_ignore is None\
         #     else self._yield_triples_excluding_namespaces
 
