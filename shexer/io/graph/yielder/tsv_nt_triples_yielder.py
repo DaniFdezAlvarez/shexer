@@ -23,23 +23,22 @@ class TsvNtTriplesYielder(BaseTriplesYielder):
 
     def yield_triples(self):
         self._reset_count()
-        with open(self._source_file, "r") as in_stream:
-            for a_line in in_stream:
-                tokens = self._look_for_tokens(a_line.strip())
-                if len(tokens) != 3:
-                    self._error_triples += 1
-                    log_to_error(msg="This line caused error: " + a_line,
+        for a_line in self._line_reader.read_lines():
+            tokens = self._look_for_tokens(a_line.strip())
+            if len(tokens) != 3:
+                self._error_triples += 1
+                log_to_error(msg="This line caused error: " + a_line,
+                             source=self._source_file)
+            else:
+                try:
+                    yield (
+                    tune_token(tokens[0]), tune_prop(tokens[1]), tune_token(tokens[2], allow_untyped_numbers=True))
+                    self._triples_count += 1
+                except ValueError as ve:
+                    log_to_error(msg=ve.message + "This line caused error: " + a_line,
                                  source=self._source_file)
-                else:
-                    try:
-                        yield (
-                        tune_token(tokens[0]), tune_prop(tokens[1]), tune_token(tokens[2], allow_untyped_numbers=True))
-                        self._triples_count += 1
-                    except ValueError as ve:
-                        log_to_error(msg=ve.message + "This line caused error: " + a_line,
-                                     source=self._source_file)
-                    # if self._triples_count % 10000 == 0:
-                    #     print("Reading..." + self._triples_count)
+                # if self._triples_count % 10000 == 0:
+                #     print("Reading..." + self._triples_count)
 
     def _look_for_tokens(self, str_line):
         return str_line.split("\t")
