@@ -136,19 +136,21 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
 def _yielder_for_rdflib_parser(source_file, allow_untyped_numbers, raw_graph,
                                input_format, namespaces_dict, list_of_source_files,
                                compression_mode, zip_base_archive):
-    # TODO CONTINUE HERE
     if zip_base_archive is not None:
-        return MultiRdfLibTripleYielder(list_of_files=list_of_source_files,
+        return MultiRdfLibTripleYielder(list_of_files=list_of_zip_internal_files(zip_base_archive),
                                         allow_untyped_numbers=allow_untyped_numbers,
                                         input_format=input_format,
-                                        namespaces_dict=namespaces_dict)
+                                        namespaces_dict=namespaces_dict,
+                                        compression_mode=compression_mode)
 
     elif source_file is not None or raw_graph is not None:
         return RdflibParserTripleYielder(source=source_file,
-                                           allow_untyped_numbers=allow_untyped_numbers,
-                                           raw_graph=raw_graph,
-                                           input_format=input_format,
-                                           namespaces_dict=namespaces_dict)
+                                         allow_untyped_numbers=allow_untyped_numbers,
+                                         raw_graph=raw_graph,
+                                         input_format=input_format,
+                                         namespaces_dict=namespaces_dict,
+                                         compression_mode=compression_mode,
+                                         zip_archive_file=zip_base_archive)
     else:
         return MultiRdfLibTripleYielder(list_of_files=list_of_source_files,
                                           allow_untyped_numbers=allow_untyped_numbers,
