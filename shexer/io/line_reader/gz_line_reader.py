@@ -8,4 +8,5 @@ class GzFileLineReader(object):
     def read_lines(self):
         with gzip.open(self._gz_file, "r") as in_stream:
             for a_line in in_stream:
+                a = a_line.decode("utf-8")
                 yield a_line.decode("utf-8")

@@ -141,7 +141,8 @@ def _yielder_for_rdflib_parser(source_file, allow_untyped_numbers, raw_graph,
                                         allow_untyped_numbers=allow_untyped_numbers,
                                         input_format=input_format,
                                         namespaces_dict=namespaces_dict,
-                                        compression_mode=compression_mode)
+                                        compression_mode=compression_mode,
+                                        zip_archive_file=zip_base_archive)
 
     elif source_file is not None or raw_graph is not None:
         return RdflibParserTripleYielder(source=source_file,
@@ -149,27 +150,30 @@ def _yielder_for_rdflib_parser(source_file, allow_untyped_numbers, raw_graph,
                                          raw_graph=raw_graph,
                                          input_format=input_format,
                                          namespaces_dict=namespaces_dict,
-                                         compression_mode=compression_mode,
-                                         zip_archive_file=zip_base_archive)
+                                         compression_mode=compression_mode)
     else:
         return MultiRdfLibTripleYielder(list_of_files=list_of_source_files,
                                           allow_untyped_numbers=allow_untyped_numbers,
                                           input_format=input_format,
-                                          namespaces_dict=namespaces_dict)
+                                          namespaces_dict=namespaces_dict,
+                                        compression_mode=compression_mode)
 
 def _yielder_for_turtle_iter(source_file, raw_graph, allow_untyped_numbers, list_of_files,
                              compression_mode, zip_base_archive):
     if zip_base_archive is not None:
         return MultiBigTtlTriplesYielder(list_of_files=list_of_zip_internal_files(zip_base_archive),
                                          compression_mode=compression_mode,
-                                         allow_untyped_numbers=allow_untyped_numbers)
+                                         allow_untyped_numbers=allow_untyped_numbers,
+                                         zip_base_archive=zip_base_archive)
     elif source_file is not None or raw_graph is not None:
         return BigTtlTriplesYielder(source_file=source_file,
                                     allow_untyped_numbers=allow_untyped_numbers,
-                                    raw_graph=raw_graph)
+                                    raw_graph=raw_graph,
+                                    compression_mode=compression_mode)
     else:
         return MultiBigTtlTriplesYielder(list_of_files=list_of_files,
-                                         allow_untyped_numbers=allow_untyped_numbers)
+                                         allow_untyped_numbers=allow_untyped_numbers,
+                                         compression_mode=compression_mode)
 
 
 def _yielder_for_tsv_spo(source_file, raw_graph, allow_untyped_numbers, list_of_files,
@@ -177,14 +181,17 @@ def _yielder_for_tsv_spo(source_file, raw_graph, allow_untyped_numbers, list_of_
     if zip_base_archive is not None:
         return MultiTsvNtTriplesYielder(list_of_files=list_of_zip_internal_files(compression_mode),
                                         compression_mode=compression_mode,
-                                        allow_untyped_numbers=allow_untyped_numbers)
+                                        allow_untyped_numbers=allow_untyped_numbers,
+                                        zip_base_archive=zip_base_archive)
     elif source_file is not None or raw_graph is not None:
         return TsvNtTriplesYielder(source_file=source_file,
                                    allow_untyped_numbers=allow_untyped_numbers,
-                                   raw_graph=raw_graph)
+                                   raw_graph=raw_graph,
+                                   compression_mode=compression_mode)
     else:
         return MultiTsvNtTriplesYielder(list_of_files=list_of_files,
-                                        allow_untyped_numbers=allow_untyped_numbers)
+                                        allow_untyped_numbers=allow_untyped_numbers,
+                                        compression_mode=compression_mode)
 
 
 def read_target_classes_from_file(file_target_classes, prefix_namespaces_dict):
@@ -249,11 +256,13 @@ def _yielder_for_nt(source_file, raw_graph, allow_untyped_numbers,
     elif zip_base_archive is not None:
         return MultiNtTriplesYielder(list_of_files=list_of_zip_internal_files(source_file),
                                      allow_untyped_numbers=allow_untyped_numbers,
-                                     compression_mode=compression_mode)
+                                     compression_mode=compression_mode,
+                                     zip_base_archive=zip_base_archive)
 
     else:
         return MultiNtTriplesYielder(list_of_files=list_of_source_files,
-                                     allow_untyped_numbers=allow_untyped_numbers)
+                                     allow_untyped_numbers=allow_untyped_numbers,
+                                     compression_mode=compression_mode)
 
 def _get_base_zip_archive_if_needed(source_file, compression_mode):
     if compression_mode != ZIP:

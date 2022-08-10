@@ -29,7 +29,7 @@ class Shaper(object):
                  # namespaces_dict_file=None,
                  instantiation_property=RDF_TYPE,
                  namespaces_to_ignore=None,
-                 infer_numeric_types_for_untyped_literals=False,
+                 infer_numeric_types_for_untyped_literals=True,
                  discard_useless_constraints_with_positive_closure=True,
                  all_instances_are_compliant_mode=True,
                  keep_less_specific=True,
@@ -51,7 +51,8 @@ class Shaper(object):
                  shapes_namespace=SHAPES_DEFAULT_NAMESPACE,
                  limit_remote_instances=-1,
                  wikidata_annotation=False,
-                 inverse_paths=False
+                 inverse_paths=False,
+                 compression_mode=None
                  ):
         """
 
@@ -123,6 +124,8 @@ class Shaper(object):
         self._limit_remote_instances = limit_remote_instances
         self._wikidata_annotation = wikidata_annotation
         self._inverse_paths = inverse_paths
+
+        self._compression_mode = compression_mode
 
         self._depth_for_building_subgraph = depth_for_building_subgraph
         self._track_classes_for_entities_at_last_depth_level = track_classes_for_entities_at_last_depth_level
@@ -283,7 +286,8 @@ class Shaper(object):
                                   remove_empty_shapes=self._remove_empty_shapes,
                                   limit_remote_instances=self._limit_remote_instances,
                                   inverse_paths=self._inverse_paths,
-                                  all_classes_mode=self._all_classes_mode)
+                                  all_classes_mode=self._all_classes_mode,
+                                  compression_mode=self._compression_mode)
 
 
     def _build_instance_tracker(self):
@@ -314,7 +318,8 @@ class Shaper(object):
                                     built_shape_map=self._built_shape_map,
                                     shapes_namespace=self._shapes_namespace,
                                     limit_remote_instances=self._limit_remote_instances,
-                                    inverse_paths=self._inverse_paths)
+                                    inverse_paths=self._inverse_paths,
+                                    compression_mode=self._compression_mode)
 
 
     @staticmethod

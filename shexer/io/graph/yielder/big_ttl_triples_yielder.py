@@ -46,6 +46,7 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
         self._triples_count = 0
         self._error_triples = 0
         self._allow_untyped_numbers = allow_untyped_numbers
+        self._compression_mode = compression_mode
         self._line_reader = self._decide_line_reader(source_file=source_file,
                                                      raw_graph=raw_graph,
                                                      compression_mode=compression_mode,
