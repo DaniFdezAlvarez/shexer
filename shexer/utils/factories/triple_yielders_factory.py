@@ -179,7 +179,7 @@ def _yielder_for_turtle_iter(source_file, raw_graph, allow_untyped_numbers, list
 def _yielder_for_tsv_spo(source_file, raw_graph, allow_untyped_numbers, list_of_files,
                          compression_mode, zip_base_archive):
     if zip_base_archive is not None:
-        return MultiTsvNtTriplesYielder(list_of_files=list_of_zip_internal_files(compression_mode),
+        return MultiTsvNtTriplesYielder(list_of_files=list_of_zip_internal_files(zip_base_archive),
                                         compression_mode=compression_mode,
                                         allow_untyped_numbers=allow_untyped_numbers,
                                         zip_base_archive=zip_base_archive)
@@ -254,7 +254,7 @@ def _yielder_for_nt(source_file, raw_graph, allow_untyped_numbers,
                                 raw_graph=raw_graph,
                                 compression_mode=compression_mode)
     elif zip_base_archive is not None:
-        return MultiNtTriplesYielder(list_of_files=list_of_zip_internal_files(source_file),
+        return MultiNtTriplesYielder(list_of_files=list_of_zip_internal_files(zip_base_archive),
                                      allow_untyped_numbers=allow_untyped_numbers,
                                      compression_mode=compression_mode,
                                      zip_base_archive=zip_base_archive)

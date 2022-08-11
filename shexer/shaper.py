@@ -1,7 +1,7 @@
 from shexer.utils.obj_references import check_just_one_not_none
 
 from shexer.consts import SHEXC, SHACL_TURTLE, NT, TSV_SPO, N3, TURTLE, TURTLE_ITER, \
-    RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE
+    RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE, ZIP, GZ
 from shexer.utils.factories.class_profiler_factory import get_class_profiler
 from shexer.utils.factories.instance_tracker_factory import get_instance_tracker
 from shexer.utils.factories.class_shexer_factory import get_class_shexer
@@ -93,6 +93,8 @@ class Shaper(object):
         #TODO ---> Param check of shape_map and graph_via_shape_map
 
         self._check_input_format(input_format)
+
+        self._check_compression_mode(compression_mode, url_endpoint, url_graph_input, list_of_url_input)
 
         self._target_classes = target_classes
         self._file_target_classes = file_target_classes
@@ -331,6 +333,18 @@ class Shaper(object):
     def _check_input_format(input_format):
         if input_format not in [NT, TSV_SPO, N3, TURTLE, RDF_XML, JSON_LD, TURTLE_ITER]:
             raise ValueError("Currently unsupported input format: " + input_format)
+
+    @staticmethod
+    def _check_compression_mode(compression_mode, url_endpoint, url_graph_input, list_of_url_input):
+        if compression_mode not in [ZIP, GZ, None]:
+            raise ValueError("Unknownk compression mode: {}. "
+                             "The currently supported compression formats are {}.".format(
+                compression_mode,
+                ", ".join([ZIP, GZ])))
+        if compression_mode is not None and (url_endpoint is not None or url_graph_input is not None or list_of_url_input is not None):
+            raise ValueError("You've chosed some compression mode ({}) to work with remote sources."
+                             "Currently, sheXer can only parse compressed local files".format(compression_mode))
+
 
     @staticmethod
     def _check_target_classes(target_classes, file_target_classes, all_classes_mode, shape_map_file, shape_map_raw):

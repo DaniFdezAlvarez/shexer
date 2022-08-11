@@ -12,8 +12,8 @@ class MultiRdfLibTripleYielder(MultifileBaseTripleYielder):
 
         self._input_format = input_format
         self._namespaces_dict = namespaces_dict if namespaces_dict is not None else {}
-        self._compression_mode = None
-        self._zip_archive_file = None
+        self._compression_mode = compression_mode
+        self._zip_archive_file = zip_archive_file
 
     def _yield_triples_of_last_yielder(self, parse_namespaces=True):
         for a_triple in self._last_yielder.yield_triples(parse_namespaces):
