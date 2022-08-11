@@ -1,7 +1,7 @@
 from shexer.utils.obj_references import check_just_one_not_none
 
 from shexer.consts import SHEXC, SHACL_TURTLE, NT, TSV_SPO, N3, TURTLE, TURTLE_ITER, \
-    RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE
+    RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE, ZIP, GZ
 from shexer.utils.factories.class_profiler_factory import get_class_profiler
 from shexer.utils.factories.instance_tracker_factory import get_instance_tracker
 from shexer.utils.factories.class_shexer_factory import get_class_shexer
@@ -29,7 +29,7 @@ class Shaper(object):
                  # namespaces_dict_file=None,
                  instantiation_property=RDF_TYPE,
                  namespaces_to_ignore=None,
-                 infer_numeric_types_for_untyped_literals=False,
+                 infer_numeric_types_for_untyped_literals=True,
                  discard_useless_constraints_with_positive_closure=True,
                  all_instances_are_compliant_mode=True,
                  keep_less_specific=True,
@@ -51,7 +51,8 @@ class Shaper(object):
                  shapes_namespace=SHAPES_DEFAULT_NAMESPACE,
                  limit_remote_instances=-1,
                  wikidata_annotation=False,
-                 inverse_paths=False
+                 inverse_paths=False,
+                 compression_mode=None
                  ):
         """
 
@@ -93,6 +94,8 @@ class Shaper(object):
 
         self._check_input_format(input_format)
 
+        self._check_compression_mode(compression_mode, url_endpoint, url_graph_input, list_of_url_input)
+
         self._target_classes = target_classes
         self._file_target_classes = file_target_classes
         self._input_format = input_format
@@ -123,6 +126,8 @@ class Shaper(object):
         self._limit_remote_instances = limit_remote_instances
         self._wikidata_annotation = wikidata_annotation
         self._inverse_paths = inverse_paths
+
+        self._compression_mode = compression_mode
 
         self._depth_for_building_subgraph = depth_for_building_subgraph
         self._track_classes_for_entities_at_last_depth_level = track_classes_for_entities_at_last_depth_level
@@ -283,7 +288,8 @@ class Shaper(object):
                                   remove_empty_shapes=self._remove_empty_shapes,
                                   limit_remote_instances=self._limit_remote_instances,
                                   inverse_paths=self._inverse_paths,
-                                  all_classes_mode=self._all_classes_mode)
+                                  all_classes_mode=self._all_classes_mode,
+                                  compression_mode=self._compression_mode)
 
 
     def _build_instance_tracker(self):
@@ -314,7 +320,8 @@ class Shaper(object):
                                     built_shape_map=self._built_shape_map,
                                     shapes_namespace=self._shapes_namespace,
                                     limit_remote_instances=self._limit_remote_instances,
-                                    inverse_paths=self._inverse_paths)
+                                    inverse_paths=self._inverse_paths,
+                                    compression_mode=self._compression_mode)
 
 
     @staticmethod
@@ -326,6 +333,18 @@ class Shaper(object):
     def _check_input_format(input_format):
         if input_format not in [NT, TSV_SPO, N3, TURTLE, RDF_XML, JSON_LD, TURTLE_ITER]:
             raise ValueError("Currently unsupported input format: " + input_format)
+
+    @staticmethod
+    def _check_compression_mode(compression_mode, url_endpoint, url_graph_input, list_of_url_input):
+        if compression_mode not in [ZIP, GZ, None]:
+            raise ValueError("Unknownk compression mode: {}. "
+                             "The currently supported compression formats are {}.".format(
+                compression_mode,
+                ", ".join([ZIP, GZ])))
+        if compression_mode is not None and (url_endpoint is not None or url_graph_input is not None or list_of_url_input is not None):
+            raise ValueError("You've chosed some compression mode ({}) to work with remote sources."
+                             "Currently, sheXer can only parse compressed local files".format(compression_mode))
+
 
     @staticmethod
     def _check_target_classes(target_classes, file_target_classes, all_classes_mode, shape_map_file, shape_map_raw):

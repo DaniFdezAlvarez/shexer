@@ -1,12 +1,13 @@
 from shexer.utils.log import log_to_error
 from shexer.utils.uri import there_is_arroba_after_last_quotes
-from shexer.utils.triple_yielders import tune_prop, tune_token, check_if_property_belongs_to_namespace_list
+from shexer.utils.triple_yielders import tune_prop, tune_token  # , check_if_property_belongs_to_namespace_list
 from shexer.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
 
 
 class NtTriplesYielder(BaseTriplesYielder):
 
-    def __init__(self, source_file=None, allow_untyped_numbers=False, raw_graph=None):
+    def __init__(self, source_file=None, allow_untyped_numbers=False, raw_graph=None,
+                 compression_mode=None, zip_base_archive=None):
 
         super(NtTriplesYielder, self).__init__()
         self._source_file = source_file
@@ -15,7 +16,9 @@ class NtTriplesYielder(BaseTriplesYielder):
         self._error_triples = 0
         self._allow_untyped_numbers = allow_untyped_numbers
         self._line_reader = self._decide_line_reader(source_file=source_file,
-                                                     raw_graph=raw_graph)
+                                                     raw_graph=raw_graph,
+                                                     compression_mode=compression_mode,
+                                                     zip_base_archive=zip_base_archive)
         # The following ones are refs to functions. Im avoiding some comparison here.
         # self.yield_triples = self._yield_triples_not_excluding_namespaces if namespaces_to_ignore is None \
         #     else self._yield_triples_excluding_namespaces

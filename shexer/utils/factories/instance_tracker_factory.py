@@ -36,7 +36,8 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                          built_shape_map=None,
                          shapes_namespace=SHAPES_DEFAULT_NAMESPACE,
                          limit_remote_instances=-1,
-                         inverse_paths=False
+                         inverse_paths=False,
+                         compression_mode=None
                          ):
     """
 
@@ -93,7 +94,8 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                                               built_shape_map=built_shape_map,
                                               limit_remote_instances=limit_remote_instances,
                                               inverse_paths=inverse_paths,
-                                              all_classes_mode=all_classes_mode
+                                              all_classes_mode=all_classes_mode,
+                                              compression_mode=compression_mode
                                               )
     else:
         instance_yielder = get_triple_yielder(source_file=graph_file_input,
@@ -119,7 +121,8 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                                               built_shape_map=built_shape_map,
                                               limit_remote_instances=limit_remote_instances,
                                               inverse_paths=inverse_paths,
-                                              all_classes_mode=all_classes_mode
+                                              all_classes_mode=all_classes_mode,
+                                              compression_mode=compression_mode
                                               )
 
     selectors_tracker = None

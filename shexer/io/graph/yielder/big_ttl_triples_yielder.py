@@ -37,7 +37,8 @@ of your computer, use RdflifTriplesYielder instead
 
 class BigTtlTriplesYielder(BaseTriplesYielder):
 
-    def __init__(self, source_file=None, allow_untyped_numbers=True, raw_graph=None):
+    def __init__(self, source_file=None, allow_untyped_numbers=True, raw_graph=None,
+                 compression_mode=None, zip_base_archive=None):
 
         super(BigTtlTriplesYielder, self).__init__()
         self._source_file = source_file
@@ -45,8 +46,11 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
         self._triples_count = 0
         self._error_triples = 0
         self._allow_untyped_numbers = allow_untyped_numbers
+        self._compression_mode = compression_mode
         self._line_reader = self._decide_line_reader(source_file=source_file,
-                                                     raw_graph=raw_graph)
+                                                     raw_graph=raw_graph,
+                                                     compression_mode=compression_mode,
+                                                     zip_base_archive=zip_base_archive)
         # Support
         self._prefixes = {}
         self._base = None

@@ -3,11 +3,17 @@ from shexer.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
 
 class MultifileBaseTripleYielder(BaseTriplesYielder):
 
-    def __init__(self, list_of_files, namespaces_to_ignore=None, allow_untyped_numbers=False):
+    def __init__(self, list_of_files,
+                 namespaces_to_ignore=None,
+                 allow_untyped_numbers=False,
+                 compression_mode=None,
+                 zip_base_archive=None):
         super(BaseTriplesYielder, self).__init__()
         self._list_of_files = list_of_files
         self._namespaces_to_ignore = namespaces_to_ignore
         self._allow_untyped_numbers = allow_untyped_numbers
+        self._compression_mode = compression_mode
+        self._zip_base_archive = zip_base_archive
 
         self._triples_yielded_from_used_yielders = 0
         self._error_triples_from_used_yielders = 0
