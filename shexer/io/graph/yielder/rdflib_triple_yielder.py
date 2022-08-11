@@ -1,6 +1,6 @@
 from rdflib.graph import Graph, URIRef, Literal, BNode
 from shexer.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
-from shexer.consts import N3, TURTLE, RDF_XML, NT, JSON_LD
+from shexer.consts import N3, TURTLE, RDF_XML, NT, JSON_LD, ZIP, GZ
 
 from shexer.model.Literal import Literal as model_Literal
 from shexer.model.IRI import IRI as model_IRI
@@ -8,6 +8,7 @@ from shexer.model.bnode import BNode as model_BNode
 from shexer.model.property import Property as model_Property
 
 from shexer.utils.uri import decide_literal_type
+from shexer.utils.compression import get_content_gz_file, get_content_zip_internal_file
 
 _SUPPORTED_FORMATS = [N3, TURTLE, RDF_XML, NT, JSON_LD]
 
@@ -108,7 +109,7 @@ class RdflibTripleYielder(BaseTriplesYielder):
 class RdflibParserTripleYielder(RdflibTripleYielder):
 
     def __init__(self, input_format=TURTLE, source=None, allow_untyped_numbers=False, raw_graph=None,
-                 namespaces_dict=None):
+                 namespaces_dict=None, compression_mode=None, zip_archive_file=None):
         """
 
         :param input_format:
@@ -124,6 +125,8 @@ class RdflibParserTripleYielder(RdflibTripleYielder):
         self._check_input_format(input_format)
         self._input_format = input_format
         self._source = source
+        self._compression_mode = compression_mode
+        self._zip_archive_file = zip_archive_file
         self._allow_untyped_numbers = allow_untyped_numbers
         self._raw_graph = raw_graph
         self._namespaces_dict = namespaces_dict if namespaces_dict is not None else {}
@@ -137,11 +140,23 @@ class RdflibParserTripleYielder(RdflibTripleYielder):
 
     def _get_tmp_graph(self):
         result = Graph()
-        if self._source is not None:
+        if self._compression_mode is not None:
+            self._parse_compressed_files(result)
+        elif self._source is not None:
             result.parse(source=self._source, format=self._input_format)
         else:
             result.parse(data=self._raw_graph, format=self._input_format)
         return result
+
+    def _parse_compressed_files(self, rdflib_graph):
+        if self._compression_mode == GZ:
+            rdflib_graph.parse(data=get_content_gz_file(self._source), format=self._input_format)
+        elif self._compression_mode == ZIP:
+            rdflib_graph.parse(data=get_content_zip_internal_file(base_archive=self._zip_archive_file,
+                                                                  target_file=self._source),
+                               format=self._input_format)
+        else:
+            raise ValueError("Unknown compression format")
 
     @staticmethod
     def _check_input_format(input_format):

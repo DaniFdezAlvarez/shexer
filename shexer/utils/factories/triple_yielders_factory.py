@@ -13,8 +13,10 @@ from shexer.model.graph.endpoint_sgraph import EndpointSGraph
 from shexer.utils.translators.list_of_classes_to_shape_map import ListOfClassesToShapeMap
 from shexer.utils.target_elements import tune_target_classes_if_needed
 from shexer.utils.dict import reverse_keys_and_values
+from shexer.utils.compression import list_of_zip_internal_files
+from zipfile import ZipFile
 
-from shexer.consts import NT, TSV_SPO, N3, TURTLE, RDF_XML, FIXED_SHAPE_MAP, JSON_LD, TURTLE_ITER
+from shexer.consts import NT, TSV_SPO, N3, TURTLE, RDF_XML, FIXED_SHAPE_MAP, JSON_LD, TURTLE_ITER, ZIP
 
 
 def produce_shape_map_according_to_input(sm_format, sgraph, namespaces_prefix_dict, target_classes,
@@ -58,84 +60,69 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
                        track_classes_for_entities_at_last_depth_level=True, depth_for_building_subgraph=1,
                        url_endpoint=None, instantiation_property=None, strict_syntax_with_corners=False,
                        target_classes=None, file_target_classes=None, built_remote_graph=None,
-                       built_shape_map=None, limit_remote_instances=-1, inverse_paths=False, all_classes_mode=False):
+                       built_shape_map=None, limit_remote_instances=-1, inverse_paths=False, all_classes_mode=False,
+                       compression_mode=None):
+    zip_base_archive = _get_base_zip_archive_if_needed(source_file, compression_mode)
     result = None
     if url_endpoint is not None:
-        sgrpah = built_remote_graph if built_remote_graph is not None else EndpointSGraph(endpoint_url=url_endpoint)
+        result = _yielder_for_url_endpoint(built_remote_graph=built_remote_graph,
+                                           url_endpoint=url_endpoint,
+                                           built_shape_map=built_shape_map,
+                                           shape_map_format=shape_map_format,
+                                           namespaces_dict=namespaces_dict,
+                                           target_classes=target_classes,
+                                           file_target_classes=file_target_classes,
+                                           shape_map_file=shape_map_file,
+                                           shape_map_raw=shape_map_raw,
+                                           instantiation_property=instantiation_property,
+                                           limit_remote_instances=limit_remote_instances,
+                                           all_classes_mode=all_classes_mode,
+                                           depth_for_building_subgraph=depth_for_building_subgraph,
+                                           track_classes_for_entities_at_last_depth_level=track_classes_for_entities_at_last_depth_level,
+                                           strict_syntax_with_corners=strict_syntax_with_corners,
+                                           allow_untyped_numbers=allow_untyped_numbers,
+                                           inverse_paths=inverse_paths)
 
-        shape_map = built_shape_map
-        if built_shape_map is None:
-            shape_map = produce_shape_map_according_to_input(sm_format=shape_map_format,
-                                                             sgraph=sgrpah,
-                                                             namespaces_prefix_dict=namespaces_dict,
-                                                             target_classes=target_classes,
-                                                             file_target_classes=file_target_classes,
-                                                             shape_map_file=shape_map_file,
-                                                             shape_map_raw=shape_map_raw,
-                                                             instantiation_property=instantiation_property,
-                                                             limit_remote_instances=limit_remote_instances,
-                                                             all_classes_mode=all_classes_mode)
-        result = SgraphFromSelectorsTripleYielder(shape_map=shape_map,
-                                                  depth=depth_for_building_subgraph,
-                                                  classes_at_last_level=track_classes_for_entities_at_last_depth_level,
-                                                  instantiation_property=instantiation_property,
-                                                  strict_syntax_with_corners=strict_syntax_with_corners,
-                                                  allow_untyped_numbers=allow_untyped_numbers,
-                                                  inverse_paths=inverse_paths
-                                                  )
     elif url_input is not None or list_of_url_input is not None:  # Always use rdflib to parse remote graphs
-        if url_input:
-            result = RdflibParserTripleYielder(source=url_input,
-                                               allow_untyped_numbers=allow_untyped_numbers,
-                                               raw_graph=raw_graph,
-                                               input_format=input_format,
-                                               namespaces_dict=namespaces_dict)
-        else:  # elif list_of_url_input:
-            result = MultiRdfLibTripleYielder(list_of_files=list_of_url_input,
-                                              allow_untyped_numbers=allow_untyped_numbers,
-                                              input_format=input_format,
-                                              namespaces_dict=namespaces_dict)
+         result = _yielder_for_url_input(url_input=url_input,
+                                        allow_untyped_numbers=allow_untyped_numbers,
+                                        raw_graph=raw_graph,
+                                        input_format=input_format,
+                                        namespaces_dict=namespaces_dict,
+                                        list_of_url_input=list_of_url_input)
     elif rdflib_graph is not None:
         result = RdflibTripleYielder(rdflib_graph=rdflib_graph,
                                      namespaces_dict=namespaces_dict)
     elif input_format == NT:
-        if source_file is not None or raw_graph is not None:
-            result = NtTriplesYielder(source_file=source_file,
-                                      allow_untyped_numbers=allow_untyped_numbers,
-                                      raw_graph=raw_graph)
-        else:
-            result = MultiNtTriplesYielder(list_of_files=list_of_source_files,
-                                           allow_untyped_numbers=allow_untyped_numbers)
+        result = _yielder_for_nt(source_file=source_file,
+                                 raw_graph=raw_graph,
+                                 allow_untyped_numbers=allow_untyped_numbers,
+                                 list_of_source_files=list_of_source_files,
+                                 compression_mode=compression_mode,
+                                 zip_base_archive=zip_base_archive)
     elif input_format == TSV_SPO:
-        if source_file is not None or raw_graph is not None:
-            result = TsvNtTriplesYielder(source_file=source_file,
-                                         allow_untyped_numbers=allow_untyped_numbers,
-                                         raw_graph=raw_graph)
-        else:
-            result = MultiTsvNtTriplesYielder(list_of_files=list_of_source_files,
-                                              allow_untyped_numbers=allow_untyped_numbers)
+        result = _yielder_for_tsv_spo(source_file=source_file,
+                                      allow_untyped_numbers=allow_untyped_numbers,
+                                      raw_graph=raw_graph,
+                                      list_of_files=list_of_source_files,
+                                      compression_mode=compression_mode,
+                                      zip_base_archive=zip_base_archive)
     elif input_format == TURTLE_ITER:
-        if source_file is not None or raw_graph is not None:
-            result = BigTtlTriplesYielder(source_file=source_file,
+        result = _yielder_for_turtle_iter(source_file=source_file,
                                           allow_untyped_numbers=allow_untyped_numbers,
-                                          raw_graph=raw_graph)
-        else:
-            result = MultiBigTtlTriplesYielder(list_of_files=list_of_source_files,
-                                               allow_untyped_numbers=allow_untyped_numbers)
-
+                                          raw_graph=raw_graph,
+                                          list_of_files=list_of_source_files,
+                                          compression_mode=compression_mode,
+                                          zip_base_archive=zip_base_archive)
     elif input_format in [N3, RDF_XML, JSON_LD, TURTLE]:
-        if source_file is not None or raw_graph is not None:
-            result = RdflibParserTripleYielder(source=source_file,
-                                               allow_untyped_numbers=allow_untyped_numbers,
-                                               raw_graph=raw_graph,
-                                               input_format=input_format,
-                                               namespaces_dict=namespaces_dict)
-        else:
-            result = MultiRdfLibTripleYielder(list_of_files=list_of_source_files,
-                                              allow_untyped_numbers=allow_untyped_numbers,
-                                              input_format=input_format,
-                                              namespaces_dict=namespaces_dict)
-
+        result = _yielder_for_rdflib_parser(source_file=source_file,
+                                            allow_untyped_numbers=allow_untyped_numbers,
+                                            raw_graph=raw_graph,
+                                            input_format=input_format,
+                                            namespaces_dict=namespaces_dict,
+                                            list_of_source_files=list_of_source_files,
+                                            compression_mode=compression_mode,
+                                            zip_base_archive=zip_base_archive)
     else:
         raise ValueError("Not supported format: " + input_format)
 
@@ -144,6 +131,67 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
     else:
         return FilterNamespacesTriplesYielder(actual_triple_yielder=result,
                                               namespaces_to_ignore=namespaces_to_ignore)
+
+
+def _yielder_for_rdflib_parser(source_file, allow_untyped_numbers, raw_graph,
+                               input_format, namespaces_dict, list_of_source_files,
+                               compression_mode, zip_base_archive):
+    if zip_base_archive is not None:
+        return MultiRdfLibTripleYielder(list_of_files=list_of_zip_internal_files(zip_base_archive),
+                                        allow_untyped_numbers=allow_untyped_numbers,
+                                        input_format=input_format,
+                                        namespaces_dict=namespaces_dict,
+                                        compression_mode=compression_mode,
+                                        zip_archive_file=zip_base_archive)
+
+    elif source_file is not None or raw_graph is not None:
+        return RdflibParserTripleYielder(source=source_file,
+                                         allow_untyped_numbers=allow_untyped_numbers,
+                                         raw_graph=raw_graph,
+                                         input_format=input_format,
+                                         namespaces_dict=namespaces_dict,
+                                         compression_mode=compression_mode)
+    else:
+        return MultiRdfLibTripleYielder(list_of_files=list_of_source_files,
+                                          allow_untyped_numbers=allow_untyped_numbers,
+                                          input_format=input_format,
+                                          namespaces_dict=namespaces_dict,
+                                        compression_mode=compression_mode)
+
+def _yielder_for_turtle_iter(source_file, raw_graph, allow_untyped_numbers, list_of_files,
+                             compression_mode, zip_base_archive):
+    if zip_base_archive is not None:
+        return MultiBigTtlTriplesYielder(list_of_files=list_of_zip_internal_files(zip_base_archive),
+                                         compression_mode=compression_mode,
+                                         allow_untyped_numbers=allow_untyped_numbers,
+                                         zip_base_archive=zip_base_archive)
+    elif source_file is not None or raw_graph is not None:
+        return BigTtlTriplesYielder(source_file=source_file,
+                                    allow_untyped_numbers=allow_untyped_numbers,
+                                    raw_graph=raw_graph,
+                                    compression_mode=compression_mode)
+    else:
+        return MultiBigTtlTriplesYielder(list_of_files=list_of_files,
+                                         allow_untyped_numbers=allow_untyped_numbers,
+                                         compression_mode=compression_mode)
+
+
+def _yielder_for_tsv_spo(source_file, raw_graph, allow_untyped_numbers, list_of_files,
+                         compression_mode, zip_base_archive):
+    if zip_base_archive is not None:
+        return MultiTsvNtTriplesYielder(list_of_files=list_of_zip_internal_files(zip_base_archive),
+                                        compression_mode=compression_mode,
+                                        allow_untyped_numbers=allow_untyped_numbers,
+                                        zip_base_archive=zip_base_archive)
+    elif source_file is not None or raw_graph is not None:
+        return TsvNtTriplesYielder(source_file=source_file,
+                                   allow_untyped_numbers=allow_untyped_numbers,
+                                   raw_graph=raw_graph,
+                                   compression_mode=compression_mode)
+    else:
+        return MultiTsvNtTriplesYielder(list_of_files=list_of_files,
+                                        allow_untyped_numbers=allow_untyped_numbers,
+                                        compression_mode=compression_mode)
 
 
 def read_target_classes_from_file(file_target_classes, prefix_namespaces_dict):
@@ -155,3 +203,68 @@ def read_target_classes_from_file(file_target_classes, prefix_namespaces_dict):
                 result.append(candidate)
     return tune_target_classes_if_needed(list_target_classes=result,
                                          prefix_namespaces_dict=prefix_namespaces_dict)
+
+def _yielder_for_url_endpoint(built_remote_graph, url_endpoint, built_shape_map, shape_map_format,
+                              namespaces_dict, target_classes, file_target_classes, shape_map_file,
+                              shape_map_raw, instantiation_property, limit_remote_instances, all_classes_mode,
+                              depth_for_building_subgraph, track_classes_for_entities_at_last_depth_level,
+                              strict_syntax_with_corners, allow_untyped_numbers, inverse_paths):
+    sgrpah = built_remote_graph if built_remote_graph is not None else EndpointSGraph(endpoint_url=url_endpoint)
+
+    shape_map = built_shape_map
+    if built_shape_map is None:
+        shape_map = produce_shape_map_according_to_input(sm_format=shape_map_format,
+                                                         sgraph=sgrpah,
+                                                         namespaces_prefix_dict=namespaces_dict,
+                                                         target_classes=target_classes,
+                                                         file_target_classes=file_target_classes,
+                                                         shape_map_file=shape_map_file,
+                                                         shape_map_raw=shape_map_raw,
+                                                         instantiation_property=instantiation_property,
+                                                         limit_remote_instances=limit_remote_instances,
+                                                         all_classes_mode=all_classes_mode)
+    return SgraphFromSelectorsTripleYielder(shape_map=shape_map,
+                                            depth=depth_for_building_subgraph,
+                                            classes_at_last_level=track_classes_for_entities_at_last_depth_level,
+                                            instantiation_property=instantiation_property,
+                                            strict_syntax_with_corners=strict_syntax_with_corners,
+                                            allow_untyped_numbers=allow_untyped_numbers,
+                                            inverse_paths=inverse_paths)
+
+def _yielder_for_url_input(url_input, allow_untyped_numbers, raw_graph,
+                          input_format, namespaces_dict, list_of_url_input):
+    if url_input:
+        return RdflibParserTripleYielder(source=url_input,
+                                         allow_untyped_numbers=allow_untyped_numbers,
+                                         raw_graph=raw_graph,
+                                         input_format=input_format,
+                                         namespaces_dict=namespaces_dict)
+    else:  # elif list_of_url_input:
+        return MultiRdfLibTripleYielder(list_of_files=list_of_url_input,
+                                        allow_untyped_numbers=allow_untyped_numbers,
+                                        input_format=input_format,
+                                        namespaces_dict=namespaces_dict)
+
+def _yielder_for_nt(source_file, raw_graph, allow_untyped_numbers,
+                    list_of_source_files, compression_mode,
+                    zip_base_archive):
+    if (source_file is not None or raw_graph is not None) and zip_base_archive is None:
+        return NtTriplesYielder(source_file=source_file,
+                                allow_untyped_numbers=allow_untyped_numbers,
+                                raw_graph=raw_graph,
+                                compression_mode=compression_mode)
+    elif zip_base_archive is not None:
+        return MultiNtTriplesYielder(list_of_files=list_of_zip_internal_files(zip_base_archive),
+                                     allow_untyped_numbers=allow_untyped_numbers,
+                                     compression_mode=compression_mode,
+                                     zip_base_archive=zip_base_archive)
+
+    else:
+        return MultiNtTriplesYielder(list_of_files=list_of_source_files,
+                                     allow_untyped_numbers=allow_untyped_numbers,
+                                     compression_mode=compression_mode)
+
+def _get_base_zip_archive_if_needed(source_file, compression_mode):
+    if compression_mode != ZIP:
+        return None
+    return ZipFile(source_file, 'r')
