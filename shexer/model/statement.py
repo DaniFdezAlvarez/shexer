@@ -4,11 +4,12 @@ OPT_CARDINALITY = "?"
 
 class Statement(object):
 
-    def __init__(self, st_property, st_type, cardinality, probability,
-                 comments=None, serializer_object=None, is_inverse=False):
+    def __init__(self, st_property, st_type, cardinality, n_occurences,
+                 probability, comments=None, serializer_object=None, is_inverse=False):
         self._st_property = st_property
         self._st_type = st_type
         self._cardinality = cardinality
+        self._n_occurences = n_occurences
         self._probability = probability
         self._serializer_object = serializer_object
         self._comments = [] if comments is None else comments
@@ -58,6 +59,10 @@ class Statement(object):
     @property
     def probability(self):
         return self._probability
+
+    @property
+    def n_occurences(self):
+        return self._n_occurences
 
     @probability.setter
     def probability(self, value):

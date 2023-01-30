@@ -3,10 +3,11 @@ STARTING_CHAR_FOR_SHAPE_NAME = "@"
 
 class Shape(object):
 
-    def __init__(self, name, class_uri, statements):
+    def __init__(self, name, class_uri, statements, n_instances):
         self._name = name
         self._class_uri = class_uri
         self._statements = statements if statements is not None else []
+        self._n_instances = n_instances
         # self._inverse_statements = inverse_statements if inverse_statements is not None else []
         self._sorting_callback = lambda x: x.probability
         self._n_direct_statements = self._count_direct_statements(statements)
@@ -31,6 +32,10 @@ class Shape(object):
     @property
     def n_inverse_statements(self):
         return self._n_inverse_statements
+
+    @property
+    def n_instances(self):
+        return self._n_instances
 
     @property
     def statements(self):

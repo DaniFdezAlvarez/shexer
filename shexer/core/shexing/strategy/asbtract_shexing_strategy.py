@@ -282,13 +282,15 @@ class AbstractShexingStrategy(object):
             else:
                 result.append(a_statement)
         to_compose.sort(reverse=True, key=lambda x: x.probability)
-        target_probability = self._get_probability_of_IRI_statement_in_group(to_compose)
+        # target_probability = self._get_probability_of_IRI_statement_in_group(to_compose)
+        iri_statement = self._get_IRI_statement_in_group(to_compose)
         self._remove_IRI_statements_if_useles(to_compose)
         if len(to_compose) > 1:  # There are som sentences to join in an OR
             composed_statement = FixedPropChoiceStatement(st_property=to_compose[0].st_property,
                                                           st_types=[a_statement.st_type for a_statement in to_compose],
                                                           cardinality=POSITIVE_CLOSURE,
-                                                          probability=target_probability,
+                                                          probability=iri_statement.probability,
+                                                          n_occurences=iri_statement.n_occurences,
                                                           serializer_object=self._get_serializer_for_choice_statement(to_compose[0].is_inverse),
                                                           is_inverse=to_compose[0].is_inverse
                                                           )
@@ -305,6 +307,12 @@ class AbstractShexingStrategy(object):
         for a_statement in group_of_statements:
             if a_statement.st_type == IRI_ELEM_TYPE:
                 return a_statement.probability
+        raise ValueError("There is no IRI statement within the received group")
+
+    def _get_IRI_statement_in_group(self, group_of_statements):
+        for a_statement in group_of_statements:
+            if a_statement.st_type == IRI_ELEM_TYPE:
+                return a_statement
         raise ValueError("There is no IRI statement within the received group")
 
     def _statements_without_shapes_to_remove(self, original_statements, shape_names_to_remove):

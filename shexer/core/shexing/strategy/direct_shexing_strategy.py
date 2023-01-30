@@ -30,19 +30,18 @@ class DirectShexingStrategy(AbstractShexingStrategy):
             for a_prop_key in self._class_profile_dict[a_class_key]:
                 for a_type_key in self._class_profile_dict[a_class_key][a_prop_key]:
                     for a_cardinality in self._class_profile_dict[a_class_key][a_prop_key][a_type_key]:
+                        n_occurences = self._class_profile_dict[a_class_key][a_prop_key][a_type_key][a_cardinality]
                         frequency = self._compute_frequency(number_of_instances,
-                                                            self._class_profile_dict
-                                                            [a_class_key]
-                                                            [a_prop_key]
-                                                            [a_type_key]
-                                                            [a_cardinality])
+                                                            n_occurences)
                         if frequency >= acceptance_threshold:
                             statements.append(Statement(st_property=a_prop_key,
                                                         st_type=a_type_key,
                                                         cardinality=a_cardinality,
-                                                        probability=frequency))
+                                                        probability=frequency,
+                                                        n_occurences=n_occurences))
 
             yield Shape(name=name,
                         class_uri=a_class_key,
-                        statements=statements)
+                        statements=statements,
+                        n_instances=number_of_instances)
 
