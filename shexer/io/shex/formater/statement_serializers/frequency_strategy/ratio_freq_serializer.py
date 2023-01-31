@@ -1,13 +1,18 @@
 from shexer.io.shex.formater.statement_serializers.frequency_strategy.base_frequency_strategy import BaseFrequencyStrategy
-import math
-
 
 class RatioFreqSerializer(BaseFrequencyStrategy):
 
     def __init__(self, decimals=-1):
+        """
+
+        :param decimals: it indicates the number of decimals to use to express ratios.
+                        When a negative number is provided, decimals won't be controlled
+        """
         self._decimals=-1
         if decimals < 0:
             self.serialize_frequency = self._serialize_freq_unbounded
+        elif decimals ==0:
+            self.serialize_frequency = self._serialize_freq_int
         else:
             self.serialize_frequency = self._serialize_freq_decimals
 
@@ -20,3 +25,6 @@ class RatioFreqSerializer(BaseFrequencyStrategy):
 
     def _serialize_freq_decimals(self, statement):
         return str(round(statement.probability, self._decimals)) + "%"
+
+    def _serialize_freq_int(self, statement):
+        return str(int(statement.probability * 100)) + "%"

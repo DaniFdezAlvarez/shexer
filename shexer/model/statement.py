@@ -22,10 +22,10 @@ class Statement(object):
                                                   namespaces_dict=namespaces_dict)
 
     def probability_representation(self):
-        return self._serializer_object.probability_representation(self._probability)
+        return self._serializer_object.probability_representation(self)
 
     def cardinality_representation(self):
-        return self._serializer_object.cardinality_representation(self._cardinality, self)
+        return self._serializer_object.cardinality_representation(self)
 
     def comment_representation(self, namespaces_dict):
         return self._serializer_object.turn_statement_into_comment(self, namespaces_dict=namespaces_dict)

@@ -4,10 +4,11 @@ from shexer.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, KLEENE_CLO
 
 class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
 
-    def __init__(self, instantiation_property_str, disable_comments=False, is_inverse=False):
+    def __init__(self, instantiation_property_str, frequency_serializer, disable_comments=False, is_inverse=False):
         super(FixedPropChoiceStatementSerializer, self).__init__(instantiation_property_str=instantiation_property_str,
                                                                  disable_comments=disable_comments,
-                                                                 is_inverse=is_inverse)
+                                                                 is_inverse=is_inverse,
+                                                                 frequency_serializer=frequency_serializer)
 
     def serialize_statement_with_indent_level(self, a_statement, is_last_statement_of_shape, namespaces_dict):
         tuples_line_indent = []
