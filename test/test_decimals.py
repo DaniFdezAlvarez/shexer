@@ -5,7 +5,7 @@ from test.t_utils import file_vs_str_exact_comparison
 import os.path as pth
 from shexer.consts import TURTLE
 
-_BASE_DIR = BASE_FILES + "decimals" + pth.sep
+_BASE_DIR = BASE_FILES + "freq_reports" + pth.sep
 
 class TestGraphFileInput(unittest.TestCase):
 

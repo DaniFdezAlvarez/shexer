@@ -267,7 +267,8 @@ class Shaper(object):
                                     output_format=output_format,
                                     instantiation_property=self._instantiation_property,
                                     disable_comments=self._disable_comments,
-                                    wikidata_annotation=self._wikidata_annotation)
+                                    wikidata_annotation=self._wikidata_annotation,
+                                    instances_report_mode=self._instances_report_mode)
 
     def _build_class_profiler(self):
         return get_class_profiler(target_classes_dict=self._target_classes_dict,

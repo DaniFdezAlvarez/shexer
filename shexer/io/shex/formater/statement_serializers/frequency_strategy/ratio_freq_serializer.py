@@ -24,9 +24,6 @@ class RatioFreqSerializer(BaseFrequencyStrategy):
         return str(statement.probability * 100) + " %"
 
     def _serialize_freq_decimals(self, statement):
-        # tmp = round(statement.probability, self._decimals + 2)
-        # return str(round(statement.probability, self._decimals + 4) * 100) + " %"
-        # {: .2f}
         pattern = "{:." + str(self._decimals) +"f} %"
         return pattern.format(statement.probability*100)
 

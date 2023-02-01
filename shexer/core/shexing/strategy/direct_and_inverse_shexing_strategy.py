@@ -37,7 +37,7 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
             yield Shape(name=name,
                         class_uri=a_class_key,
                         statements=direct_statements + inverse_statements,
-                        n_instances=number_of_instances)
+                        n_instances=int(number_of_instances))
 
     def set_valid_shape_constraints(self, shape):
         valid_statements = self._select_valid_statements_of_shape(shape.direct_statements)

@@ -43,5 +43,5 @@ class DirectShexingStrategy(AbstractShexingStrategy):
             yield Shape(name=name,
                         class_uri=a_class_key,
                         statements=statements,
-                        n_instances=number_of_instances)
+                        n_instances=int(number_of_instances))
 

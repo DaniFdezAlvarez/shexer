@@ -9,7 +9,8 @@ class MixedFrequencyStrategy(BaseFrequencyStrategy):
         self._ratio_strategy = RatioFreqSerializer(decimals=decimals)
 
     def serialize_frequency(self, statement):
+        # The abs_strategy return a trailing dot that we want to skip. That why I use slicing here
         return self._ratio_strategy.serialize_frequency(statement) + \
-               " (" + self._abs_strategy.serialize_frequency(statement) + ")"
+               " (" + self._abs_strategy.serialize_frequency(statement)[:-1] + ")."
 
 
