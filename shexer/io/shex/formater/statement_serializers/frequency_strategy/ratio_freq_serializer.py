@@ -8,7 +8,7 @@ class RatioFreqSerializer(BaseFrequencyStrategy):
         :param decimals: it indicates the number of decimals to use to express ratios.
                         When a negative number is provided, decimals won't be controlled
         """
-        self._decimals=-1
+        self._decimals=decimals
         if decimals < 0:
             self.serialize_frequency = self._serialize_freq_unbounded
         elif decimals ==0:
@@ -24,7 +24,11 @@ class RatioFreqSerializer(BaseFrequencyStrategy):
         return str(statement.probability * 100) + " %"
 
     def _serialize_freq_decimals(self, statement):
-        return str(round(statement.probability, self._decimals)) + "%"
+        # tmp = round(statement.probability, self._decimals + 2)
+        # return str(round(statement.probability, self._decimals + 4) * 100) + " %"
+        # {: .2f}
+        pattern = "{:." + str(self._decimals) +"f} %"
+        return pattern.format(statement.probability*100)
 
     def _serialize_freq_int(self, statement):
-        return str(int(statement.probability * 100)) + "%"
+        return str(int(statement.probability * 100)) + " %"

@@ -11,6 +11,7 @@ from shexer.io.profile.formater.abstract_profile_serializer import AbstractProfi
 from shexer.utils.factories.shape_serializer_factory import get_shape_serializer
 from shexer.utils.namespaces import find_adequate_prefix_for_shapes_namespaces
 from shexer.utils.log import log_msg
+from shexer.consts import RATIO_INSTANCES
 
 
 class Shaper(object):
@@ -52,7 +53,9 @@ class Shaper(object):
                  limit_remote_instances=-1,
                  wikidata_annotation=False,
                  inverse_paths=False,
-                 compression_mode=None
+                 compression_mode=None,
+                 decimals=-1,
+                 instances_report_mode=RATIO_INSTANCES
                  ):
         """
 
@@ -117,6 +120,8 @@ class Shaper(object):
         self._all_classes_mode = all_classes_mode
         self._shape_map_file = shape_map_file
         self._shape_map_raw = shape_map_raw
+        self._decimals = decimals
+        self._instances_report_mode = instances_report_mode
 
         self._remove_empty_shapes=remove_empty_shapes
         self._disable_comments = disable_comments
@@ -249,7 +254,9 @@ class Shaper(object):
                                 allow_opt_cardinality=self._allow_opt_cardinality,
                                 disable_exact_cardinality=self._disable_exact_cardinality,
                                 shapes_namespace=self._shapes_namespace,
-                                inverse_paths=self._inverse_paths
+                                inverse_paths=self._inverse_paths,
+                                decimals=self._decimals,
+                                instances_report_mode=self._instances_report_mode
                                 )
 
     def _build_shapes_serializer(self, target_file, string_return, output_format):
