@@ -41,8 +41,7 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
 
     def _tuple_closing_choice(self, a_statement, is_last_statement_of_shape):
         str_res = ")" + SPACES_GAP_BETWEEN_TOKENS + \
-                  BaseStatementSerializer.cardinality_representation(cardinality=a_statement.cardinality,
-                                                                     statement=a_statement,
+                  BaseStatementSerializer.cardinality_representation(statement=a_statement,
                                                                      out_of_comment=True) + \
                   BaseStatementSerializer.closure_of_statement(is_last_statement_of_shape)
 

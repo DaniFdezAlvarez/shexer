@@ -21,7 +21,7 @@ class RatioFreqSerializer(BaseFrequencyStrategy):
         raise NotImplementedError("This function will be initialized with a callback during the __init__")
 
     def _serialize_freq_unbounded(self, statement):
-        return str(statement.probability * 100) + "%"
+        return str(statement.probability * 100) + " %"
 
     def _serialize_freq_decimals(self, statement):
         return str(round(statement.probability, self._decimals)) + "%"
