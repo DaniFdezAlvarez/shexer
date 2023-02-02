@@ -6,15 +6,17 @@ from shexer.utils.shapes import prefixize_shape_name_if_possible
 from shexer.io.shex.formater.consts import SPACES_LEVEL_INDENTATION
 from shexer.io.wikidata import wikidata_annotation
 from shexer.io.file import read_file
+from shexer.consts import RATIO_INSTANCES, ABSOLUTE_INSTANCES, MIXED_INSTANCES
 
 from wlighter import SHEXC_FORMAT
 
-
+_MODES_REPORT_INSTANCES = [ABSOLUTE_INSTANCES, MIXED_INSTANCES]
 
 class ShexSerializer(object):
 
     def __init__(self, target_file, shapes_list, namespaces_dict=None, string_return=False,
-                 instantiation_property_str=RDF_TYPE_STR, disable_comments=False, wikidata_annotation=False):
+                 instantiation_property_str=RDF_TYPE_STR, disable_comments=False, wikidata_annotation=False,
+                 instances_report_mode=RATIO_INSTANCES):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._lines_buffer = []
@@ -23,6 +25,7 @@ class ShexSerializer(object):
         self._instantiation_property_str = self._decide_instantiation_property(instantiation_property_str)
         self._disable_comments = disable_comments
         self._wikidata_annotation = wikidata_annotation
+        self._instances_report_mode = instances_report_mode
 
         self._string_result = ""
 
@@ -128,8 +131,16 @@ class ShexSerializer(object):
     def _serialize_shape_name(self, a_shape):
         self._write_line(
             prefixize_shape_name_if_possible(a_shape_name=a_shape.name,
-                                             namespaces_prefix_dict=self._namespaces_dict)
+                                             namespaces_prefix_dict=self._namespaces_dict) +
+            self._instance_count(a_shape)
         )
+
+    def _instance_count(self, a_shape):
+        return "   # {} instance{}".format(a_shape.n_instances,
+                                           "" if a_shape.n_instances == 1 else "s") \
+            if self._instances_report_mode in _MODES_REPORT_INSTANCES and \
+                     not self._disable_comments \
+            else ""
 
     def _serialize_opening_of_rules(self):
         self._write_line("{")

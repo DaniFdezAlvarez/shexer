@@ -1,5 +1,5 @@
 from shexer.core.shexing.class_shexer import ClassShexer
-from shexer.consts import RDF_TYPE, SHAPES_DEFAULT_NAMESPACE
+from shexer.consts import RDF_TYPE, SHAPES_DEFAULT_NAMESPACE, RATIO_INSTANCES
 
 
 def get_class_shexer(class_counts,
@@ -17,7 +17,9 @@ def get_class_shexer(class_counts,
                      allow_opt_cardinality=True,
                      disable_exact_cardinality=False,
                      shapes_namespace=SHAPES_DEFAULT_NAMESPACE,
-                     inverse_paths=False):
+                     inverse_paths=False,
+                     decimals=-1,
+                     instances_report_mode=RATIO_INSTANCES):
 
     return ClassShexer(
         class_counts_dict=class_counts,
@@ -36,5 +38,7 @@ def get_class_shexer(class_counts,
         allow_opt_cardinality=allow_opt_cardinality,
         disable_exact_cardinality=disable_exact_cardinality,
         shapes_namespace=shapes_namespace,
-        inverse_paths=inverse_paths
+        inverse_paths=inverse_paths,
+        instances_report_mode=instances_report_mode,
+        decimals=decimals
     )

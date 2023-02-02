@@ -1,0 +1,18 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:Jimmy a foaf:Person ;  # Complete
+	foaf:name "Jimmy" ;
+	foaf:familyName "Jones" .
+
+ex:Sarah a foaf:Person ;  # Complete implicit type for age
+	foaf:name "Sarah" .
+
+ex:Bella a foaf:Person .  # Missing familyName
+
+
+
+
