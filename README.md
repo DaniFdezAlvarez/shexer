@@ -60,6 +60,7 @@ sheXer includes a package to deploy a wer service exposing sheXer with a REST AP
 
 * **Adaptation to Wikidata model**. sheXer includes configuration params to handle Wikidata's data model regarding qualifiers, so you can automatically extract the schema of qualifier nodes too. You can also produce content where each Wikidata ID is associated with  its label in comments, as sheXer is integrated with [wLighter](https://github.com/DaniFdezAlvarez/wLighter).
 
+
 ## Experimental results
 
 In the folder [experiments](https://github.com/DaniFdezAlvarez/shexer/tree/develop/experiments), you can see some results of applying this tool over different graphs with different configurations.
@@ -205,10 +206,12 @@ All this parameters have a default value so you do not need to use any of them. 
 #### Params to tune some features of the output
 Again, all these params have a default value and you don't need to worry about them unless you want to tune the output.
 
-* remove_empty_shapes (default True). When set to True, the result does not contain any empty shape nor any mention to it. If a shape A has a constraint pointing to a shape B and B is empty, then the constraint is modified and the macro IRI is used instead of B.
-* disable_comments (dafault False). When set to True, the results do not contain comments.
+* remove_empty_shapes (default: True). When set to True, the result does not contain any empty shape nor any mention to it. If a shape A has a constraint pointing to a shape B and B is empty, then the constraint is modified and the macro IRI is used instead of B.
+* disable_comments (dafault: False). When set to True, the results do not contain comments.
 * shapes_namespace (default: http://weso.es/shapes/). This property allows you to change the namespace in which the shape labels are created in case you do not want to use the default one. The prefix of this namespace will be the empty prefix unless the empty prefix is already being used by other namespace. In that case, sheXer looks for other preferred prefixes, or will generate a random one if any of the default ones is available. 
 * wikidata_annotation (default: False). This param can be used when the output will contain Wikidata IDs. Using the library [wLighter](https://github.com/DaniFdezAlvarez/wLighter), the ourput is annotated with comments that associate a given every Wikidata ID with its English label. 
+* instances_report_mode (default, const.RATIO_INSTANCES). With this parameter, you can configure how is the information about instances complying to each expression shown. By default, sheXer shows a percetage of instances. If you set this parameter to const.ABSOLUTE_INSTANCES, then the comments will contain the exact number of complying instances instead of the ratio. sheXer will write a comment next to the shape label so you can also know how many isntances were used to extract a shape. If you set the parameter to const.MIXED_INSTANCES, the comments will contain both relative and absolute information.
+* decimals (default: -1). With this parameter you can configure the numnber of decimals to be used when writing ratios in comments. A negative numnber means that ratios will be written using its top precission. If you set this parameter to a natural number (including 0), then such number will be the number of decimals used. sheXer will round (not truncate) the original ratio to that precission.
 
 
 ### Method __shex\_graph__
