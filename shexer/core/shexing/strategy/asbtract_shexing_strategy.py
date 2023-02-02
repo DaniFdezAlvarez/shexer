@@ -1,9 +1,14 @@
 from shexer.model.statement import POSITIVE_CLOSURE, KLEENE_CLOSURE, OPT_CARDINALITY
 from shexer.model.IRI import IRI_ELEM_TYPE
 from shexer.model.fixed_prop_choice_statement import FixedPropChoiceStatement
-from shexer.io.shex.formater.statement_serializers.base_statement_serializer import BaseStatementSerializer
+from shexer.io.shex.formater.statement_serializers.st_serializers_factory import StSerializerFactory
 from shexer.io.shex.formater.statement_serializers.fixed_prop_choice_statement_serializer import \
     FixedPropChoiceStatementSerializer  # TODO: REPFACTOR
+
+
+_DIRECT_ST_SERIALIZER = 0
+_INVERSE_ST_SERIALIZER = 1
+
 
 class AbstractShexingStrategy(object):
 
@@ -19,6 +24,12 @@ class AbstractShexingStrategy(object):
         self._disable_or_statements = self._class_shexer._disable_or_statements
         self._all_compliant_mode = self._class_shexer._all_compliant_mode
         self._disable_exact_cardinality = self._class_shexer._disable_exact_cardinality
+
+        self._statement_serializer_factory = StSerializerFactory(freq_mode=class_shexer._instances_report_mode,
+                                                                 decimals=class_shexer._decimals,
+                                                                 instantiation_property_str=self._instantiation_property_str,
+                                                                 disable_comments=self._disable_comments)
+
 
     def yield_base_shapes(self, acceptance_threshold):
         raise NotImplementedError()
@@ -90,16 +101,9 @@ class AbstractShexingStrategy(object):
             a_statement.remove_comments()
 
     def _set_serializer_object_for_statements(self, statement):
-        statement.serializer_object = BaseStatementSerializer(
-            instantiation_property_str=self._instantiation_property_str,
-            disable_comments=self._disable_comments,
-            is_inverse=statement.is_inverse)
-
-    def _get_serializer_for_choice_statement(self, is_inverse):
-        return FixedPropChoiceStatementSerializer(
-            instantiation_property_str=self._instantiation_property_str,
-            disable_comments=self._disable_comments,
-            is_inverse=is_inverse)
+        statement.serializer_object = self._statement_serializer_factory.get_base_serializer(
+            is_inverse=statement.is_inverse
+        )
 
     def _group_constraints_with_same_prop_and_obj(self, candidate_statements):
         result = []
@@ -282,16 +286,21 @@ class AbstractShexingStrategy(object):
             else:
                 result.append(a_statement)
         to_compose.sort(reverse=True, key=lambda x: x.probability)
-        target_probability = self._get_probability_of_IRI_statement_in_group(to_compose)
+        # target_probability = self._get_probability_of_IRI_statement_in_group(to_compose)
+        iri_statement = self._get_IRI_statement_in_group(to_compose)
         self._remove_IRI_statements_if_useles(to_compose)
         if len(to_compose) > 1:  # There are som sentences to join in an OR
-            composed_statement = FixedPropChoiceStatement(st_property=to_compose[0].st_property,
-                                                          st_types=[a_statement.st_type for a_statement in to_compose],
-                                                          cardinality=POSITIVE_CLOSURE,
-                                                          probability=target_probability,
-                                                          serializer_object=self._get_serializer_for_choice_statement(to_compose[0].is_inverse),
-                                                          is_inverse=to_compose[0].is_inverse
-                                                          )
+            composed_statement = FixedPropChoiceStatement(
+                st_property=to_compose[0].st_property,
+                st_types=[a_statement.st_type for a_statement in to_compose],
+                cardinality=POSITIVE_CLOSURE,
+                probability=iri_statement.probability,
+                n_occurences=iri_statement.n_occurences,
+                serializer_object=self._statement_serializer_factory.get_choice_serializer(
+                    is_inverse=to_compose[0].is_inverse
+                ),
+                is_inverse=to_compose[0].is_inverse
+            )
             for a_statement in to_compose:
                 if a_statement.st_type != IRI_ELEM_TYPE:
                     composed_statement.add_comment(self._turn_statement_into_comment(a_statement))
@@ -305,6 +314,12 @@ class AbstractShexingStrategy(object):
         for a_statement in group_of_statements:
             if a_statement.st_type == IRI_ELEM_TYPE:
                 return a_statement.probability
+        raise ValueError("There is no IRI statement within the received group")
+
+    def _get_IRI_statement_in_group(self, group_of_statements):
+        for a_statement in group_of_statements:
+            if a_statement.st_type == IRI_ELEM_TYPE:
+                return a_statement
         raise ValueError("There is no IRI statement within the received group")
 
     def _statements_without_shapes_to_remove(self, original_statements, shape_names_to_remove):

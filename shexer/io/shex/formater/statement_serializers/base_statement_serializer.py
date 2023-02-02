@@ -8,10 +8,11 @@ _INVERSE_SENSE_SHEXC = "^"
 
 class BaseStatementSerializer(object):
 
-    def __init__(self, instantiation_property_str, disable_comments=False, is_inverse=False):
+    def __init__(self, instantiation_property_str, frequency_serializer, disable_comments=False, is_inverse=False):
         self._instantiation_property_str = instantiation_property_str
         self._disable_comments = disable_comments
         self._is_inverse = is_inverse
+        self._frequency_serializer = frequency_serializer
 
     def serialize_statement_with_indent_level(self, a_statement, is_last_statement_of_shape, namespaces_dict):
         tuples_line_indent = []
@@ -20,7 +21,6 @@ class BaseStatementSerializer(object):
                                                        st_property=a_statement.st_property,
                                                        namespaces_dict=namespaces_dict)
         cardinality = BaseStatementSerializer.cardinality_representation(
-            cardinality=a_statement.cardinality,
             statement=a_statement,
             out_of_comment=True)
         result = self._sense_flag() + st_property + SPACES_GAP_BETWEEN_TOKENS + st_target_element + SPACES_GAP_BETWEEN_TOKENS + \
@@ -28,7 +28,7 @@ class BaseStatementSerializer(object):
 
         if a_statement.cardinality not in [KLEENE_CLOSURE, OPT_CARDINALITY] and not self._disable_comments:
             result += BaseStatementSerializer.adequate_amount_of_final_spaces(result)
-            result += BaseStatementSerializer.probability_representation(a_statement.probability)
+            result += a_statement.probability_representation()
         tuples_line_indent.append((result, 1))
 
         for a_comment in a_statement.comments:
@@ -41,6 +41,7 @@ class BaseStatementSerializer(object):
         Special treatment for instantiation_property. We build a value set with an specific URI
         :param target_element:
         :param st_property:
+        :param namespaces_dict:
         :return:
         """
         if st_property == self._instantiation_property_str:
@@ -86,13 +87,14 @@ class BaseStatementSerializer(object):
 
         return None if best_match is None else uri.replace(best_match, namespaces_dict[best_match] + ":")
 
-    @staticmethod
-    def probability_representation(probability):
-        return COMMENT_INI + str(probability * 100) + " %"
+
+    def probability_representation(self, statement):
+        return COMMENT_INI + self._frequency_serializer.serialize_frequency(statement)
 
     @staticmethod
-    def cardinality_representation(cardinality, statement, out_of_comment=False):
-        if out_of_comment and statement.cardinality == 1:
+    def cardinality_representation(statement, out_of_comment=False):
+        cardinality = statement.cardinality
+        if out_of_comment and cardinality == 1:
             return ""
         if cardinality in [POSITIVE_CLOSURE, KLEENE_CLOSURE, OPT_CARDINALITY]:
             return cardinality

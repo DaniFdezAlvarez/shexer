@@ -1,10 +1,12 @@
 from shexer.consts import SHEXC, SHACL_TURTLE
 from shexer.io.shex.formater.shex_serializer import ShexSerializer
 from shexer.io.shacl.formater.shacl_serializer import ShaclSerializer
+from shexer.consts import RATIO_INSTANCES
 
 
 def get_shape_serializer(output_format, shapes_list, target_file=None, string_return=False, namespaces_dict=None,
-                         instantiation_property=None, disable_comments=False, wikidata_annotation=False):
+                         instantiation_property=None, disable_comments=False, wikidata_annotation=False,
+                         instances_report_mode=RATIO_INSTANCES):
     if output_format == SHEXC:
         return ShexSerializer(target_file=target_file,
                               shapes_list=shapes_list,
@@ -12,7 +14,8 @@ def get_shape_serializer(output_format, shapes_list, target_file=None, string_re
                               string_return=string_return,
                               instantiation_property_str=instantiation_property,
                               disable_comments=disable_comments,
-                              wikidata_annotation=wikidata_annotation)
+                              wikidata_annotation=wikidata_annotation,
+                              instances_report_mode=instances_report_mode)
     elif output_format == SHACL_TURTLE:
         return ShaclSerializer(target_file=target_file,
                                shapes_list=shapes_list,

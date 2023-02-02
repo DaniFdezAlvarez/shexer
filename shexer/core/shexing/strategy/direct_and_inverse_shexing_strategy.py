@@ -36,7 +36,8 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
                                                                      number_of_instances=number_of_instances)
             yield Shape(name=name,
                         class_uri=a_class_key,
-                        statements=direct_statements + inverse_statements)
+                        statements=direct_statements + inverse_statements,
+                        n_instances=int(number_of_instances))
 
     def set_valid_shape_constraints(self, shape):
         valid_statements = self._select_valid_statements_of_shape(shape.direct_statements)
@@ -49,18 +50,15 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
         for a_prop_key in self._class_profile_dict[class_key][_POS_FEATURES_INVERSE]:
             for a_type_key in self._class_profile_dict[class_key][_POS_FEATURES_INVERSE][a_prop_key]:
                 for a_cardinality in self._class_profile_dict[class_key][_POS_FEATURES_INVERSE][a_prop_key][a_type_key]:
+                    n_occurences = self._class_profile_dict[class_key][_POS_FEATURES_INVERSE][a_prop_key][a_type_key][a_cardinality]
                     frequency = self._compute_frequency(number_of_instances,
-                                                        self._class_profile_dict
-                                                        [class_key]
-                                                        [_POS_FEATURES_INVERSE]
-                                                        [a_prop_key]
-                                                        [a_type_key]
-                                                        [a_cardinality])
+                                                        n_occurences)
                     if frequency >= acceptance_threshold:
                         result.append(Statement(st_property=a_prop_key,
                                                 st_type=a_type_key,
                                                 cardinality=a_cardinality,
                                                 probability=frequency,
+                                                n_occurences=n_occurences,
                                                 is_inverse=True))
         return result
 
@@ -69,19 +67,16 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
         for a_prop_key in self._class_profile_dict[class_key][_POS_FEATURES_DIRECT]:
             for a_type_key in self._class_profile_dict[class_key][_POS_FEATURES_DIRECT][a_prop_key]:
                 for a_cardinality in self._class_profile_dict[class_key][_POS_FEATURES_DIRECT][a_prop_key][a_type_key]:
+                    n_occurences = self._class_profile_dict[class_key][_POS_FEATURES_DIRECT][a_prop_key][a_type_key][a_cardinality]
                     frequency = self._compute_frequency(number_of_instances,
-                                                        self._class_profile_dict
-                                                        [class_key]
-                                                        [_POS_FEATURES_DIRECT]
-                                                        [a_prop_key]
-                                                        [a_type_key]
-                                                        [a_cardinality])
+                                                        n_occurences)
                     if frequency >= acceptance_threshold:
                         result.append(Statement(st_property=a_prop_key,
                                                 st_type=a_type_key,
                                                 cardinality=a_cardinality,
                                                 probability=frequency,
-                                                is_inverse=False))
+                                                is_inverse=False,
+                                                n_occurences=n_occurences))
         return result
 
     # def _set_serializer_object_for_statements(self, statement):
