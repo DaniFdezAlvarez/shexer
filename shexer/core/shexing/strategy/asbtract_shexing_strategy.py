@@ -252,15 +252,11 @@ class AbstractShexingStrategy(object):
     def _is_an_IRI(self, statement_type):
         return statement_type == IRI_ELEM_TYPE or statement_type.startswith("@")  # TODO careful here. Refactor
 
-    def _get_IRI_statement_in_group(self, group_of_statements):
-        for a_statement in group_of_statements:
-            if a_statement.st_type == IRI_ELEM_TYPE:
-                return a_statement
 
     def _remove_IRI_statements_if_useles(self, group_of_statements):
         # I am assuming a group of statements sorted by probability as param
         if len(group_of_statements) <= 1:
-            return
+            return False
         index_of_IRI_statement = -1
         for i in range(0, len(group_of_statements)):
             if group_of_statements[i].st_type == IRI_ELEM_TYPE:
@@ -270,6 +266,8 @@ class AbstractShexingStrategy(object):
             if group_of_statements[1].probability == group_of_statements[index_of_IRI_statement].probability:
                 # the previous 'if' works, trust me, im an engineer
                 del group_of_statements[index_of_IRI_statement]
+                return True
+        return False
 
     def _group_contains_IRI_statements(self, list_of_candidate_statements):
         for a_statement in list_of_candidate_statements:
@@ -288,8 +286,10 @@ class AbstractShexingStrategy(object):
         to_compose.sort(reverse=True, key=lambda x: x.probability)
         # target_probability = self._get_probability_of_IRI_statement_in_group(to_compose)
         iri_statement = self._get_IRI_statement_in_group(to_compose)
-        self._remove_IRI_statements_if_useles(to_compose)
-        if len(to_compose) > 1:  # There are som sentences to join in an OR
+        was_removed_IRI = self._remove_IRI_statements_if_useles(to_compose)
+        if not was_removed_IRI:  # The IRI macro is still there
+            return [a_sentence for a_sentence in self._manage_group_to_decide_without_or(to_compose)] + result
+        elif len(to_compose) > 1:  # There are some sentences to join in an OR and no IRI macro
             composed_statement = FixedPropChoiceStatement(
                 st_property=to_compose[0].st_property,
                 st_types=[a_statement.st_type for a_statement in to_compose],
