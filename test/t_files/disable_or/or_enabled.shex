@@ -8,24 +8,24 @@ PREFIX : <http://weso.es/shapes/>
 
 :Person
 {
-   foaf:name  xsd:string  ;
-   (
-   ex:foo  IRI
-      |
-   ex:foo  @:Person
-      |
-   ex:foo  @:Document
-   )  +;
    rdf:type  [foaf:Person]  ;
-   foaf:familyName  xsd:string  ?;
+   foaf:name  xsd:string  ;
    foaf:age  xsd:integer  ?;
-   foaf:knows  @:Person  ?
+   foaf:familyName  xsd:string  ?;
+   ex:foo  @:Person  OR  @:Document  *;
+   rdf:type  [foaf:Document]  ?;
+   foaf:knows  @:Document  OR  @:Person  *
 }
 
 
 :Document
 {
    rdf:type  [foaf:Document]  ;
-   foaf:title  xsd:string  ;
-   foaf:depiction  xsd:string  ?
+   foaf:title  xsd:string  ?;
+   rdf:type  [foaf:Person]  ?;
+   foaf:depiction  xsd:string  ?;
+   foaf:name  xsd:string  ?;
+   foaf:familyName  xsd:string  ?;
+   foaf:age  xsd:integer  ?;
+   ex:foo  @:Person  ?
 }

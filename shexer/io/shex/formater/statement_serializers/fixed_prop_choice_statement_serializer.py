@@ -19,47 +19,19 @@ class FixedPropChoiceStatementSerializer(BaseStatementSerializer):
                                                                  st_property=a_statement.st_property,
                                                                  namespaces_dict=namespaces_dict))
 
-        tuples_line_indent.append(self._opening_tuple_line_of_choice())
+        content_line = st_property + SPACES_GAP_BETWEEN_TOKENS
+        content_line += (SPACES_GAP_BETWEEN_TOKENS + "OR" + SPACES_GAP_BETWEEN_TOKENS).join(st_target_elements)
+        content_line += SPACES_GAP_BETWEEN_TOKENS + BaseStatementSerializer.cardinality_representation(
+            statement=a_statement,
+            out_of_comment=True)
+        content_line += ";" if not is_last_statement_of_shape else ""
+        tuples_line_indent.append((content_line, 1))
 
-        tuples_line_indent.append(FixedPropChoiceStatementSerializer.
-                                  _statement_in_choice_no_cardinality(st_property,
-                                                                      st_target_elements[0]))
-
-        for a_type in st_target_elements[1:]:
-            tuples_line_indent.append(FixedPropChoiceStatementSerializer._tuple_of_disjunction())
-            tuples_line_indent.append(
-                FixedPropChoiceStatementSerializer._statement_in_choice_no_cardinality(st_property,
-                                                                                       a_type))
-
-        tuples_line_indent.append(self._tuple_closing_choice(a_statement,
-                                                             is_last_statement_of_shape))
 
         for a_comment in a_statement.comments:
             tuples_line_indent.append((a_comment, 4))
         return tuples_line_indent
 
-
-    def _tuple_closing_choice(self, a_statement, is_last_statement_of_shape):
-        str_res = ")" + SPACES_GAP_BETWEEN_TOKENS + \
-                  BaseStatementSerializer.cardinality_representation(statement=a_statement,
-                                                                     out_of_comment=True) + \
-                  BaseStatementSerializer.closure_of_statement(is_last_statement_of_shape)
-
-        if a_statement.cardinality not in [KLEENE_CLOSURE, OPT_CARDINALITY] and not self._disable_comments:
-            str_res += BaseStatementSerializer.adequate_amount_of_final_spaces(str_res) + \
-                       BaseStatementSerializer.probability_representation(a_statement.probability)
-        return str_res, 1
-
-    def _opening_tuple_line_of_choice(self):
-        return self._sense_flag() + "(", 1
-
-    @staticmethod
-    def _tuple_of_disjunction():
-        return "|", 2
-
-    @staticmethod
-    def _statement_in_choice_no_cardinality(st_property, st_type):
-        return (st_property + SPACES_GAP_BETWEEN_TOKENS + st_type, 1)
 
     @staticmethod
     def turn_statement_into_comment(statement, namespaces_dict):
