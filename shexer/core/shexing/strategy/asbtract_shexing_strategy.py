@@ -228,7 +228,7 @@ class AbstractShexingStrategy(object):
             else:
                 result.append(a_statement)
         to_compose.sort(reverse=True, key=lambda x: x.probability)
-        target_sentence = self._get_IRI_statement_in_group(to_compose)
+        target_sentence = self._get_IRI_statement_in_group(to_compose)  # May be None
         self._remove_IRI_statements_if_useles(group_of_statements=to_compose)
         if len(to_compose) > 1:
             for a_statement in to_compose:
@@ -320,7 +320,7 @@ class AbstractShexingStrategy(object):
         for a_statement in group_of_statements:
             if a_statement.st_type == IRI_ELEM_TYPE:
                 return a_statement
-        raise ValueError("There is no IRI statement within the received group")
+        return None
 
     def _statements_without_shapes_to_remove(self, original_statements, shape_names_to_remove):
         new_statements = []
