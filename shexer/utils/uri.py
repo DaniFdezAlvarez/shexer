@@ -34,6 +34,11 @@ def remove_corners(a_uri, raise_error_if_no_corners=True):
 def add_corners(a_uri):
     return "<" + a_uri + ">"
 
+def add_corners_if_needed(a_uri):
+    if a_uri.startswith("<"):
+        return a_uri
+    return add_corners(a_uri)
+
 
 def add_corners_if_it_is_an_uri(a_candidate_uri):
     if a_candidate_uri.startswith("http://") or a_candidate_uri.startswith("https://"):  # TODO, check this!
