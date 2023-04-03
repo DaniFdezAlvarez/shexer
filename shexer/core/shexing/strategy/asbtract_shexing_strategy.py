@@ -310,11 +310,11 @@ class AbstractShexingStrategy(object):
         # else  # No sentences to join
         return result
 
-    def _get_probability_of_IRI_statement_in_group(self, group_of_statements):
-        for a_statement in group_of_statements:
-            if a_statement.st_type == IRI_ELEM_TYPE:
-                return a_statement.probability
-        raise ValueError("There is no IRI statement within the received group")
+    # def _get_probability_of_IRI_statement_in_group(self, group_of_statements):
+    #     for a_statement in group_of_statements:
+    #         if a_statement.st_type == IRI_ELEM_TYPE:
+    #             return a_statement.probability
+    #     raise ValueError("There is no IRI statement within the received group")
 
     def _get_IRI_statement_in_group(self, group_of_statements):
         for a_statement in group_of_statements:

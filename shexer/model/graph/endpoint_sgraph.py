@@ -70,7 +70,7 @@ class EndpointSGraph(SGraph):
         for an_elem in query_endpoint_single_variable(endpoint_url=self._endpoint_url,
                                                       str_query=str_query,
                                                       variable_id=_DEF_OBJ_ID):
-            yield (target_node, instantiation_property, an_elem)
+            yield ("<" + target_node + ">", "<" + instantiation_property + ">", an_elem)
 
 
     def _yield_local_class_triples_of_an_s(self, target_node, instantiation_property):
@@ -108,7 +108,7 @@ class EndpointSGraph(SGraph):
                                                     str_query=str_query,
                                                     p_id=_DEF_PRED_ID,
                                                     o_id=_DEF_OBJ_ID):
-            yield target_node, a_tuple_po[0], a_tuple_po[1]
+            yield "<" + target_node + ">", a_tuple_po[0], a_tuple_po[1]
 
     def _yield_remote_s_p_triples_of_an_o(self, target_node):
         str_query = "SELECT {0} {1} WHERE {{ {0} {1} <{2}> .}}".format(_DEF_SUBJ_VARIABLE,
@@ -119,7 +119,7 @@ class EndpointSGraph(SGraph):
                                                     str_query=str_query,
                                                     p_id=_DEF_PRED_ID,
                                                     s_id=_DEF_SUBJ_ID):
-            yield a_tuple_sp[0], a_tuple_sp[1], target_node
+            yield a_tuple_sp[0], a_tuple_sp[1], "<" + target_node + ">"
 
 
     def _yield_local_p_o_triples_of_an_s(self, target_node):

@@ -45,4 +45,4 @@ class TestGraphFileInput(unittest.TestCase):
         str_result = shaper.shex_graph(string_output=True)
         self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "or_disabled.shex",
                                                       str_target=str_result,
-                                                      or_shapes=False))
+                                                      or_shapes=True))

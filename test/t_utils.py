@@ -10,7 +10,7 @@ _BEG_SHAPE = "{"
 _END_SHAPE = "}"
 _BEG_OR = "("
 _END_OR = ")"
-_OR = "|"
+_OR = " OR "
 
 
 def get_namespaces_and_shapes_from_str(str_target, or_shapes=False):
@@ -118,9 +118,10 @@ def ordered_or_constraints_match(or_list_1, or_list_2):
 def unordered_or_constraints_match(or_list_1, or_list_2):
     if len(or_list_1) != len(or_list_2):
         return False
+
     for i in range(len(or_list_1)):
-        or_list_1[i] = set(or_list_1[i].split(_OR))
-        or_list_2[i] = set(or_list_2[i].split(_OR))
+        or_list_1[i] = set(or_list_1[i].split("  "))
+        or_list_2[i] = set(or_list_2[i].split("  "))
     return unordered_sets_match(or_list_1, or_list_2)
 
 
