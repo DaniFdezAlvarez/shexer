@@ -1,7 +1,7 @@
 from shexer.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
 from shexer.consts import RDF_TYPE
 from shexer.utils.triple_yielders import tune_token, tune_prop, tune_subj
-from shexer.utils.uri import add_corners, add_corners_if_it_is_an_uri
+from shexer.utils.uri import add_corners_if_needed, add_corners_if_it_is_an_uri
 
 
 class SgraphFromSelectorsTripleYielder(BaseTriplesYielder):
@@ -48,7 +48,7 @@ class SgraphFromSelectorsTripleYielder(BaseTriplesYielder):
                                                                 already_visited=None,
                                                                 strict_syntax_with_uri_corners=self._strict_syntax_with_corners):
             yield (tune_subj(a_token=add_corners_if_it_is_an_uri(s)),
-                   tune_prop(a_token=add_corners(p)),
+                   tune_prop(a_token=add_corners_if_needed(p)),
                    tune_token(a_token=add_corners_if_it_is_an_uri(o),
                               allow_untyped_numbers=self._allow_untyped_numbers)
                    )
@@ -61,7 +61,7 @@ class SgraphFromSelectorsTripleYielder(BaseTriplesYielder):
                                                                 already_visited=None,
                                                                 strict_syntax_with_uri_corners=self._strict_syntax_with_corners):
             yield (tune_subj(a_token=add_corners_if_it_is_an_uri(s)),
-                   tune_prop(a_token=add_corners(p)),
+                   tune_prop(a_token=add_corners_if_needed(p)),
                    tune_token(a_token=add_corners_if_it_is_an_uri(o),
                               allow_untyped_numbers=self._allow_untyped_numbers)
                    )

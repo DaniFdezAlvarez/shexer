@@ -39,14 +39,18 @@ class RdflibSgraph(SGraph):
                                                                          raise_error_if_no_corners=False)),
                                                    None,
                                                    None)):
-            yield str(s), str(p), self._add_lang_if_needed(o)
+            yield self._add_URI_corners_if_needed(s),\
+                  self._add_URI_corners_if_needed(p),\
+                  self._add_URI_corners_if_needed(self._add_lang_if_needed(o))
 
     def yield_s_p_triples_of_an_o(self, target_node):
         for s, p, o in self._rdflib_graph.triples((None,
                                                    None,
                                                    URIRef(remove_corners(a_uri=target_node,
                                                                          raise_error_if_no_corners=False)))):
-            yield str(s), str(p), str(o)
+            yield self._add_URI_corners_if_needed(s),\
+                  self._add_URI_corners_if_needed(p),\
+                  self._add_URI_corners_if_needed(o)
 
 
     def yield_class_triples_of_an_s(self, target_node, instantiation_property):
@@ -55,7 +59,9 @@ class RdflibSgraph(SGraph):
                                                    URIRef(remove_corners(a_uri=instantiation_property,
                                                                          raise_error_if_no_corners=False)),
                                                    None)):
-            yield str(s), str(p), self._add_lang_if_needed(o)
+            yield self._add_URI_corners_if_needed(s),\
+                  self._add_URI_corners_if_needed(p),\
+                  self._add_URI_corners_if_needed(self._add_lang_if_needed(o))
 
     def add_triple(self, a_triple):
         """
@@ -116,3 +122,8 @@ class RdflibSgraph(SGraph):
         if type(rdflib_obj) == Literal and rdflib_obj.language is not None:
             result = '"' + result + '"@' + rdflib_obj.language
         return result
+
+    def _add_URI_corners_if_needed(self, rdflib_obj):
+        if type(rdflib_obj) == URIRef:
+            return "<"+ str(rdflib_obj) + ">"
+        return str(rdflib_obj)
