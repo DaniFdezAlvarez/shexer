@@ -140,7 +140,7 @@ print("Done!")
 
 ```
 
-You can also find some examples of how to process Wikidata with sheXer in [this Jupyter notebook](https://github.com/DaniFdezAlvarez/shexer/tree/develop/shexer_wikidata_tutorial.ipynb).
+You can also find some examples of how to process Wikidata with sheXer in [this Jupyter notebook](https://github.com/DaniFdezAlvarez/shexer/blob/master/doc/shexer_wikidata_tutorial.ipynb).
 
 
 ## The Class Shaper
@@ -181,6 +181,7 @@ You must provide at least an input: a file, a string, an endpoint, a remote grap
 * depth_for_building_subgraph (default 1): use this param just in case you are working against a SPARQL endpoint. This integer indicates the max distance from any seed node to consider in order to track a subgraph from the endpoint. Please, remind that a high depth can cause a massive number of queries and have a high performance cost. 
 * track_classes_for_entities_at_last_depth_level (default True): use this param just in case you are working against a SPARQL endpoint. If it set to True, it makes a step further to the distance to the seed nodes indicated in the param depth. However, it will just look for triples related to typing, not the whole neighborhood of the nodes in the last level of depth.
 * limit_remote_instances (default -1). Use this param if you are working against an endpoint using the param target_classes. If it is set to a positive number, sheXer will just get limit_remote_instances instances for each class from the endpoint (by adding LIMIT at the end of the sparql query). This is useful when working with big sources with tons on instances, causing too many or too heavy SPARQL queries to retrieve  all the content. 
+* disable_endpoint_cache (default False). By default, if sheXer is told to consume triples from an endpoint, it will make some SPARQL queries and store the results in a local graph. If this parameter is set to True, sheXer won't save that content locally. This will help to reduce main memory usage, but will decrease the performance, as sheXer will need to make more SPARQL queries to the endpoint.
 * namespaces_dict (default None): dictionary in which the keys are namespaces and the values are their expected prefixes in the outputs. 
 * input_format (default "NT"): the format of the graph which is going to be computed. The default value is const.NT. IMPORTANT: currently, sheXer does not guess input format, so ensure you specify the format here in case you are not providing n-triples content. In case you provide a combined input (several files, several URLs...) they all should have the same format. If you work against an endpoit, then this param do not have any effect.
 * compression_mode (default None). Only when you are working with local files, if they are compressed, you do not need to uncompress to parse them. Currently supported formats are ZIP and GZ. Set compression_format to "zip" or "gz" to work with such files. Each gz file will be assumed to contain a single graph file. Each zip file will be assumed to be a directory containing one or more graph files. In case the zip contains several files, they will be all parsed and merged (they should have the same format, indicated with input_format). In every case, sheXer won't write any uncompressed content to your disk.
