@@ -114,14 +114,13 @@ class RdflibSgraph(SGraph):
 
     def _add_lang_if_needed(self, rdflib_obj):
         """
-        It return a string representation with lang if it is a langString
+        It returns a string representation with lang if it is a langString
         :param rdflib_obj:
         :return:
         """
-        result = str(rdflib_obj)
         if type(rdflib_obj) == Literal and rdflib_obj.language is not None:
-            result = '"' + result + '"@' + rdflib_obj.language
-        return result
+           return '"' + str(rdflib_obj) + '"@' + rdflib_obj.language
+        return rdflib_obj
 
     def _add_URI_corners_if_needed(self, rdflib_obj):
         if type(rdflib_obj) == URIRef:
