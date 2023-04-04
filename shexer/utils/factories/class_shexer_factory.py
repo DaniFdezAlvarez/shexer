@@ -19,7 +19,9 @@ def get_class_shexer(class_counts,
                      shapes_namespace=SHAPES_DEFAULT_NAMESPACE,
                      inverse_paths=False,
                      decimals=-1,
-                     instances_report_mode=RATIO_INSTANCES):
+                     instances_report_mode=RATIO_INSTANCES,
+                     detect_minimal_iri=False,
+                     class_min_iris=None):
 
     return ClassShexer(
         class_counts_dict=class_counts,
@@ -40,5 +42,7 @@ def get_class_shexer(class_counts,
         shapes_namespace=shapes_namespace,
         inverse_paths=inverse_paths,
         instances_report_mode=instances_report_mode,
-        decimals=decimals
+        decimals=decimals,
+        detect_minimal_iri=detect_minimal_iri,
+        class_min_iris_dict=class_min_iris
     )

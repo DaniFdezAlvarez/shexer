@@ -57,6 +57,7 @@ class Shaper(object):
                  decimals=-1,
                  instances_report_mode=RATIO_INSTANCES,
                  disable_endpoint_cache=False,
+                 detect_minimal_iri=False
                  ):
         """
 
@@ -66,14 +67,41 @@ class Shaper(object):
         :param instances_file_input:
         :param graph_file_input:
         :param graph_list_of_files_input:
+        :param raw_graph:
+        :param url_graph_input:
+        :param rdflib_graph:
+        :param list_of_url_input:
         :param namespaces_dict:
-        :param namespaces_dict_file:
         :param instantiation_property:
         :param namespaces_to_ignore:
         :param infer_numeric_types_for_untyped_literals:
         :param discard_useless_constraints_with_positive_closure:
         :param all_instances_are_compliant_mode:
         :param keep_less_specific:
+        :param all_classes_mode:
+        :param shape_map_file:
+        :param shape_map_raw:
+        :param depth_for_building_subgraph:
+        :param track_classes_for_entities_at_last_depth_level:
+        :param strict_syntax_with_corners:
+        :param url_endpoint:
+        :param shape_map_format:
+        :param shape_qualifiers_mode:
+        :param namespaces_for_qualifier_props:
+        :param remove_empty_shapes:
+        :param disable_comments:
+        :param disable_or_statements:
+        :param allow_opt_cardinality:
+        :param disable_exact_cardinality:
+        :param shapes_namespace:
+        :param limit_remote_instances:
+        :param wikidata_annotation:
+        :param inverse_paths:
+        :param compression_mode:
+        :param decimals:
+        :param instances_report_mode:
+        :param disable_endpoint_cache:
+        :param detect_minimal_iri:
         """
 
         check_just_one_not_none((graph_file_input, "graph_file_input"),
@@ -110,7 +138,6 @@ class Shaper(object):
         self._list_of_url_input = list_of_url_input
         self._rdflib_graph = rdflib_graph
         self._namespaces_dict = namespaces_dict if namespaces_dict is not None else {}
-        # self._namespaces_dict_file = namespaces_dict_file  # TODO Need to parse this
         self._instantiation_property = instantiation_property
         self._namespaces_to_ignore = namespaces_to_ignore
         self._infer_numeric_types_for_untyped_literals = infer_numeric_types_for_untyped_literals
@@ -133,6 +160,7 @@ class Shaper(object):
         self._limit_remote_instances = limit_remote_instances
         self._wikidata_annotation = wikidata_annotation
         self._inverse_paths = inverse_paths
+        self._detect_minimal_iri = detect_minimal_iri
 
         self._compression_mode = compression_mode
 
@@ -173,6 +201,7 @@ class Shaper(object):
         self._class_profiler = None
         self._profile = None
         self._class_counts = None
+        self._class_min_iris = None
         self._class_shexer = None
         self._shape_list = None
 
@@ -226,7 +255,7 @@ class Shaper(object):
     def _launch_class_profiler(self, verbose=False):
         if self._class_profiler is None:
             self._class_profiler = self._build_class_profiler()
-        self._profile, self._class_counts = self._class_profiler.profile_classes(verbose=verbose)
+        self._profile, self._class_counts, self._class_min_iris = self._class_profiler.profile_classes(verbose=verbose)
 
     def _launch_class_shexer(self, acceptance_threshold, verbose=False):
         if self._class_shexer is None:
@@ -258,7 +287,9 @@ class Shaper(object):
                                 shapes_namespace=self._shapes_namespace,
                                 inverse_paths=self._inverse_paths,
                                 decimals=self._decimals,
-                                instances_report_mode=self._instances_report_mode
+                                instances_report_mode=self._instances_report_mode,
+                                detect_minimal_iri=self._detect_minimal_iri,
+                                class_min_iris=self._class_min_iris
                                 )
 
     def _build_shapes_serializer(self, target_file, string_return, output_format):
@@ -300,7 +331,8 @@ class Shaper(object):
                                   inverse_paths=self._inverse_paths,
                                   all_classes_mode=self._all_classes_mode,
                                   compression_mode=self._compression_mode,
-                                  disable_endpoint_cache=self._disable_endpoint_cache)
+                                  disable_endpoint_cache=self._disable_endpoint_cache,
+                                  detect_minimal_iri=self._detect_minimal_iri)
 
 
     def _build_instance_tracker(self):
