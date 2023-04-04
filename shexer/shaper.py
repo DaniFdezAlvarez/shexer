@@ -55,7 +55,8 @@ class Shaper(object):
                  inverse_paths=False,
                  compression_mode=None,
                  decimals=-1,
-                 instances_report_mode=RATIO_INSTANCES
+                 instances_report_mode=RATIO_INSTANCES,
+                 disable_endpoint_cache=False,
                  ):
         """
 
@@ -122,6 +123,7 @@ class Shaper(object):
         self._shape_map_raw = shape_map_raw
         self._decimals = decimals
         self._instances_report_mode = instances_report_mode
+        self._disable_endpoint_cache=False
 
         self._remove_empty_shapes=remove_empty_shapes
         self._disable_comments = disable_comments
@@ -148,7 +150,7 @@ class Shaper(object):
 
         #The following two atts are used for optimizations
         self._built_remote_graph = get_remote_graph_if_needed(endpoint_url=url_endpoint,
-                                                              store_locally=True)
+                                                              store_locally=not disable_endpoint_cache)
         self._built_shape_map = get_shape_map_if_needed(sm_format=self._shape_map_format,
                                                         remote_sgraph=self._built_remote_graph,
                                                         namespaces_prefix_dict=self._namespaces_dict,
@@ -297,7 +299,8 @@ class Shaper(object):
                                   limit_remote_instances=self._limit_remote_instances,
                                   inverse_paths=self._inverse_paths,
                                   all_classes_mode=self._all_classes_mode,
-                                  compression_mode=self._compression_mode)
+                                  compression_mode=self._compression_mode,
+                                  disable_endpoint_cache=self._disable_endpoint_cache)
 
 
     def _build_instance_tracker(self):
@@ -329,7 +332,8 @@ class Shaper(object):
                                     shapes_namespace=self._shapes_namespace,
                                     limit_remote_instances=self._limit_remote_instances,
                                     inverse_paths=self._inverse_paths,
-                                    compression_mode=self._compression_mode)
+                                    compression_mode=self._compression_mode,
+                                    disable_endpoint_cache=self._disable_endpoint_cache)
 
 
     @staticmethod
