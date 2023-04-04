@@ -27,7 +27,8 @@ def get_class_profiler(target_classes_dict, source_file, list_of_source_files, i
                        limit_remote_instances=-1,
                        inverse_paths=False,
                        all_classes_mode=False,
-                       compression_mode=None):
+                       compression_mode=None,
+                       disable_endpoint_cache=None):
     yielder = get_triple_yielder(source_file=source_file,
                                  list_of_source_files=list_of_source_files,
                                  input_format=input_format,
@@ -52,7 +53,8 @@ def get_class_profiler(target_classes_dict, source_file, list_of_source_files, i
                                  limit_remote_instances=limit_remote_instances,
                                  inverse_paths=inverse_paths,
                                  all_classes_mode=all_classes_mode,
-                                 compression_mode=compression_mode)
+                                 compression_mode=compression_mode,
+                                 disable_endpoint_cache=disable_endpoint_cache)
 
     return ClassProfiler(triples_yielder=yielder,
                          instances_dict=target_classes_dict,

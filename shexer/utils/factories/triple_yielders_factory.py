@@ -61,7 +61,7 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
                        url_endpoint=None, instantiation_property=None, strict_syntax_with_corners=False,
                        target_classes=None, file_target_classes=None, built_remote_graph=None,
                        built_shape_map=None, limit_remote_instances=-1, inverse_paths=False, all_classes_mode=False,
-                       compression_mode=None):
+                       compression_mode=None, disable_endpoint_cache=False):
     zip_base_archive = _get_base_zip_archive_if_needed(source_file, compression_mode)
     result = None
     if url_endpoint is not None:
@@ -81,7 +81,8 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
                                            track_classes_for_entities_at_last_depth_level=track_classes_for_entities_at_last_depth_level,
                                            strict_syntax_with_corners=strict_syntax_with_corners,
                                            allow_untyped_numbers=allow_untyped_numbers,
-                                           inverse_paths=inverse_paths)
+                                           inverse_paths=inverse_paths,
+                                           disable_endpoint_cache=disable_endpoint_cache)
 
     elif url_input is not None or list_of_url_input is not None:  # Always use rdflib to parse remote graphs
          result = _yielder_for_url_input(url_input=url_input,
@@ -208,8 +209,9 @@ def _yielder_for_url_endpoint(built_remote_graph, url_endpoint, built_shape_map,
                               namespaces_dict, target_classes, file_target_classes, shape_map_file,
                               shape_map_raw, instantiation_property, limit_remote_instances, all_classes_mode,
                               depth_for_building_subgraph, track_classes_for_entities_at_last_depth_level,
-                              strict_syntax_with_corners, allow_untyped_numbers, inverse_paths):
-    sgrpah = built_remote_graph if built_remote_graph is not None else EndpointSGraph(endpoint_url=url_endpoint)
+                              strict_syntax_with_corners, allow_untyped_numbers, inverse_paths, disable_endpoint_cache):
+    sgrpah = built_remote_graph if built_remote_graph is not None else EndpointSGraph(endpoint_url=url_endpoint,
+                                                                                      store_locally=not disable_endpoint_cache)
 
     shape_map = built_shape_map
     if built_shape_map is None:

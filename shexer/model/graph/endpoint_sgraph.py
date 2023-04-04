@@ -41,7 +41,7 @@ class EndpointSGraph(SGraph):
 
 
     def yield_class_triples_of_an_s(self, target_node, instantiation_property):
-        if self._store_locally:
+        if not self._store_locally:
             for a_triple in self._yield_remote_class_triples_of_an_s(target_node, instantiation_property):
                 yield a_triple
         else:
