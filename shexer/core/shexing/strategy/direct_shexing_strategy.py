@@ -1,4 +1,4 @@
-from shexer.core.shexing.strategy.asbtract_shexing_strategy import AbstractShexingStrategy
+from shexer.core.shexing.strategy.abstract_shexing_strategy import AbstractShexingStrategy
 from shexer.utils.shapes import build_shapes_name_for_class_uri
 from shexer.model.statement import Statement
 from shexer.model.shape import Shape
