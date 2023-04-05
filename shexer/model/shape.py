@@ -42,6 +42,10 @@ class Shape(object):
     def iri_pattern(self):
         return self._iri_pattern
 
+    @iri_pattern.setter
+    def iri_pattern(self, value):
+        self._iri_pattern = value
+
     @property
     def statements(self):
         return self._statements

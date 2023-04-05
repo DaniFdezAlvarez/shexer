@@ -65,7 +65,7 @@ class ClassProfiler(object):
             self._detect_minimal_shape_iris()
             log_msg(verbose=verbose,
                     msg="Mimimal IRIs detected...")
-        return self._classes_shape_dict, self._class_counts, self._class_min_iris
+        return self._classes_shape_dict, self._class_counts, self._class_min_iris if self._detect_minimal_iri else None
 
     def get_target_classes_dict(self):
         return self._instances_dict

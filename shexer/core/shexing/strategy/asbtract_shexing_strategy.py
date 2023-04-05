@@ -2,8 +2,8 @@ from shexer.model.statement import POSITIVE_CLOSURE, KLEENE_CLOSURE, OPT_CARDINA
 from shexer.model.IRI import IRI_ELEM_TYPE
 from shexer.model.fixed_prop_choice_statement import FixedPropChoiceStatement
 from shexer.io.shex.formater.statement_serializers.st_serializers_factory import StSerializerFactory
-from shexer.io.shex.formater.statement_serializers.fixed_prop_choice_statement_serializer import \
-    FixedPropChoiceStatementSerializer  # TODO: REPFACTOR
+from shexer.core.shexing.strategy.minimal_iri_strategy.annotate_min_iri_strategy import AnnotateMinIriStrategy
+from shexer.core.shexing.strategy.minimal_iri_strategy.ignore_min_iri_strategy import IgnoreMinIriStrategy
 
 
 _DIRECT_ST_SERIALIZER = 0
@@ -25,6 +25,10 @@ class AbstractShexingStrategy(object):
         self._all_compliant_mode = self._class_shexer._all_compliant_mode
         self._disable_exact_cardinality = self._class_shexer._disable_exact_cardinality
 
+        self._strategy_min_iri = AnnotateMinIriStrategy(class_shexer._class_min_iris_dict) \
+            if class_shexer._detect_minimal_iri \
+            else IgnoreMinIriStrategy()
+
         self._statement_serializer_factory = StSerializerFactory(freq_mode=class_shexer._instances_report_mode,
                                                                  decimals=class_shexer._decimals,
                                                                  instantiation_property_str=self._instantiation_property_str,
@@ -32,6 +36,11 @@ class AbstractShexingStrategy(object):
 
 
     def yield_base_shapes(self, acceptance_threshold):
+        for a_shape in self._yield_base_shapes_direction_aware(acceptance_threshold=acceptance_threshold):
+            self._strategy_min_iri.annotate_shape_iri(a_shape)
+            yield a_shape
+
+    def _yield_base_shapes_direction_aware(self, acceptance_threshold):
         raise NotImplementedError()
 
     def set_valid_shape_constraints(self, shape):

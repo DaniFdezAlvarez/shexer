@@ -23,7 +23,7 @@ class DirectAndInverseShexingStrategy(AbstractShexingStrategy):
             original_statements=shape.inverse_statements,
             shape_names_to_remove=shape_names_to_remove)
 
-    def yield_base_shapes(self, acceptance_threshold):
+    def _yield_base_shapes_direction_aware(self, acceptance_threshold):
         for a_class_key in self._class_profile_dict:
             name = build_shapes_name_for_class_uri(class_uri=a_class_key,
                                                    shapes_namespace=self._shapes_namespace)

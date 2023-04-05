@@ -2,7 +2,7 @@ from shexer.utils.shapes import build_shapes_name_for_class_uri
 from shexer.core.profiling.consts import POS_CLASSES, _S, _P, _O, POS_FEATURES_DIRECT, _ONE_TO_MANY, POS_FEATURES_INVERSE
 from shexer.model.IRI import IRI_ELEM_TYPE, IRI
 
-class AbstractStrategy(object):
+class AbstractFeatureDirectionStrategy(object):
 
     def __init__(self, class_profiler):
         self._class_profiler = class_profiler
