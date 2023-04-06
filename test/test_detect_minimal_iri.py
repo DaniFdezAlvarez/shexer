@@ -4,7 +4,7 @@ from test.const import G1, BASE_FILES, default_namespaces, G1_ALL_CLASSES_NO_COM
 from test.t_utils import file_vs_str_tunned_comparison
 import os.path as pth
 
-from shexer.consts import TURTLE
+from shexer.consts import TURTLE, SHACL_TURTLE
 
 
 
@@ -21,7 +21,8 @@ class TestDetectMinimalIri(unittest.TestCase):
             input_format=TURTLE,
             disable_comments=True,
             detect_minimal_iri=True)
-        str_result = shaper.shex_graph(string_output=True)
+        str_result = shaper.shex_graph(string_output=True,
+                                       output_format=SHACL_TURTLE)
         print(str_result)
         self.assertTrue(file_vs_str_tunned_comparison(file_path=G1_ALL_CLASSES_NO_COMMENTS,
                                                       str_target=str_result))
