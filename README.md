@@ -202,6 +202,7 @@ All this parameters have a default value so you do not need to use any of them. 
 * shape_qualifiers_mode (default False). When it is set to True, it assumes a data model similar to Wikidata's one, where entity nodes are linked with qualifiers (BNodes) instead of the actual object meant by the triple. It is used to produce legible shapes for those special BNodes.
 * namespaces_for_qualifier_props (default None). Provide here a list of namespace in which the indirect properties used to link an entity with a qualifier node can be found. A reasonable configuration for Wikidata is namespaces_for_qualifier_props = \["http://www.wikidata.org/prop/"\] .
 * inverse_paths (default False). When it is set to True, sheXer will produce constraints with inverse_paths too. This is, constraints referring to triples in which the target node acst as object. Direct and inverse paths will be sorted in the final results w.r.t. their trutsworthiness score.
+* detect_minimal_iri (default False). When it is set to True, each shape will be associated with a regex pattern. That pattern expresses the initial part of the IRI that is common to every isntance used to extract a given shape. This pattern is only serialized when it is a "worthy" one (long enough, not just "http://", etc.).
 
 
 #### Params to tune some features of the output
