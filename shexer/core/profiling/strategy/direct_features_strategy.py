@@ -1,9 +1,9 @@
 
-from shexer.core.profiling.strategy.abstract_strategy import AbstractStrategy
+from shexer.core.profiling.strategy.abstract_feature_direction_strategy import AbstractFeatureDirectionStrategy
 from shexer.core.profiling.consts import _S
 
 
-class DirectFeaturesStrategy(AbstractStrategy):
+class DirectFeaturesStrategy(AbstractFeatureDirectionStrategy):
 
     def __init__(self, class_profiler):
         super().__init__(class_profiler)

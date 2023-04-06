@@ -6,7 +6,7 @@ from shexer.consts import RATIO_INSTANCES
 
 def get_shape_serializer(output_format, shapes_list, target_file=None, string_return=False, namespaces_dict=None,
                          instantiation_property=None, disable_comments=False, wikidata_annotation=False,
-                         instances_report_mode=RATIO_INSTANCES):
+                         instances_report_mode=RATIO_INSTANCES, detect_minimal_iri=False):
     if output_format == SHEXC:
         return ShexSerializer(target_file=target_file,
                               shapes_list=shapes_list,
@@ -15,7 +15,8 @@ def get_shape_serializer(output_format, shapes_list, target_file=None, string_re
                               instantiation_property_str=instantiation_property,
                               disable_comments=disable_comments,
                               wikidata_annotation=wikidata_annotation,
-                              instances_report_mode=instances_report_mode)
+                              instances_report_mode=instances_report_mode,
+                              detect_minimal_iri=detect_minimal_iri)
     elif output_format == SHACL_TURTLE:
         return ShaclSerializer(target_file=target_file,
                                shapes_list=shapes_list,
@@ -24,4 +25,4 @@ def get_shape_serializer(output_format, shapes_list, target_file=None, string_re
                                instantiation_property_str=instantiation_property,
                                wikidata_annotation=wikidata_annotation)
     else:
-        raise ValueError("Currently unsupported format: " + output_format)
+        raise ValueError("Currently unsupported format in 'output_format': " + output_format)

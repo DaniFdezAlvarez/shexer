@@ -39,6 +39,23 @@ def add_corners_if_needed(a_uri):
         return a_uri
     return add_corners(a_uri)
 
+def longest_common_prefix(uri1, uri2):
+    """
+    It returns an str containing the longest possible common initial part of uri1 and uri2
+
+    :param uri1:
+    :param uri2:
+
+    :return:
+    """
+
+    if len(uri1) == 0 or len(uri2) == 0:
+        return ""
+    shortest = len(uri1) if len(uri1) < len(uri2) else len(uri2)
+    for i in range(shortest):
+        if uri1[i] != uri2[i]:
+            return uri1[:i]
+    return uri1[:shortest]
 
 def add_corners_if_it_is_an_uri(a_candidate_uri):
     if a_candidate_uri.startswith("http://") or a_candidate_uri.startswith("https://"):  # TODO, check this!
