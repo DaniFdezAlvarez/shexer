@@ -1,4 +1,4 @@
-from shexer.core.profiling.strategy.abstract_strategy import AbstractStrategy
+from shexer.core.profiling.strategy.abstract_feature_direction_strategy import AbstractFeatureDirectionStrategy
 from shexer.core.profiling.consts import _S, _P, _O, POS_FEATURES_INVERSE, POS_CLASSES
 from shexer.model.IRI import IRI_ELEM_TYPE
 
@@ -6,7 +6,7 @@ _C_MAP_POS_DIRECT = 0
 _C_MAP_POS_INVERSE = 1
 
 
-class IncludeReverseFeaturesStrategy(AbstractStrategy):
+class IncludeReverseFeaturesStrategy(AbstractFeatureDirectionStrategy):
 
 
     def adapt_instances_dict(self):
