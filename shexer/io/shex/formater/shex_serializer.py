@@ -141,7 +141,7 @@ class ShexSerializer(object):
     def _minimal_iri(self, a_shape):
         if not self._detect_minimal_iri or a_shape.iri_pattern is None:
             return ""
-        return "  [{}~]  AND".format(a_shape.iri_pattern)
+        return "  [<{}>~]  AND".format(a_shape.iri_pattern)
 
     def _instance_count(self, a_shape):
         return "   # {} instance{}".format(a_shape.n_instances,
