@@ -144,8 +144,12 @@ def prefixize_uri_if_possible(target_uri, namespaces_prefix_dict):
     candidate_uri = remove_corners(target_uri)
     for a_namespace in namespaces_prefix_dict:  # Prefixed element (all literals are prefixed elements)
         if candidate_uri.startswith(a_namespace):
-            if best_match is None or len(best_match) < len(a_namespace):
+            if "/" not in candidate_uri[len(a_namespace):] and \
+                "#" not in candidate_uri[len(a_namespace):]:
                 best_match = a_namespace
+                break
+            # if best_match is None or len(best_match) < len(a_namespace):
+            #     best_match = a_namespace
 
     return target_uri if best_match is None else candidate_uri.replace(best_match, namespaces_prefix_dict[best_match] + ":")
 
