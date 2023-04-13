@@ -82,8 +82,10 @@ class BaseStatementSerializer(object):
         best_match = None
         for a_namespace in namespaces_dict:  # Prefixed element (all literals are prefixed elements)
             if uri.startswith(a_namespace):
-                if best_match is None or len(best_match) < len(a_namespace):
+                if "/" not in uri[len(a_namespace):] and \
+                        "#" not in uri[len(a_namespace):]:
                     best_match = a_namespace
+                    break
 
         return None if best_match is None else uri.replace(best_match, namespaces_dict[best_match] + ":")
 
