@@ -6,7 +6,7 @@ PREFIX ex: <http://example.org/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX : <http://weso.es/shapes/>
 
-:Person  [http://example.org/~]  AND
+:Person  [<http://example.org/>~]  AND
 {
    rdf:type  [foaf:Person]  ;
    foaf:name  xsd:string  ;
@@ -16,7 +16,7 @@ PREFIX : <http://weso.es/shapes/>
 }
 
 
-:Document  [http://example.org/~]  AND
+:Document  [<http://example.org/>~]  AND
 {
    rdf:type  [foaf:Document]  ;
    foaf:title  xsd:string  ;

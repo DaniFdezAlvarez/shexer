@@ -8,7 +8,7 @@ PREFIX : <http://weso.es/shapes/>
 PREFIX ex1: <http://example.org/ns1/>
 PREFIX ex2: <http://example.org/ns2#>
 
-:Person  [http://example.org/ns1/~]  AND
+:Person  [<http://example.org/ns1/>~]  AND
 {
    rdf:type  [foaf:Person]  ;
    foaf:name  xsd:string  ;
@@ -18,7 +18,7 @@ PREFIX ex2: <http://example.org/ns2#>
 }
 
 
-:Document  [http://example.org/ns2#~]  AND
+:Document  [<http://example.org/ns2#>~]  AND
 {
    rdf:type  [foaf:Document]  ;
    foaf:title  xsd:string  ;

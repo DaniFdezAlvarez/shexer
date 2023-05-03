@@ -18,7 +18,7 @@ class ClassShexer(object):
                  allow_opt_cardinality=True, disable_exact_cardinality=False,
                  shapes_namespace=SHAPES_DEFAULT_NAMESPACE, inverse_paths=False,
                  decimals=-1, instances_report_mode=RATIO_INSTANCES, detect_minimal_iri=False,
-                 class_min_iris_dict=None):
+                 class_min_iris_dict=None, allow_redundant_or=False):
         self._class_counts_dict = class_counts_dict
         self._class_profile_dict = class_profile_dict if class_profile_dict is not None else self._load_class_profile_dict_from_file(
             class_profile_json_file)
@@ -40,6 +40,7 @@ class ClassShexer(object):
         self._decimals = decimals
         self._instances_report_mode = instances_report_mode
         self._detect_minimal_iri = detect_minimal_iri
+        self._allow_redundant_or = allow_redundant_or
 
         self._original_target_nodes = determine_original_target_nodes_if_needed(remove_empty_shapes=remove_empty_shapes,
                                                                                 original_target_classes=original_target_classes,
