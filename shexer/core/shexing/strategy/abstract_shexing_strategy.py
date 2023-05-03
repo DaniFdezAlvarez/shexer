@@ -24,6 +24,7 @@ class AbstractShexingStrategy(object):
         self._disable_or_statements = self._class_shexer._disable_or_statements
         self._all_compliant_mode = self._class_shexer._all_compliant_mode
         self._disable_exact_cardinality = self._class_shexer._disable_exact_cardinality
+        self._allow_redundant_or = self._class_shexer._allow_redundant_or
 
         self._strategy_min_iri = AnnotateMinIriStrategy(class_shexer._class_min_iris_dict) \
             if class_shexer._detect_minimal_iri \
@@ -203,7 +204,8 @@ class AbstractShexingStrategy(object):
                             already_visited.add(candidate_statements[j])
                     if len(group_to_decide) == 1:
                         result.append(a_statement)
-                    else:
+                    else:  # At this point, group_to_decide may contain a list of constraints with the same property and
+                           # different node constraint
                         if self._disable_or_statements:
                             for a_sentence in self._manage_group_to_decide_without_or(group_to_decide):
                                 result.append(a_sentence)
@@ -296,7 +298,7 @@ class AbstractShexingStrategy(object):
         # target_probability = self._get_probability_of_IRI_statement_in_group(to_compose)
         iri_statement = self._get_IRI_statement_in_group(to_compose)
         was_removed_IRI = self._remove_IRI_statements_if_useles(to_compose)
-        if not was_removed_IRI:  # The IRI macro is still there
+        if not was_removed_IRI and not self._allow_redundant_or:  # The IRI macro is still there
             return [a_sentence for a_sentence in self._manage_group_to_decide_without_or(to_compose)] + result
         elif len(to_compose) > 1:  # There are some sentences to join in an OR and no IRI macro
             composed_statement = FixedPropChoiceStatement(
