@@ -57,7 +57,8 @@ class Shaper(object):
                  decimals=-1,
                  instances_report_mode=RATIO_INSTANCES,
                  disable_endpoint_cache=False,
-                 detect_minimal_iri=False
+                 detect_minimal_iri=False,
+                 allow_redundant_or=False
                  ):
         """
 
@@ -102,6 +103,7 @@ class Shaper(object):
         :param instances_report_mode:
         :param disable_endpoint_cache:
         :param detect_minimal_iri:
+        :param allow_redundant_or:
         """
 
         check_just_one_not_none((graph_file_input, "graph_file_input"),
@@ -121,6 +123,9 @@ class Shaper(object):
                                    all_classes_mode=all_classes_mode,
                                    shape_map_raw=shape_map_raw,
                                    shape_map_file=shape_map_file)
+
+        self._check_or_config(or_disabled=disable_or_statements,
+                              enable_redundant=allow_redundant_or)
 
         #TODO ---> Param check of shape_map and graph_via_shape_map
 
@@ -150,7 +155,8 @@ class Shaper(object):
         self._shape_map_raw = shape_map_raw
         self._decimals = decimals
         self._instances_report_mode = instances_report_mode
-        self._disable_endpoint_cache=False
+        self._disable_endpoint_cache=disable_endpoint_cache
+        self._allow_redundant_or = allow_redundant_or
 
         self._remove_empty_shapes=remove_empty_shapes
         self._disable_comments = disable_comments
@@ -289,7 +295,8 @@ class Shaper(object):
                                 decimals=self._decimals,
                                 instances_report_mode=self._instances_report_mode,
                                 detect_minimal_iri=self._detect_minimal_iri,
-                                class_min_iris=self._class_min_iris
+                                class_min_iris=self._class_min_iris,
+                                allow_redundant_or=self._allow_redundant_or
                                 )
 
     def _build_shapes_serializer(self, target_file, string_return, output_format):
@@ -410,6 +417,13 @@ class Shaper(object):
     def _check_output_format(output_format):
         if output_format not in [SHEXC, SHACL_TURTLE]:
             raise ValueError("Currently unsupported output format: " + output_format)
+
+    @staticmethod
+    def _check_or_config(or_disabled, enable_redundant):
+        if or_disabled and enable_redundant:
+            raise ValueError("You are indicating that you'd like to have disjunction constraints including the macro "
+                             "IRI, but also that you do not want to have or constraints. Please, check your configuration"
+                             "of the disable_or_statements and allow_redundant_or paremeters")
 
     @staticmethod
     def _check_aceptance_threshold(aceptance_threshold):
