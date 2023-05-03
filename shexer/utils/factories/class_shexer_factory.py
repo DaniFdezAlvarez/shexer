@@ -21,7 +21,8 @@ def get_class_shexer(class_counts,
                      decimals=-1,
                      instances_report_mode=RATIO_INSTANCES,
                      detect_minimal_iri=False,
-                     class_min_iris=None):
+                     class_min_iris=None,
+                     allow_redundant_or=False):
 
     return ClassShexer(
         class_counts_dict=class_counts,
@@ -44,5 +45,6 @@ def get_class_shexer(class_counts,
         instances_report_mode=instances_report_mode,
         decimals=decimals,
         detect_minimal_iri=detect_minimal_iri,
-        class_min_iris_dict=class_min_iris
+        class_min_iris_dict=class_min_iris,
+        allow_redundant_or=allow_redundant_or
     )
