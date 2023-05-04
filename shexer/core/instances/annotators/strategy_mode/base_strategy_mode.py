@@ -1,3 +1,5 @@
+from shexer.core.instances.pconsts import _S, _O
+
 class BaseStrategyMode(object):
 
     def __init__(self, annotator_ref):
@@ -11,6 +13,9 @@ class BaseStrategyMode(object):
 
     def annotate_triple(self, a_triple):
         raise NotImplementedError()
+
+    def annotate_class(self, a_triple):
+        self._instances_dict[a_triple[_S].iri].append(a_triple[_O].iri)
 
     def annotation_post_parsing(self):
         pass  # By default, do nothing.
