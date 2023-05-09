@@ -5,7 +5,7 @@ from shexer.core.instances.annotators.annotator_func import get_proper_annotator
 from shexer.core.instances.abstract_instance_tracker import AbstractInstanceTracker
 from shexer.consts import SHAPES_DEFAULT_NAMESPACE
 from shexer.utils.log import log_msg
-
+from shexer.core.instances.annotators.strategy_mode.instances_cap_exception import InstancesCapException
 
 
 _RDF_TYPE = Property(content="http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
@@ -17,7 +17,7 @@ class InstanceTracker(AbstractInstanceTracker):
     def __init__(self, target_classes, triples_yielder, instantiation_property=_RDF_TYPE,
                  all_classes_mode=False, subclass_property=_RDFS_SUBCLASS_OF, track_hierarchies=True,
                  shape_qualifiers_mode=False, namespaces_for_qualifier_props=None,
-                 shapes_namespace=SHAPES_DEFAULT_NAMESPACE):
+                 shapes_namespace=SHAPES_DEFAULT_NAMESPACE, instances_cap=-1):
         self._target_classes = target_classes
         self._all_classes_mode = all_classes_mode
         self._instances_dict = self._build_instances_dict()
@@ -30,6 +30,7 @@ class InstanceTracker(AbstractInstanceTracker):
         self._shape_qualifiers_mode = shape_qualifiers_mode
         self._namespaces_for_qualifiers_props = [] if namespaces_for_qualifier_props is None else namespaces_for_qualifier_props
         self._shapes_namespace = shapes_namespace
+        self._instances_cap = instances_cap
 
         self._htree = get_basic_h_tree() if track_hierarchies else None
         self._classes_considered_in_htree = set() if track_hierarchies else None
@@ -56,8 +57,11 @@ class InstanceTracker(AbstractInstanceTracker):
         log_msg(verbose=verbose,
                 msg="Starting instance tracker...")
         self._reset_count()
-        for a_revelant_triple in self._yield_relevant_triples():
-            self._annotator.annotate_triple(a_revelant_triple)
+        try:
+            for a_revelant_triple in self._yield_relevant_triples():
+                self._annotator.annotate_triple(a_revelant_triple)
+        except InstancesCapException:
+            pass  # It's OK, we just don't need to explore more
         self._annotator.annotation_post_parsing()
         log_msg(verbose=verbose,
                 msg="Instance tracker finished. {} instances located".format(len(self._instances_dict)))
