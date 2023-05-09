@@ -3,9 +3,7 @@ from shexer.shaper import Shaper
 from test.const import G1, BASE_FILES, default_namespaces, G1_ALL_CLASSES_NO_COMMENTS
 from test.t_utils import file_vs_str_tunned_comparison
 import os.path as pth
-from shexer.consts import TURTLE_ITER, MIXED_INSTANCES
-
-
+from shexer.consts import TURTLE_ITER
 
 
 _BASE_DIR = BASE_FILES + "instances_cap" + pth.sep
@@ -52,7 +50,6 @@ class TestInstancesCap(unittest.TestCase):
             disable_comments=True,
             instances_cap=3)
         str_result = shaper.shex_graph(string_output=True)
-        # print(str_result)
         self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "all_classes_cap_3.shex",
                                                       str_target=str_result))
 
@@ -78,7 +75,6 @@ class TestInstancesCap(unittest.TestCase):
             disable_comments=True,
             instances_cap=1)
         str_result = shaper.shex_graph(string_output=True)
-        # print(str_result)
         self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "target_person_cap_1.shex",
                                                       str_target=str_result))
 
@@ -90,12 +86,24 @@ class TestInstancesCap(unittest.TestCase):
             all_classes_mode=False,
             target_classes=["foaf:Person"],
             input_format=TURTLE_ITER,
-            disable_comments=False,
-            instances_report_mode=MIXED_INSTANCES,
+            disable_comments=True,
             instances_cap=5)
         str_result = shaper.shex_graph(string_output=True)
-        print(str_result)
-        self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "target_person_cap_1.shex",
+        self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "target_person_cap_5.shex",
                                                       str_target=str_result))
+
+    def test_cap_1_all_targets_g1(self):
+        shaper = Shaper(
+            graph_file_input=G1,
+            namespaces_dict=default_namespaces(),
+            all_classes_mode=False,
+            target_classes=["foaf:Person", "foaf:Document"],
+            input_format=TURTLE_ITER,
+            disable_comments=True,
+            instances_cap=1)
+        str_result = shaper.shex_graph(string_output=True)
+        self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "all_classes_cap_1.shex",
+                                                      str_target=str_result))
+
 
 

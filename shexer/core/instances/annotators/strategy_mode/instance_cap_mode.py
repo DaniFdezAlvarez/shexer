@@ -17,7 +17,7 @@ class InstanceCapMode(BaseStrategyMode):
 
 
     def is_relevant_triple(self, a_triple):
-        return self._check_class_counts(a_triple) and self._internal_strategy.is_relevant_triple
+        return self._check_class_counts(a_triple) and self._internal_strategy.is_relevant_triple(a_triple)
 
     def _check_class_counts(self, a_triple):
         """
