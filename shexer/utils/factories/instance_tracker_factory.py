@@ -38,7 +38,8 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                          limit_remote_instances=-1,
                          inverse_paths=False,
                          compression_mode=None,
-                         disable_endpoint_cache=False
+                         disable_endpoint_cache=False,
+                         instances_cap=-1
                          ):
     """
 
@@ -164,7 +165,8 @@ def get_instance_tracker(instances_file_input=None, graph_file_input=None,
                                                  track_hierarchies=False,
                                                  namespaces_for_qualifier_props=namespaces_for_qualifier_props,
                                                  shape_qualifiers_mode=shape_qualifiers_mode,
-                                                 shapes_namespace=shapes_namespace)
+                                                 shapes_namespace=shapes_namespace,
+                                                 instances_cap=instances_cap)
 
     return _decide_tracker_to_return(selectors_tracker, pure_instances_tracker)
 

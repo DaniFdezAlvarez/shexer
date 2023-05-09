@@ -58,7 +58,8 @@ class Shaper(object):
                  instances_report_mode=RATIO_INSTANCES,
                  disable_endpoint_cache=False,
                  detect_minimal_iri=False,
-                 allow_redundant_or=False
+                 allow_redundant_or=False,
+                 instances_cap=-1
                  ):
         """
 
@@ -157,13 +158,15 @@ class Shaper(object):
         self._instances_report_mode = instances_report_mode
         self._disable_endpoint_cache=disable_endpoint_cache
         self._allow_redundant_or = allow_redundant_or
+        self._instances_cap = instances_cap
 
         self._remove_empty_shapes=remove_empty_shapes
         self._disable_comments = disable_comments
         self._disable_or_statements = disable_or_statements
         self._allow_opt_cardinality = allow_opt_cardinality
         self._disable_exact_cardinality = disable_exact_cardinality
-        self._limit_remote_instances = limit_remote_instances
+        # TODO: REMOVE THE _limit_remote_instances PARAMETER IN FUTURE RELEASES
+        self._limit_remote_instances = limit_remote_instances if instances_cap==-1 else instances_cap
         self._wikidata_annotation = wikidata_annotation
         self._inverse_paths = inverse_paths
         self._detect_minimal_iri = detect_minimal_iri
@@ -373,7 +376,8 @@ class Shaper(object):
                                     limit_remote_instances=self._limit_remote_instances,
                                     inverse_paths=self._inverse_paths,
                                     compression_mode=self._compression_mode,
-                                    disable_endpoint_cache=self._disable_endpoint_cache)
+                                    disable_endpoint_cache=self._disable_endpoint_cache,
+                                    instances_cap=self._instances_cap)
 
 
     @staticmethod

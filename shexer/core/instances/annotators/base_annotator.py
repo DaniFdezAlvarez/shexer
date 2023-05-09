@@ -3,6 +3,7 @@ from shexer.core.instances.annotators.strategy_mode.target_classes_mode import T
 from shexer.core.instances.annotators.strategy_mode.all_classes_mode import AllClasesMode
 from shexer.core.instances.annotators.strategy_mode.shape_qualifiers_mode import ShapeQualifiersMode
 from shexer.core.instances.annotators.strategy_mode.compound_strategy_mode import CompoundStrategyMode
+from shexer.core.instances.annotators.strategy_mode.instance_cap_mode import InstanceCapMode
 
 
 class BaseAnnotator(object):
@@ -21,6 +22,7 @@ class BaseAnnotator(object):
         self._namespaces_for_qualifiers_props = self._instance_tracker._namespaces_for_qualifiers_props
         self._target_classes = self._instance_tracker._target_classes
         self._shapes_namespace = self._instance_tracker._shapes_namespace
+        self._instances_cap = self._instance_tracker._instances_cap
 
         self._strategy_mode = self._get_proper_strategy()
 
@@ -34,19 +36,22 @@ class BaseAnnotator(object):
         if a_triple[_S].iri not in self._instances_dict:
             self._instances_dict[a_triple[_S].iri] = []
 
-    def annotate_class(self, a_triple):
-        self._instances_dict[a_triple[_S].iri].append(a_triple[_O].iri)
+    # def annotate_class(self, a_triple):
+    #     self._strategy_mode.annotate_class(a_triple)
 
     def annotation_post_parsing(self):
         self._strategy_mode.annotation_post_parsing()
 
 
     def _get_proper_strategy(self):
+        result = None
         strategies_list = []
+        target_classes_flag = False
         if self._all_classes_mode:
             strategies_list.append(AllClasesMode(annotator_ref=self))
         if self._target_classes is not None and len(self._target_classes) > 0:
             strategies_list.append(TargetClassesMode(annotator_ref=self))
+            target_classes_flag = True
         if self._shape_qualifiers_mode:
             strategies_list.append(
                 ShapeQualifiersMode(annotator_ref=self,
@@ -56,7 +61,14 @@ class BaseAnnotator(object):
         if len(strategies_list) == 0:
             raise ValueError("Wrong combination of params when building the instance tracker. There are not target classes")
         if len(strategies_list) == 1:
-            return strategies_list[0]
+            result = strategies_list[0]
         else:
-            return CompoundStrategyMode(annotator_ref=self,
+            result = CompoundStrategyMode(annotator_ref=self,
                                         list_of_strategies=strategies_list)
+        return result if self._instances_cap <= 0 else \
+            InstanceCapMode(annotator_ref=self,
+                            internal_strategy=result,
+                            instance_limit=self._instances_cap,
+                            n_target_classes=-1 if not target_classes_flag or len(strategies_list) > 1
+                                                   else len(self._target_classes)
+                            )
