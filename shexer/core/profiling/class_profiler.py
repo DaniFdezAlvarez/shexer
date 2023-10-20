@@ -131,7 +131,7 @@ class ClassProfiler(object):
             return
         shapes_to_remove = self._detect_shapes_to_remove()
 
-        while(len(shapes_to_remove) != 0):
+        while len(shapes_to_remove) != 0:
             self._iteration_remove_empty_shapes(shapes_to_remove)
             shapes_to_remove = self._detect_shapes_to_remove()
 
