@@ -207,9 +207,9 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
         if next_quotes +1 > len(target_str) or target_str[next_quotes + 1] == " ":
             return next_quotes
         elif target_str[next_quotes + 1] == "^":
-            return self._find_next_blank(target_str, next_quotes) -1
+            return self._find_next_blank(target_str, next_quotes) - 1
         else:
-            raise ValueError("Malformed literal? It seems like there si a problem of unmatching quotes: " + target_str)
+            raise ValueError("Malformed literal? It seems like there is a problem of unmatching quotes: " + target_str)
 
     def _process_line(self, str_line):
         str_line = self._clean_line(str_line)
