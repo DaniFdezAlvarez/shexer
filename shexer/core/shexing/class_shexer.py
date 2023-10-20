@@ -93,7 +93,7 @@ class ClassShexer(object):
         result = set()
         for a_shape in self._shapes_list:
             if a_shape.n_statements == 0:
-                result.add(a_shape.class_uri)
+                result.add(a_shape.name)
         return result
 
     def _iteration_remove_empty_shapes(self, shape_names_to_remove):
