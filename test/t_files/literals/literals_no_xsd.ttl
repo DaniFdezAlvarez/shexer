@@ -1,0 +1,11 @@
+@prefix geo:   <http://www.opengis.net/ont/geosparql#> .
+@prefix cidoc: <http://erlangen-crm.org/current/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geom:  <http://data.ordnancesurvey.co.uk/ontology/geometry/> .
+
+
+<http://kb.virtualtreasury.ie/geo/modern-townland/geometry/C_10_B_06_P_02_260322_DALKEY>
+        a              cidoc:E54_Dimension  ;
+        geom:hectares  "99.56700000000001"^^xsd:double ;
+        geo:asWKT      "POINT (-6.10947 53.27544)"^^geo:wktLiteral .
