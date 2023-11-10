@@ -209,9 +209,10 @@ class ShaclSerializer(object):
     def _generate_r_uri_for_str_uri(self, property_str):
         if property_str.startswith("<") and property_str.endswith(">"):
             return URIRef(property_str[1:-1])
-        elif property_str.startswith("http://"):
+        elif property_str.startswith("http://") or property_str.startswith("https://"):
             return URIRef(property_str)
-        raise ValueError("Check here:", property_str)
+        raise ValueError("Having troubles recognizing this URI", property_str, ". "
+                        "Is it well-formed? If you think so, add a GitHub issue. ")
 
     def _is_a_shape(self, target_type):
         return target_type.startswith(STARTING_CHAR_FOR_SHAPE_NAME)
@@ -253,17 +254,20 @@ class ShaclSerializer(object):
         #  sh:dataType for literal types
         #  sh:nodeKind for IRI or similar macros.
         #  sh:node for a shape
-        if self._is_literal(statement.st_type):
-            self._add_dataType_literal(r_constraint_node=r_constraint_node,
-                                       target_type=statement.st_type)
-        elif self._is_macro(statement.st_type):
+        # if self._is_literal(statement.st_type):
+        #     self._add_dataType_literal(r_constraint_node=r_constraint_node,
+        #                                target_type=statement.st_type)
+        if self._is_macro(statement.st_type):
             self._add_nodeKind_macro(r_constraint_node=r_constraint_node,
                                      target_type=statement.st_type)
         elif self._is_a_shape(statement.st_type):
             self._add_node_shape(r_constraint_node=r_constraint_node,
                                  target_type=statement.st_type)
-        else:
-            raise ValueError("Check here: ")
+        else:  # It should be a literal
+            self._add_dataType_literal(r_constraint_node=r_constraint_node,
+                                       target_type=statement.st_type)
+        # else:
+        #     raise ValueError("Check here: ")
 
 
     def _min_occurs_from_cardinality(self, cardinality):
@@ -291,7 +295,8 @@ class ShaclSerializer(object):
         elif l_type == _STRING:
             return XSD.string
         else:
-            raise ValueError("Check here: " + l_type)
+            raise ValueError("Having troubles recognizing this literal type", l_type, ". "
+                        "Is it well-formed? If you think so, add a GitHub issue. ")
 
     def _add_min_occurs(self, r_constraint_node, min_occurs):
         self._add_triple(r_constraint_node,
@@ -322,7 +327,8 @@ class ShaclSerializer(object):
     def _generate_shape_uri(self, shape_name):
         if shape_name.startswith(_EXPECTED_SHAPE_BEGINING) and shape_name.endswith(_EXPECTED_SHAPE_ENDING):
             return URIRef(shape_name[2:-1])  # Excluding  "@<"  and ">
-        raise ValueError("Check here:", shape_name)
+        raise ValueError("Unknown error, having trouble with a shape label:", shape_name,
+                         "Add a GitHub issue to github with your input to have this review and fixed.")
 
     def _add_shape_uri(self, r_shape_uri):
         self._add_triple(r_shape_uri, RDF.type, _R_SHACL_SHAPE_URI)

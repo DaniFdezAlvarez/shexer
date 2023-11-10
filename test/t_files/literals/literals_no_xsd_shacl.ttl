@@ -1,0 +1,25 @@
+@prefix : <http://weso.es/shapes/> .
+@prefix cidoc: <http://erlangen-crm.org/current/> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix geom: <http://data.ordnancesurvey.co.uk/ontology/geometry/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:E54_Dimension a sh:NodeShape ;
+    sh:property [ a sh:PropertyShape ;
+            sh:dataType xsd:double ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path geom:hectares ],
+        [ a sh:PropertyShape ;
+            sh:in ( cidoc:E54_Dimension ) ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path rdf:type ],
+        [ a sh:PropertyShape ;
+            sh:dataType geo:wktLiteral ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path geo:asWKT ] ;
+    sh:targetClass cidoc:E54_Dimension .
