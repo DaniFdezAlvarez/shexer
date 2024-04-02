@@ -138,6 +138,7 @@ def get_triple_yielder(source_file=None, list_of_source_files=None, input_format
 
 def _yielder_for_compressed_inputs(base_yielders):
     if len(base_yielders) == 1:
+        result = base_yielders[0]
         return base_yielders[0]
     return MultiZipTriplesYielder(multiyielders=base_yielders)
 
@@ -158,7 +159,7 @@ def _yielder_for_rdflib_parser(source_file, allow_untyped_numbers, raw_graph,
                                                     input_format=input_format,
                                                     namespaces_dict=namespaces_dict,
                                                     compression_mode=compression_mode,
-                                                    zip_archive_file=zip_base_archives) for a_zip_file in
+                                                    zip_archive_file=a_zip_file) for a_zip_file in
                            zip_base_archives])
 
     elif source_file is not None or raw_graph is not None:
