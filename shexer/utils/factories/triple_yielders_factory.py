@@ -189,7 +189,7 @@ def _yielder_for_turtle_iter(source_file, raw_graph, allow_untyped_numbers, list
             [MultiBigTtlTriplesYielder(list_of_files=list_of_zip_internal_files(a_zip_file),
                                        compression_mode=compression_mode,
                                        allow_untyped_numbers=allow_untyped_numbers,
-                                       zip_base_archives=a_zip_file) for a_zip_file in zip_base_archives])
+                                       zip_base_archive=a_zip_file) for a_zip_file in zip_base_archives])
     elif source_file is not None or raw_graph is not None:
         return BigTtlTriplesYielder(source_file=source_file,
                                     allow_untyped_numbers=allow_untyped_numbers,
@@ -212,7 +212,7 @@ def _yielder_for_tsv_spo(source_file, raw_graph, allow_untyped_numbers, list_of_
             [MultiTsvNtTriplesYielder(list_of_files=list_of_zip_internal_files(a_zip_file),
                                       compression_mode=compression_mode,
                                       allow_untyped_numbers=allow_untyped_numbers,
-                                      zip_base_archives=a_zip_file) for a_zip_file in zip_base_archives])
+                                      zip_base_archive=a_zip_file) for a_zip_file in zip_base_archives])
     elif source_file is not None or raw_graph is not None:
         return TsvNtTriplesYielder(source_file=source_file,
                                    allow_untyped_numbers=allow_untyped_numbers,
@@ -296,7 +296,7 @@ def _yielder_for_nt(source_file, raw_graph, allow_untyped_numbers,
             [MultiNtTriplesYielder(list_of_files=list_of_zip_internal_files(a_zip_file),
                                    allow_untyped_numbers=allow_untyped_numbers,
                                    compression_mode=compression_mode,
-                                   zip_base_archives=a_zip_file) for a_zip_file in zip_base_archives])
+                                   zip_base_archive=a_zip_file) for a_zip_file in zip_base_archives])
 
     else:
         return MultiNtTriplesYielder(list_of_files=list_of_source_files,
