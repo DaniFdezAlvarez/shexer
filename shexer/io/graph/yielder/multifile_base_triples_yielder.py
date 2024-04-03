@@ -36,12 +36,12 @@ class MultifileBaseTripleYielder(BaseTriplesYielder):
 
     @property
     def yielded_triples(self):
-        triples_current_yielder = 0 if self._last_yielder is None else self._last_yielder.triples_yielded()
+        triples_current_yielder = 0 if self._last_yielder is None else self._last_yielder.yielded_triples
         return self._triples_yielded_from_used_yielders + triples_current_yielder
 
     @property
     def error_triples(self):
-        errors_current_yielder = 0 if self._last_yielder is None else self._last_yielder.error_triples()
+        errors_current_yielder = 0 if self._last_yielder is None else self._last_yielder.error_triples
         return self._error_triples_from_used_yielders  + errors_current_yielder
 
     def _reset_count(self):

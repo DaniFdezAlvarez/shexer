@@ -1,0 +1,9 @@
+<http://example.org/HumanLike> <http://xmlns.com/foaf/0.1/name> "Person" .
+<http://example.org/HumanLike> <http://xmlns.com/foaf/0.1/familyName> "Maybe" .
+<http://example.org/HumanLike> <http://xmlns.com/foaf/0.1/age> "99"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://example.org/HumanLike> <http://xmlns.com/foaf/0.1/knows> <http://example.org/David> .
+<http://example.org/x1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Document> .
+<http://example.org/x1> <http://xmlns.com/foaf/0.1/depiction> "A thing that s nice" .
+<http://example.org/x1> <http://xmlns.com/foaf/0.1/title> "A nice thing" .
+<http://example.org/x2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Document> .
+<http://example.org/x2> <http://xmlns.com/foaf/0.1/title> "Another thing" .
