@@ -1,7 +1,8 @@
 from shexer.consts import SHEXC, SHACL_TURTLE
 from shexer.io.shex.formater.shex_serializer import ShexSerializer
 from shexer.io.shacl.formater.shacl_serializer import ShaclSerializer
-from shexer.consts import RATIO_INSTANCES
+from shexer.io.uml.uml_serializer import UMLSerializer
+from shexer.consts import RATIO_INSTANCES, UML_PLANT_SERVER
 
 
 def get_shape_serializer(output_format, shapes_list, target_file=None, string_return=False, namespaces_dict=None,
@@ -26,3 +27,10 @@ def get_shape_serializer(output_format, shapes_list, target_file=None, string_re
                                wikidata_annotation=wikidata_annotation)
     else:
         raise ValueError("Currently unsupported format in 'output_format': " + output_format)
+
+
+def get_uml_serializer(shapes_list, image_path, url_server=UML_PLANT_SERVER, namespaces_dict=None,):
+    return UMLSerializer(shapes_list=shapes_list,
+                         url_server=url_server,
+                         image_path=image_path,
+                         namespaces_dict=namespaces_dict)

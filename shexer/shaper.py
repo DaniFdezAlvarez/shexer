@@ -8,7 +8,7 @@ from shexer.utils.factories.class_shexer_factory import get_class_shexer
 from shexer.utils.factories.remote_graph_factory import get_remote_graph_if_needed
 from shexer.utils.factories.shape_map_factory import get_shape_map_if_needed
 from shexer.io.profile.formater.abstract_profile_serializer import AbstractProfileSerializer
-from shexer.utils.factories.shape_serializer_factory import get_shape_serializer
+from shexer.utils.factories.shape_serializer_factory import get_shape_serializer, get_uml_serializer
 from shexer.utils.namespaces import find_adequate_prefix_for_shapes_namespaces
 from shexer.utils.log import log_msg
 from shexer.consts import RATIO_INSTANCES
@@ -230,7 +230,8 @@ class Shaper(object):
                    output_file=None,
                    output_format=SHEXC,
                    acceptance_threshold=0,
-                   verbose=False):
+                   verbose=False,
+                   to_uml_path=None):
         """
         :param string_output:
         :param output_file:
@@ -254,8 +255,20 @@ class Shaper(object):
         serializer = self._build_shapes_serializer(target_file=output_file,
                                                    string_return=string_output,
                                                    output_format=output_format)
+
+        if to_uml_path is not None:
+            self._generate_uml_diagram(to_uml_path)
+
         return serializer.serialize_shapes()  # If string return is active, returns string.
         # Otherwise, it writes to file and returns None
+
+
+    def _generate_uml_diagram(self, to_uml_path):
+        serializer = get_uml_serializer(shapes_list=self._shape_list,
+                                        image_path=to_uml_path,
+                                        namespaces_dict=self._namespaces_dict)
+        serializer.serialize_shapes()
+
 
     def _add_shapes_namespaces_to_namespaces_dict(self):
         self._namespaces_dict[self._shapes_namespace] = \

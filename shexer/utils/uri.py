@@ -139,9 +139,9 @@ def unprefixize_uri_mandatory(target_uri, prefix_namespaces_dict, include_corner
     raise ValueError("Unrecognized prefix in the following element" + target_uri)
 
 
-def prefixize_uri_if_possible(target_uri, namespaces_prefix_dict):
+def prefixize_uri_if_possible(target_uri, namespaces_prefix_dict, corners=True):
     best_match = None
-    candidate_uri = remove_corners(target_uri)
+    candidate_uri = remove_corners(target_uri) if corners else target_uri
     for a_namespace in namespaces_prefix_dict:  # Prefixed element (all literals are prefixed elements)
         if candidate_uri.startswith(a_namespace):
             if "/" not in candidate_uri[len(a_namespace):] and \
