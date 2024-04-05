@@ -3,11 +3,13 @@ from shexer.utils.shapes import prefixize_shape_name_if_possible
 from shexer.utils.uri import prefixize_uri_if_possible
 from shexer.model.fixed_prop_choice_statement import FixedPropChoiceStatement
 from shexer.consts import RDF_TYPE
+import warnings
 
 
 class UMLSerializer(object):
 
     def __init__(self, shapes_list, url_server, image_path, namespaces_dict=None, instantiation_property=RDF_TYPE):
+        self._disable_connection_warnings()
         self._shapes_list = shapes_list
         self._url_server = url_server
         self._image_path = image_path
@@ -30,13 +32,17 @@ class UMLSerializer(object):
         result = self._send_diagram_to_server()
         self._store_diagram(result)
 
+    def _disable_connection_warnings(self):
+        warnings.filterwarnings("ignore", category=ResourceWarning)
+
     def _send_diagram_to_server(self):
         return self._server_connection.processes(self._diagram)
+
 
     def _store_diagram(self, img_diagram):
         with open(self._image_path, "wb") as out_stream:
             out_stream.write(img_diagram)
-        print(self._diagram)
+
 
     def _fill_diagram_with_shapes(self):
         self._declare_shapes_and_atts()
@@ -103,7 +109,7 @@ class UMLSerializer(object):
     def _declare_and_open_shape(self, a_shape):
         target_name = prefixize_shape_name_if_possible(a_shape_name=a_shape.name,
                                                        namespaces_prefix_dict=self._namespaces_dict)
-        if target_name.startswith(":"):
+        if target_name.startswith(":") or target_name.startswith("<") :
             self._declare_shape_with_alias(target_name)
         else:
             self._declare_shape_without_alias(target_name)
@@ -113,8 +119,12 @@ class UMLSerializer(object):
         self._write_line(f"object {target_name} {{")
 
     def _declare_shape_with_alias(self, target_name):
-        self._shape_alias[target_name] = target_name[1:]
-        self._write_line(f'object "{target_name}" as {target_name[1:]} {{')
+        if target_name.startswith(":"):
+            alias = target_name[1:]
+        else:
+            alias = target_name[1:-1]
+        self._shape_alias[target_name] = alias
+        self._write_line(f'object "{target_name}" as {alias} {{')
 
     def _close_shape(self):
         self._write_line("}", spacing=True)
@@ -126,7 +136,7 @@ class UMLSerializer(object):
         self._write_line("@startuml", spacing=True)
 
     def _close_diagram(self):
-        self._write_line("@endum")
+        self._write_line("@enduml")
 
     def _write_line(self, text, spacing=False):
         self._diagram += text + "\n" * (1 if not spacing else 2)

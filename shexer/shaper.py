@@ -254,7 +254,10 @@ class Shaper(object):
                 msg="Building_output...")
 
         if to_uml_path is not None:
-            self._generate_uml_diagram(to_uml_path)
+            try:
+                self._generate_uml_diagram(to_uml_path)
+            except ResourceWarning as e:  # I think this is related to UMLPlant and I can't close the connection from here
+                pass
 
         if string_output or output_file is not None:
             serializer = self._build_shapes_serializer(target_file=output_file,
@@ -269,6 +272,8 @@ class Shaper(object):
                                         image_path=to_uml_path,
                                         namespaces_dict=self._namespaces_dict)
         serializer.serialize_shapes()
+
+
 
 
     def _add_shapes_namespaces_to_namespaces_dict(self):

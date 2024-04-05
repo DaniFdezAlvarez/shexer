@@ -2,8 +2,9 @@ import unittest
 from shexer.shaper import Shaper
 from test.const import BASE_FILES
 from test.t_utils import file_vs_str_tunned_comparison, text_contains_lines
+import os.path as pth
 
-_BASE_DIR = BASE_FILES + "wikidata_annotation\\"
+_BASE_DIR = BASE_FILES + "wikidata_annotation" + pth.sep
 
 class TestWikidataAnnotation(unittest.TestCase):
 

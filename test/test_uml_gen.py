@@ -1,7 +1,7 @@
 import unittest
 from shexer.shaper import Shaper
 from test.const import G1, BASE_FILES, default_namespaces, G1_ALL_CLASSES_NO_COMMENTS
-from test.t_utils import check_file_exist, delete_file,file_vs_str_tunned_comparison
+from test.t_utils import check_file_exist, delete_file, file_vs_str_tunned_comparison, number_of_shapes
 import os.path as pth
 
 from shexer.consts import TURTLE
@@ -45,16 +45,22 @@ class TestUmlGen(unittest.TestCase):
             finally:
                 delete_file(_A_PATH_FOR_IMG)
 
-    def test_or_enabled_choice_useful_IRI(self):
-        shaper = Shaper(graph_file_input=BASE_FILES + "disable_or" + pth.sep + "g_or_example_expandable_IRI.ttl",
+    def test_wikidata(self):
+        shape_map_raw = "SPARQL'select ?p where " \
+                        "{ ?p <http://www.wikidata.org/prop/direct/P31> <http://www.wikidata.org/entity/Q14660> } " \
+                        "LIMIT 1'@<Flag>"
+        shaper = Shaper(shape_map_raw=shape_map_raw,
+                        url_endpoint="https://query.wikidata.org/sparql",
                         namespaces_dict=default_namespaces(),
-                        all_classes_mode=True,
-                        input_format=TURTLE,
+                        instantiation_property="http://www.wikidata.org/prop/direct/P31",
                         disable_comments=True,
-                        disable_or_statements=False)
-        str_result = shaper.shex_graph(string_output=True, to_uml_path="here.png")
-        # In case the choice includes the IRI macro, then no OR should appear
-        print(str_result)
-        self.assertTrue(file_vs_str_tunned_comparison(file_path=BASE_FILES + "disable_or" + pth.sep + "or_enabled.shex",
-                                                      str_target=str_result,
-                                                      or_shapes=True))
+                        depth_for_building_subgraph=1,
+                        track_classes_for_entities_at_last_depth_level=False,
+                        all_classes_mode=False)
+        str_result = shaper.shex_graph(string_output=True, to_uml_path=_A_PATH_FOR_IMG)
+        self.assertTrue(number_of_shapes(str_result) == 1)
+        try:
+            check_file_exist(_A_PATH_FOR_IMG)
+        finally:
+            delete_file(_A_PATH_FOR_IMG)
+
