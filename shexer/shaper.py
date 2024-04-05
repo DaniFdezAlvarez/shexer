@@ -238,6 +238,7 @@ class Shaper(object):
         :param output_format:
         :param acceptance_threshold:
         :param verbose:
+        :param to_uml_path:
         :return:
         """
         self._check_correct_output_params(string_output, output_file, to_uml_path)
@@ -254,12 +255,18 @@ class Shaper(object):
                 msg="Building_output...")
 
         if to_uml_path is not None:
+            log_msg(verbose=verbose,
+                    msg="Trying to generat UML diagram...")
             try:
                 self._generate_uml_diagram(to_uml_path)
+                log_msg(verbose=verbose,
+                        msg="UML diagram generated...")
             except ResourceWarning as e:  # I think this is related to UMLPlant and I can't close the connection from here
                 pass
 
         if string_output or output_file is not None:
+            log_msg(verbose=verbose,
+                    msg="Generating text serialization...")
             serializer = self._build_shapes_serializer(target_file=output_file,
                                                        string_return=string_output,
                                                        output_format=output_format)
