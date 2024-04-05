@@ -1,6 +1,8 @@
 from rdflib import Graph
 from rdflib.compare import to_isomorphic, graph_diff
 import re
+from os.path import isfile, exists as file_exists
+from os import remove
 
 _BLANKS = re.compile("[ \t]+")
 _LINE_JUMPS = re.compile("\n+")
@@ -30,11 +32,13 @@ def get_namespaces_and_shapes_from_str(str_target, or_shapes=False):
         elif a_line.startswith(_END_SHAPE):
             current_shape = None
         elif current_shape is not None:
-            shapes[current_shape].append(a_line.replace(";", "").strip())  # Avoid trailing ";", that can be there or not
+            shapes[current_shape].append(
+                a_line.replace(";", "").strip())  # Avoid trailing ";", that can be there or not
 
         last_line = a_line  # Always execute
 
     return namespaces, shapes
+
 
 def get_namespaces_and_shapes_from_str_with_or(str_target):
     namespaces = []
@@ -87,16 +91,18 @@ def unordered_sets_match(sets1, sets2):
             return False
     return True
 
+
 def ordered_sets_match(sets1, sets2):
     if len(sets1) != len(sets2):
         return False
-    for i in range (len(sets1)):
+    for i in range(len(sets1)):
         if sets1[i] != sets2[i]:
             return False
     return True
 
 
-def simple_and_or_str_constraints(str_constraints):  # TODO Fix here. Receive a dict, not a list. check call to this method
+def simple_and_or_str_constraints(
+        str_constraints):  # TODO Fix here. Receive a dict, not a list. check call to this method
     simple_c = []
     or_c = []
     for a_c in str_constraints:
@@ -114,6 +120,7 @@ def ordered_or_constraints_match(or_list_1, or_list_2):
         or_list_1[i] = set(or_list_1[i].split(_OR))
         or_list_2[i] = set(or_list_2[i].split(_OR))
     return ordered_sets_match(or_list_1, or_list_2)
+
 
 def unordered_or_constraints_match(or_list_1, or_list_2):
     if len(or_list_1) != len(or_list_2):
@@ -156,6 +163,7 @@ def unsorted_constraints_comparison(shapes1, shapes2):
             return False
     return True
 
+
 def sorted_constraints_comparison(shapes1, shapes2):
     for a_key_label in shapes1:
         if a_key_label not in shapes2:
@@ -164,11 +172,13 @@ def sorted_constraints_comparison(shapes1, shapes2):
             return False
     return True
 
+
 def simple_constraints_comparison(shapes1, shapes2, check_order=False):
     if not check_order:
         return unsorted_constraints_comparison(shapes1, shapes2)
     else:
         return sorted_constraints_comparison(shapes1, shapes2)
+
 
 def shapes_match(shapes1, shapes2, or_shapes=False, check_order=False):
     if len(shapes1) != len(shapes2):
@@ -194,7 +204,6 @@ def normalize_str(str_target):
 
 
 def tunned_str_comparison(str1, str2, or_shapes=False, check_order=False):
-
     if normalize_str(str1) == normalize_str(str2):
         return True
     else:
@@ -206,9 +215,11 @@ def file_vs_str_tunned_comparison(file_path, str_target, or_shapes=False, check_
         content = in_stream.read()
     return tunned_str_comparison(content, str_target, or_shapes, check_order)
 
+
 def file_vs_str_exact_comparison(file_path, target_str):
     with open(file_path, "r") as in_stream:
         return in_stream.read().strip() == target_str.strip()
+
 
 def file_vs_file_tunned_comparison(file_path1, file_path2, or_shapes=False):
     with open(file_path1, "r") as in_stream:
@@ -217,6 +228,7 @@ def file_vs_file_tunned_comparison(file_path1, file_path2, or_shapes=False):
         content2 = in_stream.read()
     return tunned_str_comparison(content1, content2, or_shapes)
 
+
 def number_of_shapes(target_str):
     counter = 0
     for a_line in target_str.split("\n"):
@@ -224,8 +236,9 @@ def number_of_shapes(target_str):
             counter += 1
     return counter
 
+
 def shape_contains_constraint(target_str, shape, constraint):
-    constraint = constraint.replace(";","").strip()
+    constraint = constraint.replace(";", "").strip()
     lines = target_str.split("\n")
     seeking_mode = False
     for i in range(len(lines)):
@@ -234,7 +247,7 @@ def shape_contains_constraint(target_str, shape, constraint):
                 return True
             if lines[i].startswith(_END_SHAPE):
                 return False
-        if lines[i].startswith(_BEG_SHAPE) and shape == lines[i-1].strip():
+        if lines[i].startswith(_BEG_SHAPE) and shape == lines[i - 1].strip():
             seeking_mode = True
     return False
 
@@ -255,6 +268,7 @@ def graph_comparison_file_vs_str(file_path, str_target, format="turtle"):
 
     return graph_comparison_rdflib(g1, g2)
 
+
 def text_contains_lines(text, list_lines):
     text = _BLANKS.sub(" ", text)
     for a_line in list_lines:
@@ -270,3 +284,16 @@ def no_sharp_in_shepe_names(str_shapes):
         if '#' in a_key_label:
             return False
     return True
+
+
+def check_file_exist(file_path):
+    if not isfile(file_path):
+        raise FileExistsError(f"The expected file was not found in disk: {file_path}")
+
+
+def delete_file(file_path):
+    if file_exists(file_path):
+        try:
+            remove(file_path)
+        except:
+            pass

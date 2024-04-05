@@ -17,4 +17,4 @@ def find_adequate_prefix_for_shapes_namespaces(current_namespace_prefix_dict):
 
 def get_random_string(length):
     result_str = ''.join(random.choice(string.ascii_lowercase) for i in range(length))
-    print("Random string of length", length, "is:", result_str)
+    return result_str

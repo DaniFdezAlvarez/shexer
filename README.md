@@ -36,6 +36,8 @@ sheXer includes a package to deploy a wer service exposing sheXer with a REST AP
 
 * **Valid ShEx and SHACL**. The produced shapes are compilant with the current specification of ShEx2 and SHACL.
 
+* **UML**. Ypu can also generate UML-like views of the extracted schemas.
+
 * **Threshold of tolerance**. The constraints inferred for each shape may not be compatible with every node associated to the shapes. With this threshold you can indicate the minimun percentage of nodes that should conform with a constraint c. If c does not reach the indicated ratio, its associated information will not appear in the final shape.
 
 * **Informative comments** (just for ShEx, by now). Each constraint inferred is associated to one or more comments. Those comments include different types of information, such as the ratio of nodes that actually conform with a given constraint. You can keep this informative comments or exclude them from the results.
@@ -67,7 +69,7 @@ In the folder [experiments](https://github.com/DaniFdezAlvarez/shexer/tree/devel
 
 ## Example code
 
-The following code is takes the graph in _raw\_graph_ and extracts shapes for instances of the classes <http://example.org/Person> and <http://example.org/Gender>. The input file format in n-triples and the results are serialized in ShExC to the file shaper_example.shex.
+The following code takes the graph in _raw\_graph_ and extracts shapes for instances of the classes <http://example.org/Person> and <http://example.org/Gender>. The input file format in n-triples and the results are serialized in ShExC to the file shaper_example.shex.
 
 ```python
 from shexer.shaper import Shaper
@@ -226,5 +228,7 @@ The method __shex\_graph__  of shexer triggers all the inference process and giv
 * output_file (default None): it specifies the path of the file in which the inferred shapes will be written. It must have a value different to None iff string_output is False.
 * output_format (default "ShExC"): format in which the inferred shapes will be serialized. The values currently supported are const.SHEXC and const.SHACLE_TURTLE.
 * aceptance_threshold (default 0): Given a certain inferred constraint __c__ for a shape __s__, the ammount of instances which conform to this constraint (ignoring constraints with '\*' cardinality) should be at least __aceptance\_threshold__. If this does not happen, then __c__ will not be included in __s__.
+* verbose (dafault False): when it is set to True, the extraction process will print log messages through the standard output.
+* to_uml_path (default None). This parameter expects to receive a disk path. If you provide a value here, sheXer will generate a UML diagram containing the extracted scheme and will save it in the path indicated as a PNG image. WARNING: you should be connected to Internet in  order to make this work.
 
 
