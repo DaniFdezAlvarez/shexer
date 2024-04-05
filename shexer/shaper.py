@@ -8,7 +8,7 @@ from shexer.utils.factories.class_shexer_factory import get_class_shexer
 from shexer.utils.factories.remote_graph_factory import get_remote_graph_if_needed
 from shexer.utils.factories.shape_map_factory import get_shape_map_if_needed
 from shexer.io.profile.formater.abstract_profile_serializer import AbstractProfileSerializer
-from shexer.utils.factories.shape_serializer_factory import get_shape_serializer
+from shexer.utils.factories.shape_serializer_factory import get_shape_serializer, get_uml_serializer
 from shexer.utils.namespaces import find_adequate_prefix_for_shapes_namespaces
 from shexer.utils.log import log_msg
 from shexer.consts import RATIO_INSTANCES
@@ -230,7 +230,8 @@ class Shaper(object):
                    output_file=None,
                    output_format=SHEXC,
                    acceptance_threshold=0,
-                   verbose=False):
+                   verbose=False,
+                   to_uml_path=None):
         """
         :param string_output:
         :param output_file:
@@ -239,7 +240,7 @@ class Shaper(object):
         :param verbose:
         :return:
         """
-        self._check_correct_output_params(string_output, output_file)
+        self._check_correct_output_params(string_output, output_file, to_uml_path)
         self._check_output_format(output_format)
         self._check_aceptance_threshold(acceptance_threshold)
         if self._target_classes_dict is None:
@@ -251,11 +252,29 @@ class Shaper(object):
                                       verbose=verbose)
         log_msg(verbose=verbose,
                 msg="Building_output...")
-        serializer = self._build_shapes_serializer(target_file=output_file,
-                                                   string_return=string_output,
-                                                   output_format=output_format)
-        return serializer.serialize_shapes()  # If string return is active, returns string.
-        # Otherwise, it writes to file and returns None
+
+        if to_uml_path is not None:
+            try:
+                self._generate_uml_diagram(to_uml_path)
+            except ResourceWarning as e:  # I think this is related to UMLPlant and I can't close the connection from here
+                pass
+
+        if string_output or output_file is not None:
+            serializer = self._build_shapes_serializer(target_file=output_file,
+                                                       string_return=string_output,
+                                                       output_format=output_format)
+
+            return serializer.serialize_shapes()  # If string return is active, returns string.
+
+
+    def _generate_uml_diagram(self, to_uml_path):
+        serializer = get_uml_serializer(shapes_list=self._shape_list,
+                                        image_path=to_uml_path,
+                                        namespaces_dict=self._namespaces_dict)
+        serializer.serialize_shapes()
+
+
+
 
     def _add_shapes_namespaces_to_namespaces_dict(self):
         self._namespaces_dict[self._shapes_namespace] = \
@@ -381,9 +400,9 @@ class Shaper(object):
 
 
     @staticmethod
-    def _check_correct_output_params(string_output, target_file):
-        if not string_output and target_file is None:
-            raise ValueError("You must provide a target path or set string output to True")
+    def _check_correct_output_params(string_output, target_file, to_uml_path):
+        if not string_output and target_file is None and to_uml_path is None:
+            raise ValueError("You must provide a target path , set string output to True and/or give a value to to_uml_path")
 
     @staticmethod
     def _check_input_format(input_format):

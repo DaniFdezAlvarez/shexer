@@ -31,3 +31,6 @@ GZ = "gz"
 RATIO_INSTANCES = "ratio"
 ABSOLUTE_INSTANCES = "abs"
 MIXED_INSTANCES = "mixed"
+
+# UML
+UML_PLANT_SERVER = "http://www.plantuml.com/plantuml/img/"
