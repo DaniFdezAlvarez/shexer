@@ -240,7 +240,7 @@ class Shaper(object):
         :param verbose:
         :return:
         """
-        self._check_correct_output_params(string_output, output_file)
+        self._check_correct_output_params(string_output, output_file, to_uml_path)
         self._check_output_format(output_format)
         self._check_aceptance_threshold(acceptance_threshold)
         if self._target_classes_dict is None:
@@ -252,15 +252,16 @@ class Shaper(object):
                                       verbose=verbose)
         log_msg(verbose=verbose,
                 msg="Building_output...")
-        serializer = self._build_shapes_serializer(target_file=output_file,
-                                                   string_return=string_output,
-                                                   output_format=output_format)
 
         if to_uml_path is not None:
             self._generate_uml_diagram(to_uml_path)
 
-        return serializer.serialize_shapes()  # If string return is active, returns string.
-        # Otherwise, it writes to file and returns None
+        if string_output or output_file is not None:
+            serializer = self._build_shapes_serializer(target_file=output_file,
+                                                       string_return=string_output,
+                                                       output_format=output_format)
+
+            return serializer.serialize_shapes()  # If string return is active, returns string.
 
 
     def _generate_uml_diagram(self, to_uml_path):
@@ -394,9 +395,9 @@ class Shaper(object):
 
 
     @staticmethod
-    def _check_correct_output_params(string_output, target_file):
-        if not string_output and target_file is None:
-            raise ValueError("You must provide a target path or set string output to True")
+    def _check_correct_output_params(string_output, target_file, to_uml_path):
+        if not string_output and target_file is None and to_uml_path is None:
+            raise ValueError("You must provide a target path , set string output to True and/or give a value to to_uml_path")
 
     @staticmethod
     def _check_input_format(input_format):
