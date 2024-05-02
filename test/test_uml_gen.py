@@ -29,21 +29,21 @@ class TestUmlGen(unittest.TestCase):
             delete_file(_A_PATH_FOR_IMG)
 
     def test_gen_uml_and_classical_output(self):
-        def test_base_gen(self):
-            delete_file(_A_PATH_FOR_IMG)  # pre-condition
-            shaper = Shaper(
-                graph_file_input=G1,
-                namespaces_dict=default_namespaces(),
-                all_classes_mode=True,
-                input_format=TURTLE,
-                disable_comments=True)
-            str_result = shaper.shex_graph(to_uml_path=_A_PATH_FOR_IMG)
-            self.assertTrue(file_vs_str_tunned_comparison(file_path=G1_ALL_CLASSES_NO_COMMENTS,
-                                                          str_target=str_result))
-            try:
-                check_file_exist(_A_PATH_FOR_IMG)
-            finally:
-                delete_file(_A_PATH_FOR_IMG)
+
+        delete_file(_A_PATH_FOR_IMG)  # pre-condition
+        shaper = Shaper(
+            graph_file_input=G1,
+            namespaces_dict=default_namespaces(),
+            all_classes_mode=True,
+            input_format=TURTLE,
+            disable_comments=True)
+        str_result = shaper.shex_graph(to_uml_path=_A_PATH_FOR_IMG, string_output=True)
+        self.assertTrue(file_vs_str_tunned_comparison(file_path=G1_ALL_CLASSES_NO_COMMENTS,
+                                                      str_target=str_result))
+        try:
+            check_file_exist(_A_PATH_FOR_IMG)
+        finally:
+            delete_file(_A_PATH_FOR_IMG)
 
     def test_wikidata(self):
         shape_map_raw = "SPARQL'select ?p where " \

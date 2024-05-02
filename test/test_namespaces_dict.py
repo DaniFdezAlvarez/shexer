@@ -37,7 +37,7 @@ class TestNamespacesDict(unittest.TestCase):
                         input_format=NT,
                         disable_comments=True)
         str_result = shaper.shex_graph(string_output=True)
-        self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "\\no_foaf.shex",
+        self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + pth.sep +"no_foaf.shex",
                                                       str_target=str_result))
 
     def test_overwrite_empty(self):
@@ -52,7 +52,7 @@ class TestNamespacesDict(unittest.TestCase):
                         input_format=TURTLE,
                         disable_comments=True)
         str_result = shaper.shex_graph(string_output=True)
-        self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "\\overwrite_empty.shex",
+        self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + pth.sep +"overwrite_empty.shex",
                                                       str_target=str_result))
 
     def test_overwrite_some_namespaces(self):
@@ -72,5 +72,5 @@ class TestNamespacesDict(unittest.TestCase):
                         input_format=TURTLE,
                         disable_comments=True)
         str_result = shaper.shex_graph(string_output=True)
-        self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "\\overwrite.shex",
+        self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + pth.sep +"overwrite.shex",
                                                       str_target=str_result))
