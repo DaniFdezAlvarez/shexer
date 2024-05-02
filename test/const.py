@@ -12,6 +12,7 @@ G1_XML = BASE_FILES + "t_graph_1.xml"
 G1_TTL_WITH_BASE = BASE_FILES + "t_graph_1_base.ttl"
 G1_TTL_WITH_ABSOLUTES = BASE_FILES + "t_graph_1_absolutes.ttl"
 G1_TTL_WITH_USELESS_BNODE = BASE_FILES + "t_graph_1_bnode.ttl"
+G1_TTL_WITH_SCAPED_QUOTES = BASE_FILES + "t_graph_1_scaped_quotes.ttl"
 
 G1_N3 = BASE_FILES + "t_graph_1.n3"
 
