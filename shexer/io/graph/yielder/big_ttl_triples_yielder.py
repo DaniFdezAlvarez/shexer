@@ -196,10 +196,29 @@ class BigTtlTriplesYielder(BaseTriplesYielder):
         while pos != -1:
             if target_str[pos-1] != "\\":
                 return pos  # not escaped
-            if pos >= 2 and target_str[pos-2] == '\\':
-                return pos  # the scape is scaped, so not escaped
+            # if pos >= 2 and target_str[pos-2] == '\\':
+            #     return pos  # the scape is scaped, so not escaped
+            if self._count_prior_backslashes(an_str=target_str,
+                                             quote_pos=pos) % 2 == 0:
+                return pos # the scape is scaped, so not escaped
+            pos = target_str.find('"', pos+1)
         if pos == -1:
             raise ValueError("Is this line malformed? Can`t find quotes matching: " + target_str)
+
+    def _count_prior_backslashes(self, an_str, quote_pos):
+        """
+        We assume that there is at least a backslash at an_str[pos-1], so pos-1 is a non-negative index of an_str
+        """
+        counter = 1
+        quote_pos -= 2
+        while quote_pos >= 0:
+            if an_str[quote_pos] == "\\":
+                counter += 1
+            else:
+                return counter
+            quote_pos -= 1
+        return counter
+
 
     def _find_next_quoted_literal_ending(self, target_str, start_index):
         next_quotes = self._find_next_unescaped_quotes(target_str=target_str,
