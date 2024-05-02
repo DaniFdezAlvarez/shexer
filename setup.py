@@ -32,6 +32,7 @@ setup(
           'Flask-Cors',
 		  'rdflib',
 		  'SPARQLWrapper',
-          'wlighter'
+          'wlighter',
+          'plantuml'
       ],
 )
