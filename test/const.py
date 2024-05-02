@@ -1,6 +1,5 @@
 import os.path as pth
 
-# BASE_FILES = "C:\\Users\\Dani\\repos-git\\shexerp3\\test\\t_files\\"
 BASE_FILES = pth.join(pth.dirname(pth.normpath(__file__)), "t_files" + pth.sep)
 BASE_FILES_GENERAL = BASE_FILES + "general" + pth.sep
 

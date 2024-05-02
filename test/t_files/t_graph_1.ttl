@@ -28,7 +28,6 @@ ex:HumanLike foaf:name "Person" ;  # foaf properties, but not explicit type.
 	foaf:age 99 ;
 	foaf:knows ex:David .
 
-
 ex:x1 rdf:type foaf:Document ;
 	foaf:depiction "A thing that is nice" ;
 	foaf:title "A nice thing" .
