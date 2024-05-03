@@ -9,7 +9,8 @@ class AnnotateMinIriStrategy(AbstractMinIriStrategy):
         self._min_iris_dict = min_iris_dict
 
     def annotate_shape_iri(self, shape):
-        shape.iri_pattern = self._determine_suitable_iri_pattern(self._min_iris_dict[shape.class_uri])
+        shape.iri_pattern = self._determine_suitable_iri_pattern(self._min_iris_dict.shape_min_iri(shape.class_uri))
+        # shape.iri_pattern = self._determine_suitable_iri_pattern(self._min_iris_dict[shape.class_uri])
 
     def _determine_suitable_iri_pattern(self, longest_common_prefix):
         backwards_str = longest_common_prefix[::-1]

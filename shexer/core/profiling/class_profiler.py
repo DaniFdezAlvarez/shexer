@@ -8,6 +8,7 @@ from shexer.utils.uri import longest_common_prefix
 from shexer.core.profiling.strategy.direct_features_strategy import DirectFeaturesStrategy
 from shexer.core.profiling.strategy.include_reverse_features_strategy import IncludeReverseFeaturesStrategy
 from shexer.core.profiling.consts import RDF_TYPE_STR
+from shexer.utils.structures.dicts import ShapeExampleFeaturesDict
 
 _MINIMAL_IRI_INIT = "@"
 
@@ -18,7 +19,8 @@ class ClassProfiler(object):
 
     def __init__(self, triples_yielder, instances_dict, instantiation_property_str=RDF_TYPE_STR,
                  remove_empty_shapes=True, original_target_classes=None, original_shape_map=None,
-                 shapes_namespace=SHAPES_DEFAULT_NAMESPACE, inverse_paths=False, detect_minimal_iri=False):
+                 shapes_namespace=SHAPES_DEFAULT_NAMESPACE, inverse_paths=False, detect_minimal_iri=False,
+                 examples_mode=None):
         self._triples_yielder = triples_yielder
         self._instances_dict = instances_dict  # TODO  refactor: change name once working again
         # self._instances_shape_dict = {}
@@ -30,8 +32,8 @@ class ClassProfiler(object):
         self._original_raw_target_classes = original_target_classes
         self._classes_shape_dict = {}  # Will be filled later
         self._class_counts = {}  # Will be filled later
-        if detect_minimal_iri:
-            self._class_min_iris = {}  # Will be filled later if detect_minimal_iri is True
+        if detect_minimal_iri or examples_mode is not None:
+            self._shape_feature_examples = ShapeExampleFeaturesDict()  # Will be filled later if detect_minimal_iri is True
         self._original_target_nodes = determine_original_target_nodes_if_needed(remove_empty_shapes=remove_empty_shapes,
                                                                                 original_target_classes=original_target_classes,
                                                                                 original_shape_map=original_shape_map,
@@ -39,6 +41,7 @@ class ClassProfiler(object):
         self._strategy = DirectFeaturesStrategy(class_profiler=self) if not inverse_paths \
             else IncludeReverseFeaturesStrategy(class_profiler=self)
         self._detect_minimal_iri = detect_minimal_iri
+        self._examples_mode = examples_mode
 
 
     def profile_classes(self, verbose):
@@ -59,24 +62,26 @@ class ClassProfiler(object):
         self._clean_class_profile()
         log_msg(verbose=verbose,
                 msg="Shape profiles done. Working with {} shapes.".format(len(self._classes_shape_dict)))
-        if self._detect_minimal_iri:
+        if self._detect_minimal_iri or self._examples_mode is not None:
             log_msg(verbose=verbose,
-                    msg="Detecting mimimal IRIs for each shape...")
-            self._detect_minimal_shape_iris()
+                    msg="Detecting example features for each shape...")
+            self._detect_shape_features()
             log_msg(verbose=verbose,
                     msg="Mimimal IRIs detected...")
-        return self._classes_shape_dict, self._class_counts, self._class_min_iris if self._detect_minimal_iri else None
+        return self._classes_shape_dict, self._class_counts, self._shape_feature_examples if self._detect_minimal_iri else None
 
     def get_target_classes_dict(self):
         return self._instances_dict
 
-    def _detect_minimal_shape_iris(self):
+    def _detect_shape_features(self):
         self._init_class_iris_dict()
         self._annotate_instance_iris()
 
     def _init_class_iris_dict(self):
         for a_class_key in self._class_counts:
-            self._class_min_iris[a_class_key] = _MINIMAL_IRI_INIT
+            self._shape_feature_examples.set_shape_min_iri(shape_id=a_class_key,
+                                                           min_iri=_MINIMAL_IRI_INIT)
+            # self._shape_feature_examples[a_class_key] = _MINIMAL_IRI_INIT
 
     def _annotate_instance_iris(self):
         for an_instance_iri in self._instances_dict:
@@ -85,12 +90,16 @@ class ClassProfiler(object):
                                            instance_iri=an_instance_iri)
 
     def _update_shape_min_iri(self, target_shape, instance_iri):
-        if self._class_min_iris[target_shape] == _MINIMAL_IRI_INIT:
-            self._class_min_iris[target_shape] = instance_iri
+        curr_iri = self._shape_feature_examples.shape_min_iri(shape_id=target_shape)
+        if curr_iri == _MINIMAL_IRI_INIT:
+            self._shape_feature_examples.set_shape_min_iri(shape_id=target_shape,
+                                                           min_iri=instance_iri)
             return
-        self._class_min_iris[target_shape] = \
-            longest_common_prefix(uri1=instance_iri,
-                                  uri2=self._class_min_iris[target_shape])
+
+        self._shape_feature_examples.set_shape_min_iri(shape_id=target_shape,
+                                                       min_iri=longest_common_prefix(uri1=instance_iri,
+                                                                                     uri2=curr_iri))
+
 
 
     @staticmethod
