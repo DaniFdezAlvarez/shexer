@@ -33,6 +33,9 @@ class AbstractFeatureDirectionStrategy(object):
     def has_shape_annotated_features(self, shape_label):
         raise NotImplementedError()
 
+    def look_for_example_features(self, instance_id, shape_id):
+        raise NotImplementedError()
+
     def _init_annotated_direct_features(self):
         for an_instance, class_list in self._i_dict.items():
             for a_class in class_list:
