@@ -16,7 +16,7 @@ class ShexSerializer(object):
 
     def __init__(self, target_file, shapes_list, namespaces_dict=None, string_return=False,
                  instantiation_property_str=RDF_TYPE_STR, disable_comments=False, wikidata_annotation=False,
-                 instances_report_mode=RATIO_INSTANCES, detect_minimal_iri=False):
+                 instances_report_mode=RATIO_INSTANCES, detect_minimal_iri=False, shape_example_features=None):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._lines_buffer = []
@@ -27,6 +27,7 @@ class ShexSerializer(object):
         self._wikidata_annotation = wikidata_annotation
         self._instances_report_mode = instances_report_mode
         self._detect_minimal_iri = detect_minimal_iri
+        self._shape_example_features = shape_example_features
 
         self._string_result = ""
 
@@ -139,9 +140,9 @@ class ShexSerializer(object):
         )
 
     def _minimal_iri(self, a_shape):
-        if not self._detect_minimal_iri or a_shape.iri_pattern is None:
+        if not self._detect_minimal_iri or self._shape_example_features.shape_min_iri(a_shape.iri) is None:
             return ""
-        return "  [<{}>~]  AND".format(a_shape.iri_pattern)
+        return "  [<{}>~]  AND".format(self._shape_example_features.shape_min_iri(a_shape.iri))
 
     def _instance_count(self, a_shape):
         return "   # {} instance{}".format(a_shape.n_instances,

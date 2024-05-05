@@ -32,16 +32,20 @@ class ClassProfiler(object):
         self._original_raw_target_classes = original_target_classes
         self._classes_shape_dict = {}  # Will be filled later
         self._class_counts = {}  # Will be filled later
-        if detect_minimal_iri or examples_mode is not None:
-            self._shape_feature_examples = ShapeExampleFeaturesDict()  # Will be filled later if detect_minimal_iri is True
+        self._detect_minimal_iri = detect_minimal_iri
+        self._examples_mode = examples_mode
+
         self._original_target_nodes = determine_original_target_nodes_if_needed(remove_empty_shapes=remove_empty_shapes,
                                                                                 original_target_classes=original_target_classes,
                                                                                 original_shape_map=original_shape_map,
                                                                                 shapes_namespace=shapes_namespace)
+
+        if detect_minimal_iri or examples_mode is not None:
+            self._shape_feature_examples = ShapeExampleFeaturesDict(track_inverse_features=inverse_paths)
+            # This last one will be filled later if detect_minimal_iri is True
         self._strategy = DirectFeaturesStrategy(class_profiler=self) if not inverse_paths \
             else IncludeReverseFeaturesStrategy(class_profiler=self)
-        self._detect_minimal_iri = detect_minimal_iri
-        self._examples_mode = examples_mode
+
 
 
     def profile_classes(self, verbose):
@@ -65,7 +69,7 @@ class ClassProfiler(object):
         if self._detect_minimal_iri or self._examples_mode is not None:
             log_msg(verbose=verbose,
                     msg="Detecting example features for each shape...")
-            self._detect_shape_features()
+            self._detect_min_iris()
             log_msg(verbose=verbose,
                     msg="Mimimal IRIs detected...")
         return self._classes_shape_dict, self._class_counts, self._shape_feature_examples if self._detect_minimal_iri else None
@@ -73,64 +77,23 @@ class ClassProfiler(object):
     def get_target_classes_dict(self):
         return self._instances_dict
 
-    def _detect_shape_features(self):
+    def _detect_min_iris(self):
         self._init_class_features_dict()
-        self._set_anotation_instance_methods()
-        self._annotate_instance_features()
+        self._annotate_min_iris()
 
     def _init_class_features_dict(self):
         for a_class_key in self._class_counts:
             self._shape_feature_examples.set_shape_min_iri(shape_id=a_class_key,
                                                            min_iri=_MINIMAL_IRI_INIT)
 
-    def _set_anotation_instance_methods(self):
-        # MIN IRIS
-        if self._detect_minimal_iri:
-            self._update_shape_min_iri = self._update_shape_min_iri_active
-        else:
-            self._update_shape_min_iri = self._update_shape_min_iri_inactive
-
-        # EXAMPLE FEATURES
-        if self._examples_mode is None:
-            self._update_shape_examples = self._update_shape_examples_inactive
-        elif self._examples_mode == SHAPE_EXAMPLES:
-            self._update_shape_examples = self._update_shape_examples_only_shapes
-        elif self._examples_mode == CONSTRAINT_EXAMPLES:
-            self._update_shape_examples = self._update_shape_examples_only_constraints
-        elif self._examples_mode == ALL_EXAMPLES:
-            self._update_shape_examples = self._update_shape_examples_shapes_and_constraints
-        else:
-            raise ValueError("Unrecognized mode for getting shape examples. Choose one between the values offered in shexer.const, section # EXAMPLES")
-
-    def _update_shape_examples_only_shapes(self, instance_id, shape_id):
-        if self._instances_dict.shape_example is None:
-            self._instances_dict.set_shape_example(shape_id=shape_id,
-                                                   example_iri=instance_id)
-
-    def _update_shape_examples_only_constraints(self, instance_id, shape_id):
-        self._strategy.look_for_example_features(instance_id=instance_id,
-                                                 shape_id=shape_id)
-
-    def _update_shape_examples_shapes_and_constraints(self, instance_id, shape_id):
-        self._update_shape_examples_only_shapes(instance_id, shape_id)
-        self._update_shape_examples_only_constraints(instance_id, shape_id)
-
-    def _update_shape_examples(self, instance_id, shape_id):
-        raise NotImplementedError()
-
-    def _update_shape_examples_inactive(self, instance_id, shape_id):
-        pass  # This is OK, do nothing
-
-    def _annotate_instance_features(self):
+    def _annotate_min_iris(self):
         for an_instance_iri in self._instances_dict:
             for a_class_key in self._instances_dict[an_instance_iri][POS_CLASSES]:
-                self._update_shape_examples(instance_id=instance_id,
-                                            shape_id=shape_id)
                 self._update_shape_min_iri(target_shape=a_class_key,
                                            instance_iri=an_instance_iri)
 
 
-    def _update_shape_min_iri_active(self, target_shape, instance_iri):
+    def _update_shape_min_iri(self, target_shape, instance_iri):
         curr_iri = self._shape_feature_examples.shape_min_iri(shape_id=target_shape)
         if curr_iri == _MINIMAL_IRI_INIT:
             self._shape_feature_examples.set_shape_min_iri(shape_id=target_shape,
@@ -140,11 +103,6 @@ class ClassProfiler(object):
         self._shape_feature_examples.set_shape_min_iri(shape_id=target_shape,
                                                        min_iri=longest_common_prefix(uri1=instance_iri,
                                                                                      uri2=curr_iri))
-    def _update_shape_min_iri_inactive(self, target_shape, instance_iri):
-        pass  # This is OK, do Nothing
-
-    def _update_shape_min_iri(self, target_shape, instance_iri):
-        raise NotImplementedError()
 
     @staticmethod
     def _decide_instantiation_property(instantiation_property_str):
@@ -164,7 +122,6 @@ class ClassProfiler(object):
 
         :return:
         """
-        # self._classes_shape_dict
         self._init_original_targets()
         self._init_annotated_targets()
 
@@ -232,6 +189,46 @@ class ClassProfiler(object):
         for a_triple in self._triples_yielder.yield_triples():
             if self._strategy.is_a_relevant_triple(a_triple):
                 yield a_triple
+
+
+    # def _set_anotation_instance_methods(self):
+    #     # MIN IRIS
+    #     if self._detect_minimal_iri:
+    #         self._update_shape_min_iri = self._update_shape_min_iri_active
+    #     else:
+    #         self._update_shape_min_iri = self._update_shape_min_iri_inactive
+    #
+    #     # EXAMPLE FEATURES
+    #     if self._examples_mode is None:
+    #         self._update_shape_examples = self._update_shape_examples_inactive
+    #     elif self._examples_mode == SHAPE_EXAMPLES:
+    #         self._update_shape_examples = self._update_shape_examples_only_shapes
+    #     elif self._examples_mode == CONSTRAINT_EXAMPLES:
+    #         self._update_shape_examples = self._update_shape_examples_only_constraints
+    #     elif self._examples_mode == ALL_EXAMPLES:
+    #         self._update_shape_examples = self._update_shape_examples_shapes_and_constraints
+    #     else:
+    #         raise ValueError("Unrecognized mode for getting shape examples. Choose one between the values offered in shexer.const, section # EXAMPLES")
+
+    # def _update_shape_examples_only_shapes(self, instance_id, shape_id):
+    #     if self._shape_feature_examples.shape_example(shape_id=shape_id) is None:
+    #         self._instances_dict.set_shape_example(shape_id=shape_id,
+    #                                                example_iri=instance_id)
+    #
+    # def _update_shape_examples_only_constraints(self, instance_id, shape_id):
+    #     self._strategy.look_for_example_features(instance_id=instance_id,
+    #                                              shape_id=shape_id)
+    #
+    # def _update_shape_examples_shapes_and_constraints(self, instance_id, shape_id):
+    #     self._update_shape_examples_only_shapes(instance_id, shape_id)
+    #     self._update_shape_examples_only_constraints(instance_id, shape_id)
+    #
+    # def _update_shape_examples(self, instance_id, shape_id):
+    #     raise NotImplementedError()
+    #
+    # def _update_shape_examples_inactive(self, instance_id, shape_id):
+    #     pass  # This is OK, do nothing
+    #
 
 
 

@@ -13,9 +13,17 @@ class ShapeExampleFeaturesDict(object):
     def __init__(self, track_inverse_features):
         self._base_dict = {}
         self._track_inverse_features = track_inverse_features
-        self.has_constraint_example = self._has_constraint_example_inverse \
-            if track_inverse_features \
-            else self._has_constraint_example_no_inverse  # TODO CONTINUE HERE: init several methods w.r.t. track_inverse_features
+        self._init_example_tracking_methods()
+
+
+    def _init_example_tracking_methods(self):
+        if self._track_inverse_features:
+            self.has_constraint_example = self._has_constraint_example_inverse
+            self.set_constraint_example = self._set_constraint_example_inverse
+        else:
+            self.has_constraint_example = self._has_constraint_example_no_inverse
+            self.set_constraint_example = self._set_constraint_example_no_inverse
+
 
     def set_shape_min_iri(self, shape_id, min_iri):
         if shape_id not in self._base_dict:
@@ -38,13 +46,13 @@ class ShapeExampleFeaturesDict(object):
     def has_constraint_example(self, shape_id, prop_id):
         raise NotImplementedError()
 
-    def set_constraint_example(self, shape_id, prop):
+    def set_constraint_example(self, shape_id, prop, example):
         raise NotImplementedError()
 
-    def set_constraint_example_no_inverse(self, shape_id, prop_id, example):
+    def _set_constraint_example_no_inverse(self, shape_id, prop_id, example):
         self._base_dict[shape_id][_PROP_FEATURES_POS][prop_id] = example
 
-    def set_constraint_example_inverse(self, shape_id, prop_id, example, inverse):
+    def _set_constraint_example_inverse(self, shape_id, prop_id, example, inverse):
         self._base_dict[shape_id][_PROP_FEATURES_POS][_POS_INVERSE if inverse else _POS_DIRECT][prop_id] = example
 
     def _has_constraint_example_no_inverse(self, shape_id, prop_id):
