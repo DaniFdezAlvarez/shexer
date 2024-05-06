@@ -136,9 +136,9 @@ class IncludeReverseFeaturesStrategy(AbstractFeatureDirectionStrategy):
 
     def _set_annotation_methods(self):
         if not self._examples_mode:
-            self._annotate_triple_features = self._annotate_triple_features_no_examples
+            self.annotate_triple_features = self._annotate_triple_features_no_examples
         else:
-            self._annotate_triple_features = self._annotate_triple_features_with_examples
+            self.annotate_triple_features = self._annotate_triple_features_with_examples
 
     def _annotate_triple_features_with_examples(self, a_triple):
         if self._is_relevant_instance(a_triple[_S]):

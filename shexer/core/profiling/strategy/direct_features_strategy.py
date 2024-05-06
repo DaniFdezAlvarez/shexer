@@ -42,10 +42,10 @@ class DirectFeaturesStrategy(AbstractFeatureDirectionStrategy):
         return len(self._c_shapes_dict[shape_label]) > 0
 
     def _set_annotation_methods(self):
-        if not self._examples_mode:
-            self._annotate_triple_features = self._annotate_triple_features_no_examples
+        if self._examples_mode is None:
+            self.annotate_triple_features = self._annotate_triple_features_no_examples
         else:
-            self._annotate_triple_features = self._annotate_triple_features_with_examples
+            self.annotate_triple_features = self._annotate_triple_features_with_examples
 
 
     def _annotate_triple_features_with_examples(self, a_triple):
@@ -56,12 +56,12 @@ class DirectFeaturesStrategy(AbstractFeatureDirectionStrategy):
         self._annotate_target_subject(a_triple)
 
     def _annotate_example_no_inverse(self, a_triple):
-        for a_class_key in self._i_dict[a_triple[_S]][POS_CLASSES]:
+        for a_class_key in self._i_dict[str(a_triple[_S])][POS_CLASSES]:
             if not self._shape_feature_examples.has_constraint_example(shape_id=a_class_key,
-                                                                       prop_id=a_triple[_P]):
+                                                                       prop_id=str(a_triple[_P])):
                 self._shape_feature_examples.set_constraint_example(shape_id=a_class_key,
-                                                                    prop_id=a_triple[_P],
-                                                                    example=a_triple[_O])
+                                                                    prop_id=str(a_triple[_P]),
+                                                                    example=str(a_triple[_O]))
 
 
 

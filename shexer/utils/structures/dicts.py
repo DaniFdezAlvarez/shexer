@@ -20,9 +20,11 @@ class ShapeExampleFeaturesDict(object):
         if self._track_inverse_features:
             self.has_constraint_example = self._has_constraint_example_inverse
             self.set_constraint_example = self._set_constraint_example_inverse
+            self.get_constraint_example = self._get_constraint_example_inverse
         else:
             self.has_constraint_example = self._has_constraint_example_no_inverse
             self.set_constraint_example = self._set_constraint_example_no_inverse
+            self.get_constraint_example = self._get_constraint_example_no_inverse
 
 
     def set_shape_min_iri(self, shape_id, min_iri):
@@ -48,6 +50,15 @@ class ShapeExampleFeaturesDict(object):
 
     def set_constraint_example(self, shape_id, prop, example):
         raise NotImplementedError()
+
+    def get_constraint_example(self, shape_id, prop):
+        raise NotImplementedError()
+
+    def _get_constraint_example_no_inverse(self, shape_id, prop):
+        return self._base_dict[shape_id][_PROP_FEATURES_POS][prop]
+
+    def _get_constraint_example_inverse(self, shape_id, prop, inverse):
+        return self._base_dict[shape_id][_PROP_FEATURES_POS][_POS_INVERSE if inverse else _POS_DIRECT][prop]
 
     def _set_constraint_example_no_inverse(self, shape_id, prop_id, example):
         self._base_dict[shape_id][_PROP_FEATURES_POS][prop_id] = example

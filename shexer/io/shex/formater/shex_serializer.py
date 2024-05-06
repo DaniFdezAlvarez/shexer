@@ -6,17 +6,20 @@ from shexer.utils.shapes import prefixize_shape_name_if_possible
 from shexer.io.shex.formater.consts import SPACES_LEVEL_INDENTATION
 from shexer.io.wikidata import wikidata_annotation
 from shexer.io.file import read_file
-from shexer.consts import RATIO_INSTANCES, ABSOLUTE_INSTANCES, MIXED_INSTANCES
+from shexer.consts import RATIO_INSTANCES, ABSOLUTE_INSTANCES, MIXED_INSTANCES, ALL_EXAMPLES, SHAPE_EXAMPLES, CONSTRAINT_EXAMPLES
 
 from wlighter import SHEXC_FORMAT
 
 _MODES_REPORT_INSTANCES = [ABSOLUTE_INSTANCES, MIXED_INSTANCES]
+_EXAMPLE_CONSTRAINT_PATTERN = "Node constraint example: {}"
+
 
 class ShexSerializer(object):
 
     def __init__(self, target_file, shapes_list, namespaces_dict=None, string_return=False,
                  instantiation_property_str=RDF_TYPE_STR, disable_comments=False, wikidata_annotation=False,
-                 instances_report_mode=RATIO_INSTANCES, detect_minimal_iri=False, shape_example_features=None):
+                 instances_report_mode=RATIO_INSTANCES, detect_minimal_iri=False, shape_example_features=None,
+                 examples_mode=None, inverse_paths=False):
         self._target_file = target_file
         self._shapes_list = shapes_list
         self._lines_buffer = []
@@ -27,7 +30,9 @@ class ShexSerializer(object):
         self._wikidata_annotation = wikidata_annotation
         self._instances_report_mode = instances_report_mode
         self._detect_minimal_iri = detect_minimal_iri
+        self._examples_mode = examples_mode
         self._shape_example_features = shape_example_features
+        self._inverse_paths = inverse_paths
 
         self._string_result = ""
 
@@ -55,17 +60,16 @@ class ShexSerializer(object):
         raise ValueError("Unrecognized param type to define instantiation property")
 
     def _annotate_wikidata_ids_in_result(self):
-        self._string_result =  wikidata_annotation(raw_input=self._get_raw_input_for_wikidata_annotation(),
-                                                   string_return=self._string_return,
-                                                   out_file=self._target_file,
-                                                   format=SHEXC_FORMAT,
-                                                   rdfs_comments=True)
+        self._string_result = wikidata_annotation(raw_input=self._get_raw_input_for_wikidata_annotation(),
+                                                  string_return=self._string_return,
+                                                  out_file=self._target_file,
+                                                  format=SHEXC_FORMAT,
+                                                  rdfs_comments=True)
 
     def _get_raw_input_for_wikidata_annotation(self):
         if self._string_return:
             return self._string_result
         return read_file(self._target_file)
-
 
     def _serialize_namespaces(self):
         for a_namespace in self._namespaces_dict:
@@ -117,7 +121,9 @@ class ShexSerializer(object):
     def _serialize_shape_rules(self, a_shape):
         if a_shape.n_statements == 0:
             return
+        self._tune_statement_examples_if_needed(a_shape)
         statements = [a_statement for a_statement in a_shape.yield_statements()]
+
         for i in range(0, len(statements) - 1):
             for line_indent_tuple in statements[i]. \
                     get_tuples_to_serialize_line_indent_level(is_last_statement_of_shape=False,
@@ -130,6 +136,29 @@ class ShexSerializer(object):
             self._write_line(a_line=line_indent_tuple[0],
                              indent_level=line_indent_tuple[1])
 
+    def _tune_statement_examples_if_needed(self, a_shape):
+        if self._examples_mode not in [ALL_EXAMPLES, CONSTRAINT_EXAMPLES]:
+            return
+        if self._inverse_paths:
+            self._add_statement_examples_inverse(a_shape)
+        else:
+            self._add_statement_examples_no_inverse(a_shape)
+
+    def _add_statement_examples_no_inverse(self, a_shape):
+        for a_statement in a_shape.yield_statements():
+            a_statement.add_comment(comment=_EXAMPLE_CONSTRAINT_PATTERN.format(
+                self._shape_example_features.get_constraint_example(shape_id=a_shape.class_uri,
+                                                                    prop=a_statement.st_property)
+            ))
+    def _add_statement_examples_inverse(self, a_shape):
+        for a_statement in a_shape.yield_statements():
+            a_statement.add_comment(comment=_EXAMPLE_CONSTRAINT_PATTERN.format(
+                self._shape_example_features.get_constraint_example(shape_id=a_shape.class_uri,
+                                                                    prop=a_statement.st_property,
+                                                                    inverse=a_statement.is_inverse)
+            ))
+
+
     def _serialize_shape_name(self, a_shape):
         self._write_line(
 
@@ -140,15 +169,15 @@ class ShexSerializer(object):
         )
 
     def _minimal_iri(self, a_shape):
-        if not self._detect_minimal_iri or self._shape_example_features.shape_min_iri(a_shape.iri) is None:
+        if not self._detect_minimal_iri or self._shape_example_features.shape_min_iri(a_shape.class_uri) is None:
             return ""
-        return "  [<{}>~]  AND".format(self._shape_example_features.shape_min_iri(a_shape.iri))
+        return "  [<{}>~]  AND".format(self._shape_example_features.shape_min_iri(a_shape.class_uri))
 
     def _instance_count(self, a_shape):
         return "   # {} instance{}".format(a_shape.n_instances,
                                            "" if a_shape.n_instances == 1 else "s") \
             if self._instances_report_mode in _MODES_REPORT_INSTANCES and \
-                     not self._disable_comments \
+               not self._disable_comments \
             else ""
 
     def _serialize_opening_of_rules(self):
