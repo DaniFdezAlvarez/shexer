@@ -7,7 +7,7 @@ from shexer.consts import RATIO_INSTANCES, UML_PLANT_SERVER
 
 def get_shape_serializer(output_format, shapes_list, target_file=None, string_return=False, namespaces_dict=None,
                          instantiation_property=None, disable_comments=False, wikidata_annotation=False,
-                         instances_report_mode=RATIO_INSTANCES, detect_minimal_iri=False, shape_features_examples=None):
+                         instances_report_mode=RATIO_INSTANCES, detect_minimal_iri=False, shape_features_examples=None, examples_mode=None):
     if output_format == SHEXC:
         return ShexSerializer(target_file=target_file,
                               shapes_list=shapes_list,
@@ -18,7 +18,8 @@ def get_shape_serializer(output_format, shapes_list, target_file=None, string_re
                               wikidata_annotation=wikidata_annotation,
                               instances_report_mode=instances_report_mode,
                               detect_minimal_iri=detect_minimal_iri,
-                              shape_example_features=shape_features_examples)
+                              shape_example_features=shape_features_examples,
+                              examples_mode=examples_mode)
     elif output_format == SHACL_TURTLE:
         return ShaclSerializer(target_file=target_file,
                                shapes_list=shapes_list,

@@ -346,7 +346,8 @@ class Shaper(object):
                                     wikidata_annotation=self._wikidata_annotation,
                                     instances_report_mode=self._instances_report_mode,
                                     detect_minimal_iri=self._detect_minimal_iri,
-                                    shape_features_examples=self._class_min_iris)
+                                    shape_features_examples=self._class_min_iris,
+                                    examples_mode=self._examples_mode)
 
     def _build_class_profiler(self):
         return get_class_profiler(target_classes_dict=self._target_classes_dict,

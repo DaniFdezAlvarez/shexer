@@ -33,7 +33,7 @@ class TestExamplesMode(unittest.TestCase):
             namespaces_dict=default_namespaces(),
             all_classes_mode=True,
             input_format=TURTLE,
-            disable_comments=True,
+            disable_comments=False,
             examples_mode=ALL_EXAMPLES)
         str_result = shaper.shex_graph(string_output=True)
         print(str_result)

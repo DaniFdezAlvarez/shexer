@@ -36,9 +36,13 @@ class ShapeExampleFeaturesDict(object):
         return self._base_dict[shape_id][_MIN_IRI_POS]
 
     def set_shape_example(self, shape_id, example_iri):
+        if shape_id not in self._base_dict:
+            self._init_shape(shape_id)
         self._base_dict[shape_id][_EXAMPLE_ENTITY_POS] = example_iri
 
     def shape_example(self, shape_id):
+        if shape_id not in self._base_dict:
+            return False
         return self._base_dict[shape_id][_EXAMPLE_ENTITY_POS]
 
     def _init_shape(self, shape_id):
@@ -46,6 +50,9 @@ class ShapeExampleFeaturesDict(object):
 
 
     def has_constraint_example(self, shape_id, prop_id):
+        raise NotImplementedError()
+
+    def _has_constraint_example_abstract(self):
         raise NotImplementedError()
 
     def set_constraint_example(self, shape_id, prop, example):
@@ -61,13 +68,21 @@ class ShapeExampleFeaturesDict(object):
         return self._base_dict[shape_id][_PROP_FEATURES_POS][_POS_INVERSE if inverse else _POS_DIRECT][prop]
 
     def _set_constraint_example_no_inverse(self, shape_id, prop_id, example):
+        if shape_id not in self._base_dict:
+            self._init_shape(shape_id)
         self._base_dict[shape_id][_PROP_FEATURES_POS][prop_id] = example
 
     def _set_constraint_example_inverse(self, shape_id, prop_id, example, inverse):
+        if shape_id not in self._base_dict:
+            self._init_shape(shape_id)
         self._base_dict[shape_id][_PROP_FEATURES_POS][_POS_INVERSE if inverse else _POS_DIRECT][prop_id] = example
 
     def _has_constraint_example_no_inverse(self, shape_id, prop_id):
+        if shape_id not in self._base_dict:
+            return False
         return prop_id in self._base_dict[shape_id][_PROP_FEATURES_POS]
 
     def _has_constraint_example_inverse(self, shape_id, prop_id, inverse):
+        if shape_id not in self._base_dict:
+            return False
         return  prop_id in self._base_dict[shape_id][_PROP_FEATURES_POS][_POS_INVERSE if inverse else _POS_DIRECT]
