@@ -332,7 +332,8 @@ class Shaper(object):
                                 instances_report_mode=self._instances_report_mode,
                                 detect_minimal_iri=self._detect_minimal_iri,
                                 class_min_iris=self._class_min_iris,
-                                allow_redundant_or=self._allow_redundant_or
+                                allow_redundant_or=self._allow_redundant_or,
+
                                 )
 
     def _build_shapes_serializer(self, target_file, string_return, output_format):
@@ -347,7 +348,8 @@ class Shaper(object):
                                     instances_report_mode=self._instances_report_mode,
                                     detect_minimal_iri=self._detect_minimal_iri,
                                     shape_features_examples=self._class_min_iris,
-                                    examples_mode=self._examples_mode)
+                                    examples_mode=self._examples_mode,
+                                    inverse_paths=self._inverse_paths)
 
     def _build_class_profiler(self):
         return get_class_profiler(target_classes_dict=self._target_classes_dict,

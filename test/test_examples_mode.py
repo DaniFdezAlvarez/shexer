@@ -39,7 +39,7 @@ class TestExamplesMode(unittest.TestCase):
         self.assertTrue(file_vs_str_shex_exact_comparison_excluding_prefixes(file_path=_BASE_DIR + "determ_constraint_examples_no_inverse.shex",
                                                                              str_target=str_result))
 
-    def test_all_classes_g1_all_examples_with_inverse(self):
+    def test_all_classes_constraint_examples_with_inverse(self):
         shaper = Shaper(
             graph_file_input=_BASE_DIR + "single_class_deterministic_order.ttl",
             namespaces_dict=default_namespaces(),
@@ -49,7 +49,6 @@ class TestExamplesMode(unittest.TestCase):
             examples_mode=CONSTRAINT_EXAMPLES,
             inverse_paths=True)
         str_result = shaper.shex_graph(string_output=True)
-        print(str_result)
-        self.assertTrue(file_vs_str_shex_exact_comparison_excluding_prefixes(file_path=_BASE_DIR + "determ_constraint_examples_no_inverse.shex",
+        self.assertTrue(file_vs_str_shex_exact_comparison_excluding_prefixes(file_path=_BASE_DIR + "determ_constraint_examples_with_inverse.shex",
                                                                              str_target=str_result))
 

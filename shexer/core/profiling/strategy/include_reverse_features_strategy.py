@@ -155,23 +155,23 @@ class IncludeReverseFeaturesStrategy(AbstractFeatureDirectionStrategy):
             self._annotate_target_object(a_triple)
 
     def _annotate_example_subject_inverse_paths(self, a_triple):
-        for a_class_key in self._i_dict[a_triple[_S]][POS_CLASSES]:
+        for a_class_key in self._i_dict[str(a_triple[_S])][POS_CLASSES]:
             if not self._shape_feature_examples.has_constraint_example(shape_id=a_class_key,
-                                                                       prop_id=a_triple[_P],
+                                                                       prop_id=str(a_triple[_P]),
                                                                        inverse=False):
                 self._shape_feature_examples.set_constraint_example(shape_id=a_class_key,
-                                                                    prop_id=a_triple[_P],
-                                                                    example=a_triple[_O],
+                                                                    prop_id=str(a_triple[_P]),
+                                                                    example=str(a_triple[_O]),
                                                                     inverse=False)
 
     def _annotate_example_object_inverse_paths(self, a_triple):
-        for a_class_key in self._i_dict[a_triple[_O]][POS_CLASSES]:
+        for a_class_key in self._i_dict[str(a_triple[_O])][POS_CLASSES]:
             if not self._shape_feature_examples.has_constraint_example(shape_id=a_class_key,
-                                                                       prop_id=a_triple[_P],
+                                                                       prop_id=str(a_triple[_P]),
                                                                        inverse=True):
                 self._shape_feature_examples.set_constraint_example(shape_id=a_class_key,
-                                                                    prop_id=a_triple[_P],
-                                                                    example=a_triple[_S],
+                                                                    prop_id=str(a_triple[_P]),
+                                                                    example=str(a_triple[_S]),
                                                                     inverse=True)
 
 
