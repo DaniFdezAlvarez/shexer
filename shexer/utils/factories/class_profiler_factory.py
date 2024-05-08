@@ -29,7 +29,8 @@ def get_class_profiler(target_classes_dict, source_file, list_of_source_files, i
                        all_classes_mode=False,
                        compression_mode=None,
                        disable_endpoint_cache=None,
-                       detect_minimal_iri=False):
+                       detect_minimal_iri=False,
+                       examples_mode=None):
     yielder = get_triple_yielder(source_file=source_file,
                                  list_of_source_files=list_of_source_files,
                                  input_format=input_format,
@@ -68,4 +69,5 @@ def get_class_profiler(target_classes_dict, source_file, list_of_source_files, i
                          original_shape_map=built_shape_map,
                          remove_empty_shapes=remove_empty_shapes,
                          inverse_paths=inverse_paths,
-                         detect_minimal_iri=detect_minimal_iri)
+                         detect_minimal_iri=detect_minimal_iri,
+                         examples_mode=examples_mode)

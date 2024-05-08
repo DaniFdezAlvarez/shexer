@@ -57,7 +57,7 @@ class AbstractShexingStrategy(object):
         :return:
         """
         if not len(valid_statements) == 0:
-            valid_statements.sort(reverse=True, key=lambda x: x.probability)  # Restoring order completly
+            valid_statements.sort(reverse=True, key=lambda x: x.probability)  # Restoring order completely
                                                                               # before changing cardinalities
 
             if self._all_compliant_mode:

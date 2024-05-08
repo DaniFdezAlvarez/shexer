@@ -9,12 +9,16 @@ _C_MAP_POS_INVERSE = 1
 class IncludeReverseFeaturesStrategy(AbstractFeatureDirectionStrategy):
 
 
+
+    def __init__(self, class_profiler):
+        super().__init__(class_profiler)
+        self._set_annotation_methods()
+
+
     def adapt_instances_dict(self):
         for a_subj_key in self._i_dict:
             self._i_dict[a_subj_key] = (self._i_dict[a_subj_key], {}, {})
 
-    def __init__(self, class_profiler):
-        super().__init__(class_profiler)
 
     def is_a_relevant_triple(self, a_triple):
         target_elems = (a_triple[_S], a_triple[_O])
@@ -25,10 +29,7 @@ class IncludeReverseFeaturesStrategy(AbstractFeatureDirectionStrategy):
 
 
     def annotate_triple_features(self, a_triple):
-        if self._is_relevant_instance(a_triple[_S]):
-            self._annotate_target_subject(a_triple)
-        if self._is_relevant_instance(a_triple[_O]):
-            self._annotate_target_object(a_triple)
+        raise NotImplementedError()
 
 
     def init_annotated_targets(self):
@@ -133,5 +134,44 @@ class IncludeReverseFeaturesStrategy(AbstractFeatureDirectionStrategy):
             if a_shape not in self._i_dict[str_obj][POS_FEATURES_INVERSE][str_prop]:
                 self._i_dict[str_obj][POS_FEATURES_INVERSE][str_prop][a_shape] = 0
 
+    def _set_annotation_methods(self):
+        if not self._examples_mode:
+            self.annotate_triple_features = self._annotate_triple_features_no_examples
+        else:
+            self.annotate_triple_features = self._annotate_triple_features_with_examples
+
+    def _annotate_triple_features_with_examples(self, a_triple):
+        if self._is_relevant_instance(a_triple[_S]):
+            self._annotate_target_subject(a_triple)
+            self._annotate_example_subject_inverse_paths(a_triple)
+        if self._is_relevant_instance(a_triple[_O]):
+            self._annotate_target_object(a_triple)
+            self._annotate_example_object_inverse_paths(a_triple)
+
+    def _annotate_triple_features_no_examples(self, a_triple):
+        if self._is_relevant_instance(a_triple[_S]):
+            self._annotate_target_subject(a_triple)
+        if self._is_relevant_instance(a_triple[_O]):
+            self._annotate_target_object(a_triple)
+
+    def _annotate_example_subject_inverse_paths(self, a_triple):
+        for a_class_key in self._i_dict[str(a_triple[_S])][POS_CLASSES]:
+            if not self._shape_feature_examples.has_constraint_example(shape_id=a_class_key,
+                                                                       prop_id=str(a_triple[_P]),
+                                                                       inverse=False):
+                self._shape_feature_examples.set_constraint_example(shape_id=a_class_key,
+                                                                    prop_id=str(a_triple[_P]),
+                                                                    example=str(a_triple[_O]),
+                                                                    inverse=False)
+
+    def _annotate_example_object_inverse_paths(self, a_triple):
+        for a_class_key in self._i_dict[str(a_triple[_O])][POS_CLASSES]:
+            if not self._shape_feature_examples.has_constraint_example(shape_id=a_class_key,
+                                                                       prop_id=str(a_triple[_P]),
+                                                                       inverse=True):
+                self._shape_feature_examples.set_constraint_example(shape_id=a_class_key,
+                                                                    prop_id=str(a_triple[_P]),
+                                                                    example=str(a_triple[_S]),
+                                                                    inverse=True)
 
 

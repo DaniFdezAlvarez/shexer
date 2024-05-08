@@ -11,6 +11,10 @@ class AbstractFeatureDirectionStrategy(object):
         self._c_counts = self._class_profiler._class_counts
         self._shape_names_dict = self._class_profiler._shape_names_dict
         self._original_raw_target_classes = self._class_profiler._original_raw_target_classes
+        self._detect_minimal_iri = self._class_profiler._detect_minimal_iri
+        self._examples_mode = self._class_profiler._examples_mode
+        if self._detect_minimal_iri or self._examples_mode is not None:
+            self._shape_feature_examples = self._class_profiler._shape_feature_examples
 
     def adapt_instances_dict(self):
         raise NotImplementedError()
@@ -32,6 +36,9 @@ class AbstractFeatureDirectionStrategy(object):
 
     def has_shape_annotated_features(self, shape_label):
         raise NotImplementedError()
+    #
+    # def look_for_example_features(self, instance_id, shape_id):
+    #     raise NotImplementedError()
 
     def _init_annotated_direct_features(self):
         for an_instance, class_list in self._i_dict.items():

@@ -12,7 +12,7 @@ class Shape(object):
         self._sorting_callback = lambda x: x.probability
         self._n_direct_statements = self._count_direct_statements(statements)
         self._n_inverse_statements = len(statements) - self._n_direct_statements
-        self._iri_pattern = iri_pattern
+        # self._iri_pattern = iri_pattern
 
     @property
     def name(self):
@@ -38,13 +38,13 @@ class Shape(object):
     def n_instances(self):
         return self._n_instances
 
-    @property
-    def iri_pattern(self):
-        return self._iri_pattern
-
-    @iri_pattern.setter
-    def iri_pattern(self, value):
-        self._iri_pattern = value
+    # @property
+    # def iri_pattern(self):
+    #     return self._iri_pattern
+    #
+    # @iri_pattern.setter
+    # def iri_pattern(self, value):
+    #     self._iri_pattern = value
 
     @property
     def statements(self):

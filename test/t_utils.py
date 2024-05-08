@@ -220,6 +220,25 @@ def file_vs_str_exact_comparison(file_path, target_str):
     with open(file_path, "r") as in_stream:
         return in_stream.read().strip() == target_str.strip()
 
+def filter_prefixes_str_shex(target_str):
+    result = []
+    lines = target_str.split("\n")
+    counter = 0
+    while len(lines) > counter:
+        if not lines[counter].startswith("PREFIX"):
+            break
+        counter += 1
+    return "\n".join(lines[counter:]).strip() if counter > 0 else target_str
+
+def file_vs_str_shex_exact_comparison_excluding_prefixes(file_path, str_target):
+    with open(file_path, "r") as in_stream:
+        target_file_content = filter_prefixes_str_shex(in_stream.read().strip())
+        target_str_content = filter_prefixes_str_shex(str_target.strip())
+
+        return target_file_content == target_str_content
+
+
+
 
 def file_vs_file_tunned_comparison(file_path1, file_path2, or_shapes=False):
     with open(file_path1, "r") as in_stream:
