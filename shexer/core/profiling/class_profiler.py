@@ -1,7 +1,7 @@
 from shexer.utils.target_elements import determine_original_target_nodes_if_needed
 from shexer.model.property import Property
 from shexer.utils.uri import remove_corners
-from shexer.consts import SHAPES_DEFAULT_NAMESPACE, SHAPE_EXAMPLES, ALL_EXAMPLES, CONSTRAINT_EXAMPLES
+from shexer.consts import SHAPES_DEFAULT_NAMESPACE, SHAPE_EXAMPLES, ALL_EXAMPLES
 from shexer.core.profiling.consts import POS_CLASSES
 from shexer.utils.log import log_msg
 from shexer.utils.uri import longest_common_prefix
@@ -66,10 +66,11 @@ class ClassProfiler(object):
         self._clean_class_profile()
         log_msg(verbose=verbose,
                 msg="Shape profiles done. Working with {} shapes.".format(len(self._classes_shape_dict)))
-        if self._detect_minimal_iri or self._examples_mode is not None:
+        if self._detect_minimal_iri or self._examples_mode in [SHAPE_EXAMPLES, ALL_EXAMPLES]:
             log_msg(verbose=verbose,
                     msg="Detecting example features for each shape...")
-            self._detect_min_iris()
+            self._init_anotation_example_method()
+            self._detect_example_features()
             log_msg(verbose=verbose,
                     msg="Mimimal IRIs detected...")
         return self._classes_shape_dict, self._class_counts, \
@@ -78,20 +79,46 @@ class ClassProfiler(object):
     def get_target_classes_dict(self):
         return self._instances_dict
 
-    def _detect_min_iris(self):
+    def _detect_example_features(self):
         self._init_class_features_dict()
-        self._annotate_min_iris()
+        self._annotate_example_features()
+
 
     def _init_class_features_dict(self):
         for a_class_key in self._class_counts:
             self._shape_feature_examples.set_shape_min_iri(shape_id=a_class_key,
                                                            min_iri=_MINIMAL_IRI_INIT)
 
+    def _init_anotation_example_method(self):
+        if self._detect_minimal_iri and self._examples_mode in [SHAPE_EXAMPLES, ALL_EXAMPLES]:
+            self._annotate_example_features = self._annotate_shape_examples_and_min_iris
+        elif self._detect_minimal_iri:
+            self._annotate_example_features = self._annotate_min_iris
+        else:  # not minimal IRIs, but if this was called, at this point, it means that we are looking for shape examples
+            self._annotate_example_features = self._annotate_shape_examples
+    def _annotate_example_features(self):
+        raise NotImplementedError()
+
     def _annotate_min_iris(self):
         for an_instance_iri in self._instances_dict:
             for a_class_key in self._instances_dict[an_instance_iri][POS_CLASSES]:
                 self._update_shape_min_iri(target_shape=a_class_key,
                                            instance_iri=an_instance_iri)
+    def _annotate_shape_examples(self):
+        for an_instance_iri in self._instances_dict:
+            for a_class_key in self._instances_dict[an_instance_iri][POS_CLASSES]:
+                if self._shape_feature_examples.shape_example(shape_id=a_class_key) is None:
+                    self._shape_feature_examples.set_shape_example(shape_id=a_class_key,
+                                                           example_iri=an_instance_iri)
+
+    def _annotate_shape_examples_and_min_iris(self):
+        for an_instance_iri in self._instances_dict:
+            for a_class_key in self._instances_dict[an_instance_iri][POS_CLASSES]:
+                self._update_shape_min_iri(target_shape=a_class_key,
+                                           instance_iri=an_instance_iri)
+                if self._shape_feature_examples.shape_example(shape_id=a_class_key) is None:
+                    self._shape_feature_examples.set_shape_example(shape_id=a_class_key,
+                                                           example_iri=an_instance_iri)
 
 
     def _update_shape_min_iri(self, target_shape, instance_iri):
@@ -191,7 +218,6 @@ class ClassProfiler(object):
             if self._strategy.is_a_relevant_triple(a_triple):
                 yield a_triple
 
-
     # def _set_anotation_instance_methods(self):
     #     # MIN IRIS
     #     if self._detect_minimal_iri:
@@ -211,10 +237,7 @@ class ClassProfiler(object):
     #     else:
     #         raise ValueError("Unrecognized mode for getting shape examples. Choose one between the values offered in shexer.const, section # EXAMPLES")
 
-    # def _update_shape_examples_only_shapes(self, instance_id, shape_id):
-    #     if self._shape_feature_examples.shape_example(shape_id=shape_id) is None:
-    #         self._instances_dict.set_shape_example(shape_id=shape_id,
-    #                                                example_iri=instance_id)
+
     #
     # def _update_shape_examples_only_constraints(self, instance_id, shape_id):
     #     self._strategy.look_for_example_features(instance_id=instance_id,

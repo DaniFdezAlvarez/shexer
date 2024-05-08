@@ -11,7 +11,8 @@ from shexer.consts import RATIO_INSTANCES, ABSOLUTE_INSTANCES, MIXED_INSTANCES, 
 from wlighter import SHEXC_FORMAT
 
 _MODES_REPORT_INSTANCES = [ABSOLUTE_INSTANCES, MIXED_INSTANCES]
-_EXAMPLE_CONSTRAINT_PATTERN = "# Node constraint example: '{}'"
+_EXAMPLE_CONSTRAINT_TEMPLATE = "# Node constraint example: '{}'"
+_EXAMPLE_SHAPE_TEMPLATE = "{} Instance example: '{}'"
 
 
 class ShexSerializer(object):
@@ -84,6 +85,7 @@ class ShexSerializer(object):
 
     def _serialize_shape(self, a_shape):
         self._serialize_shape_name(a_shape)
+        # self._serialize_example(a_shape)
         self._serialize_opening_of_rules()
         self._serialize_shape_rules(a_shape)
         self._serialize_closure_of_rule()
@@ -144,7 +146,7 @@ class ShexSerializer(object):
     def _add_statement_examples(self, a_shape):
         for a_statement in a_shape.yield_statements():
             if a_statement.st_property != self._instantiation_property_str:
-                comment = _EXAMPLE_CONSTRAINT_PATTERN.format(
+                comment = _EXAMPLE_CONSTRAINT_TEMPLATE.format(
                     self._get_node_constraint_example_no_inverse(a_shape, a_statement) if not self._inverse_paths
                     else self._get_node_constraint_example_inverse(a_shape, a_statement)
                 )
@@ -152,15 +154,6 @@ class ShexSerializer(object):
                 a_statement.add_comment(comment, insert_first=True)
 
 
-
-    # def _add_statement_examples_inverse(self, a_shape):
-    #     for a_statement in a_shape.yield_statements():
-    #         if a_statement.st_property != self._instantiation_property_str:
-    #             a_statement.add_comment(comment=_EXAMPLE_CONSTRAINT_PATTERN.format(
-    #                 self._shape_example_features.get_constraint_example(shape_id=a_shape.class_uri,
-    #                                                                     prop=a_statement.st_property,
-    #                                                                     inverse=a_statement.is_inverse)
-    #             ))
 
     def _get_node_constraint_example_no_inverse(self, shape, statement):
         candidate = self._shape_example_features.get_constraint_example(shape_id=shape.class_uri,
@@ -188,8 +181,23 @@ class ShexSerializer(object):
             prefixize_shape_name_if_possible(a_shape_name=a_shape.name,
                                              namespaces_prefix_dict=self._namespaces_dict) +
             self._minimal_iri(a_shape=a_shape) +
-            self._instance_count(a_shape)
+            self._instance_count(a_shape) +
+            self._serialize_example(a_shape)
         )
+
+    def _serialize_example(self, a_shape):
+        if self._examples_mode not in [ALL_EXAMPLES, SHAPE_EXAMPLES]:
+            return ""
+        return _EXAMPLE_SHAPE_TEMPLATE.format(
+            " " if self._instances_report_mode in _MODES_REPORT_INSTANCES and not self._disable_comments else "   #",
+            self._shape_example_features.shape_example(shape_id=a_shape.class_uri))
+        # self._write_line(
+        #     a_line=_EXAMPLE_SHAPE_TEMPLATE.format(
+        #         self._shape_example_features.shape_example(shape_id=a_shape.class_uri)),
+        #     indent_level=2)
+
+        # self._instances_report_mode in _MODES_REPORT_INSTANCES and not self._disable_comments
+
 
     def _minimal_iri(self, a_shape):
         if not self._detect_minimal_iri or self._shape_example_features.shape_min_iri(a_shape.class_uri) is None:
@@ -197,10 +205,9 @@ class ShexSerializer(object):
         return "  [<{}>~]  AND".format(self._shape_example_features.shape_min_iri(a_shape.class_uri))
 
     def _instance_count(self, a_shape):
-        return "   # {} instance{}".format(a_shape.n_instances,
-                                           "" if a_shape.n_instances == 1 else "s") \
-            if self._instances_report_mode in _MODES_REPORT_INSTANCES and \
-               not self._disable_comments \
+        return "   # {} instance{}.".format(a_shape.n_instances,
+                                            "" if a_shape.n_instances == 1 else "s") \
+            if self._instances_report_mode in _MODES_REPORT_INSTANCES and not self._disable_comments \
             else ""
 
     def _serialize_opening_of_rules(self):
