@@ -1,7 +1,7 @@
 from shexer.core.profiling.class_profiler import RDF_TYPE_STR
 
 from shexer.model.property import Property
-from shexer.utils.uri import remove_corners
+from shexer.utils.uri import remove_corners, prefixize_uri_if_possible
 from shexer.utils.shapes import prefixize_shape_name_if_possible
 from shexer.io.shex.formater.consts import SPACES_LEVEL_INDENTATION
 from shexer.io.wikidata import wikidata_annotation
@@ -11,7 +11,7 @@ from shexer.consts import RATIO_INSTANCES, ABSOLUTE_INSTANCES, MIXED_INSTANCES, 
 from wlighter import SHEXC_FORMAT
 
 _MODES_REPORT_INSTANCES = [ABSOLUTE_INSTANCES, MIXED_INSTANCES]
-_EXAMPLE_CONSTRAINT_PATTERN = "Node constraint example: {}"
+_EXAMPLE_CONSTRAINT_PATTERN = "# Node constraint example: '{}'"
 
 
 class ShexSerializer(object):
@@ -139,24 +139,47 @@ class ShexSerializer(object):
     def _tune_statement_examples_if_needed(self, a_shape):
         if self._examples_mode not in [ALL_EXAMPLES, CONSTRAINT_EXAMPLES]:
             return
-        if self._inverse_paths:
-            self._add_statement_examples_inverse(a_shape)
-        else:
-            self._add_statement_examples_no_inverse(a_shape)
+        self._add_statement_examples(a_shape)
 
-    def _add_statement_examples_no_inverse(self, a_shape):
+    def _add_statement_examples(self, a_shape):
         for a_statement in a_shape.yield_statements():
-            a_statement.add_comment(comment=_EXAMPLE_CONSTRAINT_PATTERN.format(
-                self._shape_example_features.get_constraint_example(shape_id=a_shape.class_uri,
-                                                                    prop=a_statement.st_property)
-            ))
-    def _add_statement_examples_inverse(self, a_shape):
-        for a_statement in a_shape.yield_statements():
-            a_statement.add_comment(comment=_EXAMPLE_CONSTRAINT_PATTERN.format(
-                self._shape_example_features.get_constraint_example(shape_id=a_shape.class_uri,
-                                                                    prop=a_statement.st_property,
-                                                                    inverse=a_statement.is_inverse)
-            ))
+            if a_statement.st_property != self._instantiation_property_str:
+                comment = _EXAMPLE_CONSTRAINT_PATTERN.format(
+                    self._get_node_constraint_example_no_inverse(a_shape, a_statement) if not self._inverse_paths
+                    else self._get_node_constraint_example_inverse(a_shape, a_statement)
+                )
+
+                a_statement.add_comment(comment, insert_first=True)
+
+
+
+    # def _add_statement_examples_inverse(self, a_shape):
+    #     for a_statement in a_shape.yield_statements():
+    #         if a_statement.st_property != self._instantiation_property_str:
+    #             a_statement.add_comment(comment=_EXAMPLE_CONSTRAINT_PATTERN.format(
+    #                 self._shape_example_features.get_constraint_example(shape_id=a_shape.class_uri,
+    #                                                                     prop=a_statement.st_property,
+    #                                                                     inverse=a_statement.is_inverse)
+    #             ))
+
+    def _get_node_constraint_example_no_inverse(self, shape, statement):
+        candidate = self._shape_example_features.get_constraint_example(shape_id=shape.class_uri,
+                                                                        prop=statement.st_property)
+        if candidate.startswith("http"):  # Let's assume this means that it is an URI
+            candidate = prefixize_uri_if_possible(target_uri=candidate,
+                                                  namespaces_prefix_dict=self._namespaces_dict,
+                                                  corners=False)
+        return candidate
+
+    def _get_node_constraint_example_inverse(self, shape, statement):
+        candidate = self._shape_example_features.get_constraint_example(shape_id=shape.class_uri,
+                                                                        prop=statement.st_property,
+                                                                        inverse=statement.is_inverse)
+        if candidate.startswith("https://"):  # Let's assume this means that it is a URI
+            candidate = prefixize_uri_if_possible(target_uri=candidate,
+                                                  namespaces_prefix_dict=self._namespaces_dict,
+                                                  corners=False)
+        return candidate
 
 
     def _serialize_shape_name(self, a_shape):
