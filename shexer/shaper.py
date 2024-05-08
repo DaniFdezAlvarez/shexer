@@ -1,7 +1,8 @@
 from shexer.utils.obj_references import check_just_one_not_none
 
 from shexer.consts import SHEXC, SHACL_TURTLE, NT, TSV_SPO, N3, TURTLE, TURTLE_ITER, \
-    RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE, ZIP, GZ
+    RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE, ZIP, GZ, \
+    ALL_EXAMPLES, CONSTRAINT_EXAMPLES, SHAPE_EXAMPLES
 from shexer.utils.factories.class_profiler_factory import get_class_profiler
 from shexer.utils.factories.instance_tracker_factory import get_instance_tracker
 from shexer.utils.factories.class_shexer_factory import get_class_shexer
@@ -59,7 +60,8 @@ class Shaper(object):
                  disable_endpoint_cache=False,
                  detect_minimal_iri=False,
                  allow_redundant_or=False,
-                 instances_cap=-1
+                 instances_cap=-1,
+                 examples_mode=None
                  ):
         """
 
@@ -105,6 +107,8 @@ class Shaper(object):
         :param disable_endpoint_cache:
         :param detect_minimal_iri:
         :param allow_redundant_or:
+        :param instances_cap:
+        :param examples_mode:
         """
 
         check_just_one_not_none((graph_file_input, "graph_file_input"),
@@ -133,6 +137,8 @@ class Shaper(object):
         self._check_input_format(input_format)
 
         self._check_compression_mode(compression_mode, url_endpoint, url_graph_input, list_of_url_input)
+
+        self._check_examples_mode(examples_mode)
 
         self._target_classes = target_classes
         self._file_target_classes = file_target_classes
@@ -170,6 +176,7 @@ class Shaper(object):
         self._wikidata_annotation = wikidata_annotation
         self._inverse_paths = inverse_paths
         self._detect_minimal_iri = detect_minimal_iri
+        self._examples_mode = examples_mode
 
         self._compression_mode = compression_mode
 
@@ -325,7 +332,8 @@ class Shaper(object):
                                 instances_report_mode=self._instances_report_mode,
                                 detect_minimal_iri=self._detect_minimal_iri,
                                 class_min_iris=self._class_min_iris,
-                                allow_redundant_or=self._allow_redundant_or
+                                allow_redundant_or=self._allow_redundant_or,
+
                                 )
 
     def _build_shapes_serializer(self, target_file, string_return, output_format):
@@ -338,7 +346,10 @@ class Shaper(object):
                                     disable_comments=self._disable_comments,
                                     wikidata_annotation=self._wikidata_annotation,
                                     instances_report_mode=self._instances_report_mode,
-                                    detect_minimal_iri=self._detect_minimal_iri)
+                                    detect_minimal_iri=self._detect_minimal_iri,
+                                    shape_features_examples=self._class_min_iris,
+                                    examples_mode=self._examples_mode,
+                                    inverse_paths=self._inverse_paths)
 
     def _build_class_profiler(self):
         return get_class_profiler(target_classes_dict=self._target_classes_dict,
@@ -369,7 +380,8 @@ class Shaper(object):
                                   all_classes_mode=self._all_classes_mode,
                                   compression_mode=self._compression_mode,
                                   disable_endpoint_cache=self._disable_endpoint_cache,
-                                  detect_minimal_iri=self._detect_minimal_iri)
+                                  detect_minimal_iri=self._detect_minimal_iri,
+                                  examples_mode=self._examples_mode)
 
 
     def _build_instance_tracker(self):
@@ -459,3 +471,8 @@ class Shaper(object):
     def _check_aceptance_threshold(aceptance_threshold):
         if aceptance_threshold < 0 or aceptance_threshold > 1:
             raise ValueError("The acceptance threshold must be a value in [0,1]")
+
+    @staticmethod
+    def _check_examples_mode(examples_mode):
+        if examples_mode not in [None, ALL_EXAMPLES, CONSTRAINT_EXAMPLES, SHAPE_EXAMPLES]:
+            raise ValueError("The examples mode param should be set to None or using one of the values in shexer.const, section \"EXAMPLES\" ")

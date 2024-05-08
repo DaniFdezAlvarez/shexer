@@ -1,0 +1,27 @@
+PREFIX ex: <http://example.org/>
+PREFIX xml: <http://www.w3.org/XML/1998/namespace/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX : <http://weso.es/shapes/>
+
+:Person
+{
+   rdf:type  [foaf:Person]  ;                                  # 100.0 %
+   foaf:age  xsd:integer  ?;
+            # Node constraint example: '22'
+            # 80.0 % obj: xsd:integer. Cardinality: {1}
+   foaf:name  xsd:string  ?;
+            # Node constraint example: 'Jimmy'
+            # 60.0 % obj: xsd:string. Cardinality: {1}
+   foaf:familyName  xsd:string  ?;
+            # Node constraint example: 'Jones'
+            # 40.0 % obj: xsd:string. Cardinality: {1}
+   foaf:knows  @:Person  ?;
+            # Node constraint example: 'http://example.org/Bella'
+            # 20.0 % obj: @:Person. Cardinality: {1}
+   ^  foaf:knows  @:Person  ?
+            # Node constraint example: 'http://example.org/Jimmy'
+            # 20.0 % obj: @:Person. Cardinality: {1}
+}

@@ -53,14 +53,15 @@ class ShaclSerializer(object):
 
     def __init__(self, target_file, shapes_list, namespaces_dict=None, string_return=False,
                  instantiation_property_str=RDF_TYPE_STR, wikidata_annotation=False,
-                 detect_minimal_iri=False):
+                 detect_minimal_iri=False, shape_example_features=None):
         self._target_file = target_file
         self._namespaces_dict = namespaces_dict if namespaces_dict is not None else {}
         self._shapes_list = shapes_list
         self._string_return = string_return
         self._instantiation_property_str = instantiation_property_str
         self._wikidata_annotation = wikidata_annotation
-        self._detect_minimal_iri=detect_minimal_iri
+        self._detect_minimal_iri = detect_minimal_iri
+        self._shape_example_features = shape_example_features
 
         self._g_shapes = Graph()
 
@@ -117,8 +118,9 @@ class ShaclSerializer(object):
         self._add_shape_uri(r_shape_uri=r_shape_uri)
         self._add_target_class(r_shape_uri=r_shape_uri,
                                shape=shape)
-        self._add_min_iri(r_shape_uri=r_shape_uri,
-                          shape=shape)
+        if self._detect_minimal_iri:
+            self._add_min_iri(r_shape_uri=r_shape_uri,
+                              shape=shape)
         self._add_shape_constraints(shape=shape,
                                     r_shape_uri=r_shape_uri)
 
@@ -130,13 +132,14 @@ class ShaclSerializer(object):
                              URIRef(shape.class_uri))  # TODO check if this is always an abs. URI, not sure
 
     def _add_min_iri (self, shape, r_shape_uri):
-        if shape.iri_pattern is not None:
+        # if shape.iri_pattern is not None:
+        if self._shape_example_features.shape_min_iri(shape_id=shape.class_uri) is not None:
             self._add_triple(r_shape_uri,
                              _R_SHACL_PATTERN_PROP,
                              self._literal_iri_pattern(shape))
 
     def _literal_iri_pattern(self, shape):
-        return Literal("^{}".format(shape.iri_pattern))
+        return Literal("^{}".format(self._shape_example_features.shape_min_iri(shape_id=shape.class_uri)))
 
     def _add_shape_constraints(self, shape, r_shape_uri):
         for a_statement in shape.yield_statements():

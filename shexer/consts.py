@@ -32,5 +32,11 @@ RATIO_INSTANCES = "ratio"
 ABSOLUTE_INSTANCES = "abs"
 MIXED_INSTANCES = "mixed"
 
+
+# EXAMPLES
+SHAPE_EXAMPLES = "shape"
+CONSTRAINT_EXAMPLES = "cons"
+ALL_EXAMPLES = "all"
+
 # UML
 UML_PLANT_SERVER = "http://www.plantuml.com/plantuml/img/"

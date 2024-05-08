@@ -13,6 +13,9 @@ Use this work in case you want to cite this software: [Automatic extraction of s
 
 If you want to read the paper but cannot access the full-content using the previous link, there is a [preprint available in Researchgate](https://www.researchgate.net/publication/357146819_Automatic_extraction_of_shapes_using_sheXer).
 
+
+However, please, be aware that this software capabilities' have evolved and improved since the publication of the mentioned paper.
+
 ## Installation
 
 sheXer can be installed using pip:
@@ -55,6 +58,8 @@ sheXer includes a package to deploy a wer service exposing sheXer with a REST AP
 * **Inverse paths**. sheXer can extract constraints related to incomming links. Shapes are usually described using contraints realted to outgoing links, i.d., triples in which the node is the subject. However, sheXer can extract also constraints where the node is the object.
 
 * **Configurable priority of cardinalities**. sheXer can be configured to prioritize the less specific cardinality or the most specific one if its trustworthiness score is high enough.
+
+* **Example serialization**. sheXer is able to produce outputs that include examples of instances among the input data matching each shape and/or examples of node constraints matching each constraint of each shape. Currently, this feature works only with ShEx outputs.
 
 * **All compliant mode**: You can produce shapes that conform with every instance using to extract them. This is done by using cadinalities \* or ? for every constraint extracted that does not conform with EVERY instance. You may prefer to avoid these cardinalities and keep constraints that may not conform with every instance, but include the most frequent features of the instances. Both settings are available in sheXer.
 
@@ -218,6 +223,7 @@ Again, all these params have a default value and you don't need to worry about t
 * wikidata_annotation (default: False). This param can be used when the output will contain Wikidata IDs. Using the library [wLighter](https://github.com/DaniFdezAlvarez/wLighter), the ourput is annotated with comments that associate a given every Wikidata ID with its English label. 
 * instances_report_mode (default, const.RATIO_INSTANCES). With this parameter, you can configure how is the information about instances complying to each expression shown. By default, sheXer shows a percetage of instances. If you set this parameter to const.ABSOLUTE_INSTANCES, then the comments will contain the exact number of complying instances instead of the ratio. sheXer will write a comment next to the shape label so you can also know how many isntances were used to extract a shape. If you set the parameter to const.MIXED_INSTANCES, the comments will contain both relative and absolute information.
 * decimals (default: -1). With this parameter you can configure the numnber of decimals to be used when writing ratios in comments. A negative numnber means that ratios will be written using its top precission. If you set this parameter to a natural number (including 0), then such number will be the number of decimals used. sheXer will round (not truncate) the original ratio to that precission.
+* examples_mode (default: None). You can set this parameter to one of the values included in the '#EXAMPLES' section of shexer.consts. If you choose SHAPE_EXAMPLES, sheXer will write the URI of an instance matching each shape extracted as a comment next to the shape label. If you choose CONSTRAINT_EXAMPLES, sheXer will write a comment including an example of node constraint matching each triple constraint of each shape (each value is used by an instance example with the triple constraint's property). If you choose ALL_EXAMPLES, sheXer will do both things. When the value of this parameter is None, sheXer will not serialize examples in comments.
 
 
 ### Method __shex\_graph__

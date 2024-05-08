@@ -15,8 +15,8 @@ class StSerializerFactory(object):
     """
 
     def __init__(self, freq_mode, decimals, instantiation_property_str, disable_comments):
-        self._freq_serializer = self._build_freq_serializer(freq_mode = freq_mode,
-                                                            decimals = decimals)
+        self._freq_serializer = self._build_freq_serializer(freq_mode=freq_mode,
+                                                            decimals=decimals)
 
         self._direct_base = BaseStatementSerializer(
                 instantiation_property_str=instantiation_property_str,
