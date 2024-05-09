@@ -25,6 +25,7 @@ SHAPES_DEFAULT_NAMESPACE = "http://weso.es/shapes/"
 #COMPRESSION FORMATS
 ZIP = "zip"
 GZ = "gz"
+XZ = "xz"
 
 # FREQUENCY MODES
 

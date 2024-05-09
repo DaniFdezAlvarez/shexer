@@ -1,7 +1,7 @@
 from shexer.utils.obj_references import check_just_one_not_none
 
 from shexer.consts import SHEXC, SHACL_TURTLE, NT, TSV_SPO, N3, TURTLE, TURTLE_ITER, \
-    RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE, ZIP, GZ, \
+    RDF_XML, FIXED_SHAPE_MAP, JSON_LD, RDF_TYPE, SHAPES_DEFAULT_NAMESPACE, ZIP, GZ, XZ, \
     ALL_EXAMPLES, CONSTRAINT_EXAMPLES, SHAPE_EXAMPLES
 from shexer.utils.factories.class_profiler_factory import get_class_profiler
 from shexer.utils.factories.instance_tracker_factory import get_instance_tracker
@@ -430,11 +430,11 @@ class Shaper(object):
 
     @staticmethod
     def _check_compression_mode(compression_mode, url_endpoint, url_graph_input, list_of_url_input):
-        if compression_mode not in [ZIP, GZ, None]:
+        if compression_mode not in [ZIP, GZ, XZ, None]:
             raise ValueError("Unknownk compression mode: {}. "
                              "The currently supported compression formats are {}.".format(
                 compression_mode,
-                ", ".join([ZIP, GZ])))
+                ", ".join([ZIP, GZ, XZ])))
         if compression_mode is not None and (url_endpoint is not None or url_graph_input is not None or list_of_url_input is not None):
             raise ValueError("You've chosed some compression mode ({}) to work with remote sources."
                              "Currently, sheXer can only parse compressed local files".format(compression_mode))
