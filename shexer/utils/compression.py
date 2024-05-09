@@ -1,8 +1,15 @@
-import gzip
+from gzip import open as gzopen
 from zipfile import ZipFile
+from xz import open as xzopen
+
+
+def get_content_xz_file(xz_path):
+    with xzopen(xz_path, "r") as in_stream:
+        return in_stream.read()
+
 
 def get_content_gz_file(gz_path):
-    with gzip.open(gz_path, "r") as in_stream:
+    with gzopen(gz_path, "r") as in_stream:
         return in_stream.read()
 
 

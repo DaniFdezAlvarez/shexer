@@ -1,6 +1,6 @@
 from rdflib.graph import Graph, URIRef, Literal, BNode
 from shexer.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
-from shexer.consts import N3, TURTLE, RDF_XML, NT, JSON_LD, ZIP, GZ
+from shexer.consts import N3, TURTLE, RDF_XML, NT, JSON_LD, ZIP, GZ, XZ
 
 from shexer.model.Literal import Literal as model_Literal
 from shexer.model.IRI import IRI as model_IRI
@@ -8,7 +8,7 @@ from shexer.model.bnode import BNode as model_BNode
 from shexer.model.property import Property as model_Property
 
 from shexer.utils.uri import decide_literal_type
-from shexer.utils.compression import get_content_gz_file, get_content_zip_internal_file
+from shexer.utils.compression import get_content_gz_file, get_content_zip_internal_file, get_content_xz_file
 
 _SUPPORTED_FORMATS = [N3, TURTLE, RDF_XML, NT, JSON_LD]
 
@@ -155,6 +155,8 @@ class RdflibParserTripleYielder(RdflibTripleYielder):
             rdflib_graph.parse(data=get_content_zip_internal_file(base_archive=self._zip_archive_file,
                                                                   target_file=self._source),
                                format=self._input_format)
+        elif self._compression_mode == XZ:
+            rdflib_graph.parse(data=get_content_xz_file(self._source), format=self._input_format)
         else:
             raise ValueError("Unknown compression format")
 
