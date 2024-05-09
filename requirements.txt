@@ -1,5 +1,5 @@
 Flask==2.3.2
-Flask-Cors==3.0.9
+Flask-Cors==4.0.1
 rdflib==6.0.2
 SPARQLWrapper==1.8.4
 wlighter==1.0.1
