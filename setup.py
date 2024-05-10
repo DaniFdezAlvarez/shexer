@@ -33,6 +33,7 @@ setup(
 		  'rdflib',
 		  'SPARQLWrapper',
           'wlighter',
-          'plantuml'
+          'plantuml',
+          'python-xz'
       ],
 )
