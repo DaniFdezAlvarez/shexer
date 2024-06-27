@@ -109,7 +109,7 @@ class UMLSerializer(object):
     def _declare_and_open_shape(self, a_shape):
         target_name = prefixize_shape_name_if_possible(a_shape_name=a_shape.name,
                                                        namespaces_prefix_dict=self._namespaces_dict)
-        if target_name.startswith(":") or target_name.startswith("<") :
+        if ":" in target_name or "-" in target_name or target_name.startswith("<") :
             self._declare_shape_with_alias(target_name)
         else:
             self._declare_shape_without_alias(target_name)
@@ -119,9 +119,11 @@ class UMLSerializer(object):
         self._write_line(f"object {target_name} {{")
 
     def _declare_shape_with_alias(self, target_name):
-        if target_name.startswith(":"):
-            alias = target_name[1:]
-        else:
+        alias = target_name
+        alias = alias.replace(":", "_")
+        alias = alias.replace("-", "_")
+
+        if alias.startswith("<"):
             alias = target_name[1:-1]
         self._shape_alias[target_name] = alias
         self._write_line(f'object "{target_name}" as {alias} {{')
