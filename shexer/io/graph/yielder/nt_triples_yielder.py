@@ -1,4 +1,4 @@
-from shexer.utils.log import log_to_error
+from shexer.utils.log import log_msg
 from shexer.utils.uri import there_is_arroba_after_last_quotes
 from shexer.utils.triple_yielders import tune_prop, tune_token  # , check_if_property_belongs_to_namespace_list
 from shexer.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
@@ -29,8 +29,8 @@ class NtTriplesYielder(BaseTriplesYielder):
             tokens = self._look_for_tokens(a_line.strip())
             if len(tokens) != 3:
                 self._error_triples += 1
-                log_to_error(msg="This line was discarded: " + a_line,
-                             source=self._source_file)
+                log_msg(msg="This line was discarded: " + a_line,
+                        source=self._source_file)
             else:
                 yield (tune_token(a_token=tokens[0]),
                        tune_prop(a_token=tokens[1]),
