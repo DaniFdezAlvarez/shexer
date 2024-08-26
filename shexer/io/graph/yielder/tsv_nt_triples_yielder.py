@@ -1,5 +1,4 @@
-
-from shexer.utils.log import log_to_error
+from shexer.utils.log import log_msg
 from shexer.utils.triple_yielders import tune_token, tune_prop
 from shexer.io.graph.yielder.base_triples_yielder import BaseTriplesYielder
 
@@ -27,7 +26,7 @@ class TsvNtTriplesYielder(BaseTriplesYielder):
             tokens = self._look_for_tokens(a_line.strip())
             if len(tokens) != 3:
                 self._error_triples += 1
-                log_to_error(msg="This line caused error: " + a_line,
+                log_msg(msg="This line caused error: " + a_line,
                              source=self._source_file)
             else:
                 try:
@@ -35,7 +34,7 @@ class TsvNtTriplesYielder(BaseTriplesYielder):
                     tune_token(tokens[0]), tune_prop(tokens[1]), tune_token(tokens[2], allow_untyped_numbers=True))
                     self._triples_count += 1
                 except ValueError as ve:
-                    log_to_error(msg=ve.message + "This line caused error: " + a_line,
+                    log_msg(msg=ve.message + "This line caused error: " + a_line,
                                  source=self._source_file)
                 # if self._triples_count % 10000 == 0:
                 #     print("Reading..." + self._triples_count)
@@ -61,7 +60,7 @@ class TsvNtTriplesYielder(BaseTriplesYielder):
     #         tokens = self._look_for_tokens(a_line.strip())
     #         if len(tokens) != 3:
     #             self._error_triples += 1
-    #             log_to_error(msg="This line caused error: " + a_line,
+    #             log_msg(msg="This line caused error: " + a_line,
     #                          source=self._source_file)
     #         else:
     #             try:
@@ -70,7 +69,7 @@ class TsvNtTriplesYielder(BaseTriplesYielder):
     #                        tune_token(tokens[2], allow_untyped_numbers=self._allow_untyped_numbers))
     #                 self._triples_count += 1
     #             except ValueError as ve:
-    #                 log_to_error(msg=ve.message + "This line caused error: " + a_line,
+    #                 log_msg(msg=ve.message + "This line caused error: " + a_line,
     #                              source=self._source_file)
     #             if self._triples_count % 10000 == 0:
     #                 print("Reading..." + self._triples_count)
@@ -81,7 +80,7 @@ class TsvNtTriplesYielder(BaseTriplesYielder):
     #         tokens = self._look_for_tokens(a_line.strip())
     #         if len(tokens) != 3:
     #             self._error_triples += 1
-    #             log_to_error(msg="This line caused error: " + a_line,
+    #             log_msg(msg="This line caused error: " + a_line,
     #                          source=self._source_file)
     #         else:
     #             try:
@@ -94,7 +93,7 @@ class TsvNtTriplesYielder(BaseTriplesYielder):
     #
     #                 self._triples_count += 1
     #             except ValueError as ve:
-    #                 log_to_error(msg=ve.message + "This line caused error: " + a_line,
+    #                 log_msg(msg=ve.message + "This line caused error: " + a_line,
     #                              source=self._source_file)
     #             if self._triples_count % 10000 == 0:
     #                 print("Reading..." + self._triples_count)
