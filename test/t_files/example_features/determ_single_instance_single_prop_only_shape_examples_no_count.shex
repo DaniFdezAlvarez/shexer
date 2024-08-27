@@ -6,7 +6,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX : <http://weso.es/shapes/>
 
-:Person   # Instance example: 'http://example.org/Jimmy'
+:Person
 {
    rdf:type  [foaf:Person]                                     # 100.0 %
-}
+} // rdfs:comment ex:Jimmy
