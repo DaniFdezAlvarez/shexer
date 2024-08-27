@@ -89,9 +89,9 @@ class TestExamplesMode(unittest.TestCase):
             inverse_paths=False,
             instances_report_mode=ABSOLUTE_INSTANCES)
         str_result = shaper.shex_graph(string_output=True)
-        # print(str_result)
-        self.assertTrue("# Node constraint example: '22'" in str_result)
-        self.assertTrue(":Person   # 1 instance.  Instance example: 'http://example.org/Jimmy'" in str_result)
+        self.assertTrue('// rdfs:comment "22" ;' in str_result)
+        self.assertTrue(":Person   # 1 instance." in str_result)
+        self.assertTrue("} // rdfs:comment ex:Jimmy" in str_result)
 
     def test_all_examples_no_instance_stats(self):
         shaper = Shaper(
@@ -103,8 +103,9 @@ class TestExamplesMode(unittest.TestCase):
             examples_mode=ALL_EXAMPLES,
             inverse_paths=False)
         str_result = shaper.shex_graph(string_output=True)
-        self.assertTrue("# Node constraint example: '22'" in str_result)
-        self.assertTrue(":Person   # Instance example: 'http://example.org/Jimmy'" in str_result)
+        self.assertTrue('// rdfs:comment "22" ;' in str_result)
+        self.assertTrue("} // rdfs:comment ex:Jimmy" in str_result)
+        self.assertFalse(":Person   # 1 instance." in str_result)
 
 
 
