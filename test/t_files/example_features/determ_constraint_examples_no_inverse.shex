@@ -10,15 +10,15 @@ PREFIX : <http://weso.es/shapes/>
 {
    rdf:type  [foaf:Person]  ;                                  # 100.0 %
    foaf:age  xsd:integer  ?;
-            # Node constraint example: '22'
+            // rdfs:comment "22" ;
             # 80.0 % obj: xsd:integer. Cardinality: {1}
    foaf:name  xsd:string  ?;
-            # Node constraint example: 'Jimmy'
+            // rdfs:comment "Jimmy" ;
             # 60.0 % obj: xsd:string. Cardinality: {1}
    foaf:familyName  xsd:string  ?;
-            # Node constraint example: 'Jones'
+            // rdfs:comment "Jones" ;
             # 40.0 % obj: xsd:string. Cardinality: {1}
    foaf:knows  @:Person  ?
-            # Node constraint example: 'ex:Bella'
+            // rdfs:comment "ex:Bella" ;
             # 20.0 % obj: @:Person. Cardinality: {1}
 }

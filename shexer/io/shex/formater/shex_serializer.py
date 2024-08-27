@@ -1,3 +1,5 @@
+import re
+
 from shexer.core.profiling.class_profiler import RDF_TYPE_STR
 
 from shexer.model.property import Property
@@ -11,8 +13,10 @@ from shexer.consts import RATIO_INSTANCES, ABSOLUTE_INSTANCES, MIXED_INSTANCES, 
 from wlighter import SHEXC_FORMAT
 
 _MODES_REPORT_INSTANCES = [ABSOLUTE_INSTANCES, MIXED_INSTANCES]
-_EXAMPLE_CONSTRAINT_TEMPLATE = "# Node constraint example: '{}'"
-_EXAMPLE_SHAPE_TEMPLATE = "{} Instance example: '{}'"
+_EXAMPLE_CONSTRAINT_TEMPLATE = '// rdfs:comment {} ;'
+_EXAMPLE_INSTANCE_TEMPLATE = " // rdfs:comment {}"
+
+_INIT_URI_PATTERN = re.compile("http[s]?\://")
 
 
 class ShexSerializer(object):
@@ -85,10 +89,9 @@ class ShexSerializer(object):
 
     def _serialize_shape(self, a_shape):
         self._serialize_shape_name(a_shape)
-        # self._serialize_example(a_shape)
         self._serialize_opening_of_rules()
         self._serialize_shape_rules(a_shape)
-        self._serialize_closure_of_rule()
+        self._serialize_closure_of_rules(a_shape)
         self._serialize_shape_gap()
 
     def _flush(self):
@@ -147,13 +150,32 @@ class ShexSerializer(object):
         for a_statement in a_shape.yield_statements():
             if a_statement.st_property != self._instantiation_property_str:
                 comment = _EXAMPLE_CONSTRAINT_TEMPLATE.format(
-                    self._get_node_constraint_example_no_inverse(a_shape, a_statement) if not self._inverse_paths
-                    else self._get_node_constraint_example_inverse(a_shape, a_statement)
+                    self._turn_str_comment_into_proper_rdf(
+                        self._get_node_constraint_example_no_inverse(a_shape, a_statement) if not self._inverse_paths
+                        else self._get_node_constraint_example_inverse(a_shape, a_statement)
+                    )
                 )
 
                 a_statement.add_comment(comment, insert_first=True)
 
 
+    def _turn_str_comment_into_proper_rdf(self, str_object_to_transform):
+        """
+        If it's a whole prefixed URI, return it as it is.
+        If it is a literal, surround it with quotes.
+        If it starts with http(s)://, surround it with corners.
+        """
+
+        if " " not in str_object_to_transform and "".count(":") == 1:
+            return str_object_to_transform
+        elif _INIT_URI_PATTERN.match(str_object_to_transform):
+            prefixed = prefixize_uri_if_possible(str_object_to_transform, namespaces_prefix_dict=self._namespaces_dict, corners=False)
+            if prefixed == str_object_to_transform:
+                return "<"+str_object_to_transform+">"
+            else:
+                return prefixed
+        else:
+            return '"' + str_object_to_transform + '"'
 
     def _get_node_constraint_example_no_inverse(self, shape, statement):
         candidate = self._shape_example_features.get_constraint_example(shape_id=shape.class_uri,
@@ -181,22 +203,17 @@ class ShexSerializer(object):
             prefixize_shape_name_if_possible(a_shape_name=a_shape.name,
                                              namespaces_prefix_dict=self._namespaces_dict) +
             self._minimal_iri(a_shape=a_shape) +
-            self._instance_count(a_shape) +
-            self._serialize_example(a_shape)
+            self._instance_count(a_shape) 
         )
 
     def _serialize_example(self, a_shape):
         if self._examples_mode not in [ALL_EXAMPLES, SHAPE_EXAMPLES]:
             return ""
-        return _EXAMPLE_SHAPE_TEMPLATE.format(
-            " " if self._instances_report_mode in _MODES_REPORT_INSTANCES and not self._disable_comments else "   #",
-            self._shape_example_features.shape_example(shape_id=a_shape.class_uri))
-        # self._write_line(
-        #     a_line=_EXAMPLE_SHAPE_TEMPLATE.format(
-        #         self._shape_example_features.shape_example(shape_id=a_shape.class_uri)),
-        #     indent_level=2)
+        candidate = self._shape_example_features.shape_example(shape_id=a_shape.class_uri)
+        prefixed = prefixize_uri_if_possible(candidate, namespaces_prefix_dict=self._namespaces_dict, corners=False)
+        return _EXAMPLE_INSTANCE_TEMPLATE.format( prefixed if prefixed != candidate else f'<{candidate}>')
 
-        # self._instances_report_mode in _MODES_REPORT_INSTANCES and not self._disable_comments
+
 
 
     def _minimal_iri(self, a_shape):
@@ -213,8 +230,8 @@ class ShexSerializer(object):
     def _serialize_opening_of_rules(self):
         self._write_line("{")
 
-    def _serialize_closure_of_rule(self):
-        self._write_line("}")
+    def _serialize_closure_of_rules(self, a_shape):
+        self._write_line("}" + self._serialize_example(a_shape=a_shape))
 
     def _serialize_shape_gap(self):
         self._write_line("")
