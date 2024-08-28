@@ -1,4 +1,5 @@
 from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
+from shexer.io.shex.formater.consts import SHAPE_LINK_CHAR
 
 class ShapeMapLabelParser(object):
 
@@ -9,7 +10,7 @@ class ShapeMapLabelParser(object):
 
         if self._is_a_prefixed_uri(raw_label):
             return STARTING_CHAR_FOR_SHAPE_NAME + self._parse_prefixed_label(raw_label)
-        return STARTING_CHAR_FOR_SHAPE_NAME + raw_label
+        return raw_label  # todo SURE?
         # return self._parse_unprefixed_label(raw_label)
 
 

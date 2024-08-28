@@ -9,8 +9,9 @@ from shexer.core.profiling.strategy.direct_features_strategy import DirectFeatur
 from shexer.core.profiling.strategy.include_reverse_features_strategy import IncludeReverseFeaturesStrategy
 from shexer.core.profiling.consts import RDF_TYPE_STR
 from shexer.utils.structures.dicts import ShapeExampleFeaturesDict
+from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 
-_MINIMAL_IRI_INIT = "@"
+_MINIMAL_IRI_INIT = STARTING_CHAR_FOR_SHAPE_NAME
 
 
 

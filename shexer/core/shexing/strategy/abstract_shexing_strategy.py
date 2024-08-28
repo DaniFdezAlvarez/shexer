@@ -4,6 +4,7 @@ from shexer.model.fixed_prop_choice_statement import FixedPropChoiceStatement
 from shexer.io.shex.formater.statement_serializers.st_serializers_factory import StSerializerFactory
 from shexer.core.shexing.strategy.minimal_iri_strategy.annotate_min_iri_strategy import AnnotateMinIriStrategy
 from shexer.core.shexing.strategy.minimal_iri_strategy.ignore_min_iri_strategy import IgnoreMinIriStrategy
+from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 
 
 _DIRECT_ST_SERIALIZER = 0
@@ -261,7 +262,7 @@ class AbstractShexingStrategy(object):
                 yield a_new_statement
 
     def _is_an_IRI(self, statement_type):
-        return statement_type == IRI_ELEM_TYPE or statement_type.startswith("@")  # TODO careful here. Refactor
+        return statement_type == IRI_ELEM_TYPE or statement_type.startswith(STARTING_CHAR_FOR_SHAPE_NAME)  # TODO careful here. Refactor
 
 
     def _remove_IRI_statements_if_useles(self, group_of_statements):
