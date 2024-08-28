@@ -1,3 +1,4 @@
+from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 
 XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema#"
 XSD_PREFIX = "xsd"
@@ -104,7 +105,7 @@ def is_a_correct_uri(target_uri, prefix_namespace_dict):
 
 
 def there_is_arroba_after_last_quotes(target_str):
-    if target_str.rfind("@") > target_str.rfind('"'):
+    if target_str.rfind(STARTING_CHAR_FOR_SHAPE_NAME) > target_str.rfind('"'):
         return True
     return False
 

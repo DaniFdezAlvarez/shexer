@@ -39,6 +39,6 @@ def build_shape_name_for_qualifier_prop_uri(prop_uri, shapes_namespace):  # TODO
 
 
 def prefixize_shape_name_if_possible(a_shape_name, namespaces_prefix_dict):
-    result = prefixize_uri_if_possible(target_uri=a_shape_name[1:],                  # Avoid the "@" starting char
+    result = prefixize_uri_if_possible(target_uri=a_shape_name[1:],                  # Avoid the "from shexer.model.shape. STARTING_CHAR_FOR_SHAPE_NAME starting char
                                        namespaces_prefix_dict=namespaces_prefix_dict)
     return result

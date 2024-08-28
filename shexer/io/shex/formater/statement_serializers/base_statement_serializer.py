@@ -1,5 +1,5 @@
 from shexer.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, \
-    COMMENT_INI, TARGET_LINE_LENGHT, SPACES_GAP_FOR_FREQUENCY, KLEENE_CLOSURE, POSITIVE_CLOSURE, OPT_CARDINALITY
+    COMMENT_INI, TARGET_LINE_LENGHT, SPACES_GAP_FOR_FREQUENCY, KLEENE_CLOSURE, POSITIVE_CLOSURE, OPT_CARDINALITY, SHAPE_LINK_CHAR
 from shexer.model.IRI import IRI_ELEM_TYPE
 from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 from shexer.utils.shapes import prefixize_shape_name_if_possible
@@ -53,16 +53,16 @@ class BaseStatementSerializer(object):
         # TODO:  a lot to correct here for normal behaviour
         if a_token.startswith(STARTING_CHAR_FOR_SHAPE_NAME):  # Shape
             # return STARTING_CHAR_FOR_SHAPE_NAME +":" + a_token.replace(STARTING_CHAR_FOR_SHAPE_NAME, "")
-            return STARTING_CHAR_FOR_SHAPE_NAME \
+            return SHAPE_LINK_CHAR \
                    + prefixize_shape_name_if_possible(a_shape_name=a_token,
                                                       namespaces_prefix_dict=namespaces_dict)
         if a_token == IRI_ELEM_TYPE:  # iri
             return a_token
         if ":" not in a_token:
             if "<" in a_token:
-                return STARTING_CHAR_FOR_SHAPE_NAME + a_token
+                return SHAPE_LINK_CHAR + a_token
             else:
-                return STARTING_CHAR_FOR_SHAPE_NAME + "<" + a_token + ">"
+                return SHAPE_LINK_CHAR + "<" + a_token + ">"
         candidate_prefixed = BaseStatementSerializer._prefixize_uri_if_possible(uri=a_token,
                                                                                 namespaces_dict=namespaces_dict)
         if candidate_prefixed is not None:

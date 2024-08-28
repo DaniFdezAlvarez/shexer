@@ -3,6 +3,7 @@ from shexer.utils.shapes import prefixize_shape_name_if_possible
 from shexer.utils.uri import prefixize_uri_if_possible
 from shexer.model.fixed_prop_choice_statement import FixedPropChoiceStatement
 from shexer.consts import RDF_TYPE
+from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 import warnings
 
 
@@ -90,7 +91,7 @@ class UMLSerializer(object):
             return result
         types = []
         for a_type in a_statement.st_types:
-            if a_type.startswith("@"):
+            if a_type.startswith(STARTING_CHAR_FOR_SHAPE_NAME):
                 types.append("@" + prefixize_uri_if_possible(target_uri=a_type[1:],
                                                              namespaces_prefix_dict=self._namespaces_dict,
                                                              corners=True))
@@ -104,7 +105,7 @@ class UMLSerializer(object):
     def _is_a_shape_link(self, statement):
         if type(statement) == FixedPropChoiceStatement:
             return False
-        return statement.st_type.startswith("@")
+        return statement.st_type.startswith(STARTING_CHAR_FOR_SHAPE_NAME)
 
     def _declare_and_open_shape(self, a_shape):
         target_name = prefixize_shape_name_if_possible(a_shape_name=a_shape.name,

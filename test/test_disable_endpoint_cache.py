@@ -55,6 +55,5 @@ class TestDisableEndpointCache(unittest.TestCase):
                         limit_remote_instances=5,
                         disable_endpoint_cache=True)
         str_result = shaper.shex_graph(string_output=True)
-        print(str_result)
         self.assertTrue(number_of_shapes(str_result) > 2)
         pass  #

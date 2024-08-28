@@ -12,6 +12,8 @@ from shexer.io.profile.formater.abstract_profile_serializer import AbstractProfi
 from shexer.utils.factories.shape_serializer_factory import get_shape_serializer, get_uml_serializer
 from shexer.utils.namespaces import find_adequate_prefix_for_shapes_namespaces
 from shexer.utils.log import log_msg
+from shexer.utils.uri import unprefixize_uri_if_possible
+from shexer.utils.dict import reverse_keys_and_values
 from shexer.consts import RATIO_INSTANCES
 
 
@@ -150,7 +152,10 @@ class Shaper(object):
         self._list_of_url_input = list_of_url_input
         self._rdflib_graph = rdflib_graph
         self._namespaces_dict = namespaces_dict if namespaces_dict is not None else {}
-        self._instantiation_property = instantiation_property
+        self._instantiation_property = \
+            unprefixize_uri_if_possible(instantiation_property,
+                                        include_corners=False,
+                                        prefix_namespaces_dict=reverse_keys_and_values(self._namespaces_dict))
         self._namespaces_to_ignore = namespaces_to_ignore
         self._infer_numeric_types_for_untyped_literals = infer_numeric_types_for_untyped_literals
         self._discard_useles_constraints_with_positive_closure = discard_useless_constraints_with_positive_closure
