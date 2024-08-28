@@ -48,6 +48,19 @@ class TestInstantiationProperty(unittest.TestCase):
         self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "G1_ex_a.shex",
                                                       str_target=str_result))
 
+    def test_explicit_ex_a_prefixed(self):
+        shaper = Shaper(target_classes=["http://xmlns.com/foaf/0.1/Person",
+                                        "http://xmlns.com/foaf/0.1/Document"],
+                        graph_file_input=_BASE_DIR + "G1_ex_a.ttl",
+                        instantiation_property="ex:a",
+                        namespaces_dict=default_namespaces(),
+                        all_classes_mode=False,
+                        input_format=TURTLE,
+                        disable_comments=True)
+        str_result = shaper.shex_graph(string_output=True)
+        self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "G1_ex_a.shex",
+                                                      str_target=str_result))
+
     def test_explicit_ex_a_rdf_type_mixed(self):
         # G1_ex_a_some_rdftype
         shaper = Shaper(target_classes=["http://xmlns.com/foaf/0.1/Person",
