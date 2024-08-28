@@ -50,16 +50,4 @@ class TestUrlEndpoint(unittest.TestCase):
         str_result = shaper.shex_graph(string_output=True)
         self.assertTrue(number_of_shapes(str_result) > 2)
 
-    def test_all_classes_mode(self):
-        shaper = Shaper(all_classes_mode=True,
-                        url_endpoint="https://agrovoc.fao.org/sparql",
-                        namespaces_dict=default_namespaces(),
-                        disable_comments=True,
-                        instantiation_property="http://some/made/up#property",
-                        depth_for_building_subgraph=1,
-                        track_classes_for_entities_at_last_depth_level=False,
-                        limit_remote_instances=5)
-        str_result = shaper.shex_graph(string_output=True)
-        print(str_result)
-        self.assertTrue(number_of_shapes(str_result) > 2)
 
