@@ -29,8 +29,7 @@ class NtTriplesYielder(BaseTriplesYielder):
             tokens = self._look_for_tokens(a_line.strip())
             if len(tokens) != 3:
                 self._error_triples += 1
-                log_msg(msg="This line was discarded: " + a_line,
-                        source=self._source_file)
+                log_msg(verbose=False, msg="This line was discarded: " + a_line)
             else:
                 yield (tune_token(a_token=tokens[0]),
                        tune_prop(a_token=tokens[1]),

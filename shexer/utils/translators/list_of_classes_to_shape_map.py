@@ -37,7 +37,7 @@ class ListOfClassesToShapeMap(object):
             return class_uri
 
     def _get_raw_selector_to_catch_instances_of_class_uri(self, class_uri, instantiation_property, limit_remote_instances):
-        return 'SPARQL "select ?s where {{ ?s <{prop}> <{class_uri}> }} {limit}"'.format(
+        return 'SPARQL "select ?s where {{ ?s <{prop}> <{class_uri}> . FILTER (!isBlank(?s)) }} {limit}"'.format(  # FILTER (!isBlank(?c))
             class_uri=class_uri,
             prop=instantiation_property,
             limit="" if limit_remote_instances < 0 else "LIMIT " + str(limit_remote_instances)
