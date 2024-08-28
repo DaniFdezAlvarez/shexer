@@ -48,5 +48,6 @@ class TestUrlEndpoint(unittest.TestCase):
                         track_classes_for_entities_at_last_depth_level=False,
                         limit_remote_instances=5)
         str_result = shaper.shex_graph(string_output=True)
+        print(str_result)
         self.assertTrue(number_of_shapes(str_result) > 2)
         pass  #
