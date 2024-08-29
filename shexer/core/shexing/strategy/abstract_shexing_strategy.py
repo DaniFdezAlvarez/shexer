@@ -1,5 +1,6 @@
 from shexer.model.statement import POSITIVE_CLOSURE, KLEENE_CLOSURE, OPT_CARDINALITY
 from shexer.model.IRI import IRI_ELEM_TYPE
+from shexer.model.bnode import BNODE_ELEM_TYPE
 from shexer.model.fixed_prop_choice_statement import FixedPropChoiceStatement
 from shexer.io.shex.formater.statement_serializers.st_serializers_factory import StSerializerFactory
 from shexer.core.shexing.strategy.minimal_iri_strategy.annotate_min_iri_strategy import AnnotateMinIriStrategy
@@ -235,7 +236,7 @@ class AbstractShexingStrategy(object):
         result = []
         to_compose = []
         for a_statement in group_to_decide:
-            if self._is_an_IRI(a_statement.st_type):
+            if self._is_a_node(a_statement.st_type):
                 to_compose.append(a_statement)
             else:
                 result.append(a_statement)
@@ -261,8 +262,8 @@ class AbstractShexingStrategy(object):
             for a_new_statement in self._compose_statements_with_IRI_objects(group_to_decide):
                 yield a_new_statement
 
-    def _is_an_IRI(self, statement_type):
-        return statement_type == IRI_ELEM_TYPE or statement_type.startswith(STARTING_CHAR_FOR_SHAPE_NAME)  # TODO careful here. Refactor
+    def _is_a_node(self, statement_type):
+        return statement_type == IRI_ELEM_TYPE or statement_type == BNODE_ELEM_TYPE or statement_type.startswith(STARTING_CHAR_FOR_SHAPE_NAME)  # TODO careful here. Refactor
 
 
     def _remove_IRI_statements_if_useles(self, group_of_statements):
@@ -291,7 +292,7 @@ class AbstractShexingStrategy(object):
         result = []
         to_compose = []
         for a_statement in list_of_candidate_statements:
-            if self._is_an_IRI(a_statement.st_type):
+            if self._is_a_node(a_statement.st_type):
                 to_compose.append(a_statement)
             else:
                 result.append(a_statement)

@@ -1,6 +1,7 @@
 from shexer.utils.shapes import build_shapes_name_for_class_uri
 from shexer.core.profiling.consts import POS_CLASSES, _S, _P, _O, POS_FEATURES_DIRECT, _ONE_TO_MANY, POS_FEATURES_INVERSE
 from shexer.model.IRI import IRI_ELEM_TYPE, IRI
+from shexer.model.bnode import BNode, BNODE_ELEM_TYPE
 
 class AbstractFeatureDirectionStrategy(object):
 
@@ -97,11 +98,11 @@ class AbstractFeatureDirectionStrategy(object):
             self._c_shapes_dict[a_class][str_prop][str_type][cardinality] = 0
 
     def _is_relevant_instance(self, an_instance):
-        return isinstance(an_instance, IRI) and an_instance.iri in self._i_dict
+        return (isinstance(an_instance, IRI) or isinstance(an_instance, BNode)) and an_instance.iri in self._i_dict
 
     def _decide_type_elem(self, original_elem, str_prop):
         """
-        Special traetment for self._instantiation_property_str property. We look for ValueSets instead of types when this property appears.
+        Special treatment for self._instantiation_property_str property. We look for ValueSets instead of types when this property appears.
 
         :param original_elem:
         :param str_prop:
@@ -133,7 +134,7 @@ class AbstractFeatureDirectionStrategy(object):
         str_prop = a_triple[_P].iri
         type_obj = self._decide_type_elem(a_triple[_O], str_prop)
 
-        obj_shapes = [] if type_obj != IRI_ELEM_TYPE else self._decide_shapes_elem(a_triple[_O].iri)
+        obj_shapes = [] if type_obj not in [IRI_ELEM_TYPE, BNODE_ELEM_TYPE] else self._decide_shapes_elem(a_triple[_O].iri)
 
         self._introduce_needed_elements_in_shape_instances_dict_for_subj(str_subj=str_subj,
                                                                          str_prop=str_prop,
