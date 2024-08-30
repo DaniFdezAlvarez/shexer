@@ -79,7 +79,7 @@ class AbstractShexingStrategy(object):
             self._set_serializer_object_for_statements(a_statement)
 
         result = self._group_constraints_with_same_prop_and_obj(original_statements)
-        result = self._group_IRI_constraints(result)
+        result = self._group_node_constraints(result)
 
         return result
 
@@ -186,7 +186,7 @@ class AbstractShexingStrategy(object):
                 return a_statement
         raise ValueError("The received group does not contain any statement with positive closure")
 
-    def _group_IRI_constraints(self, candidate_statements):
+    def _group_node_constraints(self, candidate_statements):
         result = []
         already_visited = set()
         for i in range(0, len(candidate_statements)):
@@ -199,23 +199,70 @@ class AbstractShexingStrategy(object):
                     already_visited.add(a_statement)
                     group_to_decide = [a_statement]
 
-                    for j in range(i + 1, len(candidate_statements)):
-                        if self._statements_have_same_prop(a_statement,
-                                                           candidate_statements[j]):
-                            group_to_decide.append(candidate_statements[j])
-                            already_visited.add(candidate_statements[j])
-                    if len(group_to_decide) == 1:
-                        result.append(a_statement)
-                    else:  # At this point, group_to_decide may contain a list of constraints with the same property and
-                           # different node constraint
-                        if self._disable_or_statements:
-                            for a_sentence in self._manage_group_to_decide_without_or(group_to_decide):
-                                result.append(a_sentence)
-                        else:
-                            for a_sentence in self._manage_group_to_decide_with_or(group_to_decide):
-                                result.append(a_sentence)
-
+                    result.append(self._find_and_merge_potentially_swapped_constraints(
+                        original_group_to_decide=group_to_decide,
+                        already_visited=already_visited,
+                        all_original_statements=candidate_statements,
+                        target_index_original_statements=i+1,
+                    ))
         return result
+
+    def _find_and_merge_potentially_swapped_constraints(self, original_group_to_decide,
+                                                        already_visited,
+                                                        all_original_statements,
+                                                        target_index_original_statements):
+        self._find_all_candidates_to_merge_swapped_constraints_at_node_level(
+            original_group_to_decide=original_group_to_decide,
+            already_visited=already_visited,
+            all_original_statements=all_original_statements,
+            target_index_original_statements=target_index_original_statements
+        )
+        return self._find_all_candidates_to_merge_swapped_constraints_at_node_level(  # TODO
+            group_to_decide=original_group_to_decide
+        )
+
+    def _find_all_candidates_to_merge_swapped_constraints_at_node_level(self,
+                                                                        original_group_to_decide,
+                                                                        already_visited,
+                                                                        all_original_statements,
+                                                                        target_index_original_statements):
+        for j in range(target_index_original_statements, len(all_original_statements)):
+            if self._statements_have_same_prop(original_group_to_decide[0],  # todo check have_same_prop_behaviour
+                                               all_original_statements[j]):
+                original_group_to_decide.append(all_original_statements[j])
+                already_visited.add(all_original_statements[j])
+
+
+    # def _group_node_constraints(self, candidate_statements):
+    #     result = []
+    #     already_visited = set()
+    #     for i in range(0, len(candidate_statements)):
+    #         a_statement = candidate_statements[i]
+    #         if a_statement.st_property == self._instantiation_property_str:
+    #             result.append(a_statement)
+    #             already_visited.add(a_statement)
+    #         else:  # a_statement.st_property != self._instantiation_property_str:
+    #             if a_statement not in already_visited:
+    #                 already_visited.add(a_statement)
+    #                 group_to_decide = [a_statement]
+    #
+    #                 for j in range(i + 1, len(candidate_statements)):
+    #                     if self._statements_have_same_prop(a_statement,
+    #                                                        candidate_statements[j]):
+    #                         group_to_decide.append(candidate_statements[j])
+    #                         already_visited.add(candidate_statements[j])
+    #                 if len(group_to_decide) == 1:
+    #                     result.append(a_statement)
+    #                 else:  # At this point, group_to_decide may contain a list of constraints with the same property and
+    #                        # different node constraint
+    #                     if self._disable_or_statements:
+    #                         for a_sentence in self._manage_group_to_decide_without_or(group_to_decide):
+    #                             result.append(a_sentence)
+    #                     else:
+    #                         for a_sentence in self._manage_group_to_decide_with_or(group_to_decide):
+    #                             result.append(a_sentence)
+    #
+    #     return result
 
     def _statements_have_same_prop(self, st1, st2):
         if st1.st_property == st2.st_property:
