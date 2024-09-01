@@ -459,11 +459,28 @@ class MergeableConstraints(object):
         else:  # No IRI and no shape is used enough, BNODE should subsume everything.
             self._promote_to_dominant(self._bnode_constraint)
 
+
+
     def _no_bnode_merging_strategy(self):
-        pass  # TODO
+        if len(self._shape_constraints) == 0 or self._shape_constraints[0].n_occurences < self._iri_constraint.n_occurences:
+            self._promote_to_dominant(self._iri_constraint)
+        else:
+            self._promote_to_dominant(self._shape_constraints[0])
 
     def _merge_content_in_single_statement(self):
-        pass  # TODO
+        if self._disable_or:
+            if self._dominant_constraint.st_type not in [IRI_ELEM_TYPE, BNODE_ELEM_TYPE, NONLITERAL_ELEM_TYPE] \
+                    and len(self._shape_constraints) > 0 \
+                    and self._shape_constraints[0].n_occurence == self._dominant_constraint:
+                if self._iri_constraint is not None:
+                    self._promote_to_dominant(self._iri_constraint)
+                else:  # It must be a BNODE
+                    self._promote_to_dominant(self._bnode_constraint)
+        elif self._redundant_or_enabled:
+            pass  # TODO. Create an OR one with all shapes
+        pass # todo. Everything which is not dominant is transformed into comments for the dominant.
+             # todo. The dominant will be then returned as a result
+    
 
 
 
@@ -476,6 +493,13 @@ class MergeableConstraints(object):
         self._dominant_constraint = statement
 
     def _promote_to_dominant(self, statement):
-        self._dominant_constraint =statement
+        self._dominant_constraint = statement
         self._constraints.remove(statement)
+
+    def _demote_dominant_to_plain(self):
+        if self._dominant_constraint.st_type not in [IRI_ELEM_TYPE, BNODE_ELEM_TYPE, NONLITERAL_ELEM_TYPE]:
+            self.add_constraints(self._dominant_constraint)
+            self.sort()
+        self._dominant_constraint = None
+
 
