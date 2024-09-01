@@ -1,7 +1,7 @@
 from shexer.model.statement import POSITIVE_CLOSURE, KLEENE_CLOSURE, OPT_CARDINALITY
-from shexer.model.IRI import IRI_ELEM_TYPE
-from shexer.model.bnode import BNODE_ELEM_TYPE
+from shexer.model.const_elem_types import NONLITERAL_ELEM_TYPE, BNODE_ELEM_TYPE, IRI_ELEM_TYPE
 from shexer.model.fixed_prop_choice_statement import FixedPropChoiceStatement
+from shexer.model.statement import Statement
 from shexer.io.shex.formater.statement_serializers.st_serializers_factory import StSerializerFactory
 from shexer.core.shexing.strategy.minimal_iri_strategy.annotate_min_iri_strategy import AnnotateMinIriStrategy
 from shexer.core.shexing.strategy.minimal_iri_strategy.ignore_min_iri_strategy import IgnoreMinIriStrategy
@@ -117,18 +117,18 @@ class AbstractShexingStrategy(object):
             is_inverse=statement.is_inverse
         )
 
-    def _group_constraints_with_same_prop_and_obj(self, candidate_statements):
+    def _group_constraints_with_same_prop_and_obj(self, candidate_statements):  # TODO REFACTORING
         result = []
         already_visited = set()
         for i in range(0, len(candidate_statements)):
             a_statement = candidate_statements[i]
             if a_statement not in already_visited:
                 already_visited.add(a_statement)
-                group_to_decide = [a_statement]
+                group_to_decide = MergeableConstraints()  # TODO
                 for j in range(i + 1, len(candidate_statements)):
                     if self._statements_have_same_tokens(a_statement,
                                                          candidate_statements[j]):
-                        group_to_decide.append(candidate_statements[j])
+                        group_to_decide.add_constraints(candidate_statements[j])
                         already_visited.add(candidate_statements[j])
                 if len(group_to_decide) == 1:
                     result.append(a_statement)
@@ -141,36 +141,36 @@ class AbstractShexingStrategy(object):
             return True
         return False
 
-    def _decide_best_statement_with_cardinalities_in_comments(self, list_of_candidate_statements):
+    def _decide_best_statement_with_cardinalities_in_comments(self, mergeable_constraints):  # TODO REFACTORING
         if self._discard_useless_positive_closures:
-            if self._is_a_group_of_statements_with_useless_positive_closure(list_of_candidate_statements):
-                return self._statement_for_a_group_with_a_useless_positive_closure(list_of_candidate_statements)
-        list_of_candidate_statements.sort(reverse=True, key=lambda x: x.probability)
+            if self._is_a_group_of_statements_with_useless_positive_closure(mergeable_constraints):
+                return self._statement_for_a_group_with_a_useless_positive_closure(mergeable_constraints)
+        mergeable_constraints.sort()
         result = None
         if self._keep_less_specific:
-            for a_statement in list_of_candidate_statements:
+            for a_statement in mergeable_constraints.constraints():
                 if a_statement.cardinality == POSITIVE_CLOSURE:
                     result = a_statement
                     break
             if result is None:
-                result = list_of_candidate_statements[0]
+                result = mergeable_constraints.get(0)
         else:
-            for a_statement in list_of_candidate_statements:
+            for a_statement in mergeable_constraints.constraints():
                 if a_statement.cardinality != POSITIVE_CLOSURE:
                     result = a_statement
                     break
             if result is None:
-                result = list_of_candidate_statements[0]
+                result = mergeable_constraints.get(0)
 
-        for a_statement in list_of_candidate_statements:
+        for a_statement in mergeable_constraints.constraints():
             if a_statement.cardinality != result.cardinality:
                 result.add_comment(self._turn_statement_into_comment(a_statement))
         return result
 
-    def _is_a_group_of_statements_with_useless_positive_closure(self, list_of_candidate_sentences):
+    def _is_a_group_of_statements_with_useless_positive_closure(self, list_of_candidate_sentences):  # todo during refactor
         if len(list_of_candidate_sentences) != 2:
             return False
-        if abs(list_of_candidate_sentences[0].probability - list_of_candidate_sentences[1].probability) > self._tolerance:
+        if abs(list_of_candidate_sentences.get(0).probability - list_of_candidate_sentences.get(1).probability) > self._tolerance:
             return False
         one_if_there_is_a_single_positive_closure = -1
         for a_statement in list_of_candidate_sentences:
@@ -180,7 +180,7 @@ class AbstractShexingStrategy(object):
             return True
         return False
 
-    def _statement_for_a_group_with_a_useless_positive_closure(self, group_of_candidate_statements):
+    def _statement_for_a_group_with_a_useless_positive_closure(self, group_of_candidate_statements):  # TODO DURING REFACTOR
         for a_statement in group_of_candidate_statements:
             if a_statement.cardinality != POSITIVE_CLOSURE:
                 return a_statement
@@ -197,72 +197,56 @@ class AbstractShexingStrategy(object):
             else:  # a_statement.st_property != self._instantiation_property_str:
                 if a_statement not in already_visited:
                     already_visited.add(a_statement)
-                    group_to_decide = [a_statement]
+                    group_to_decide = MergeableConstraints(a_statement)
 
                     result.append(self._find_and_merge_potentially_swapped_constraints(
-                        original_group_to_decide=group_to_decide,
+                        mergeable_constraints=group_to_decide,
                         already_visited=already_visited,
                         all_original_statements=candidate_statements,
                         target_index_original_statements=i+1,
                     ))
         return result
 
-    def _find_and_merge_potentially_swapped_constraints(self, original_group_to_decide,
+    def _find_and_merge_potentially_swapped_constraints(self, mergeable_constraints,
                                                         already_visited,
                                                         all_original_statements,
                                                         target_index_original_statements):
         self._find_all_candidates_to_merge_swapped_constraints_at_node_level(
-            original_group_to_decide=original_group_to_decide,
+            mergeable_constraints=mergeable_constraints,
             already_visited=already_visited,
             all_original_statements=all_original_statements,
             target_index_original_statements=target_index_original_statements
         )
-        return self._find_all_candidates_to_merge_swapped_constraints_at_node_level(  # TODO
-            group_to_decide=original_group_to_decide
+        return self._merge_swapped_constraints_at_node_level(  # TODO
+            group_to_merge=mergeable_constraints
         )
 
     def _find_all_candidates_to_merge_swapped_constraints_at_node_level(self,
-                                                                        original_group_to_decide,
+                                                                        mergeable_constraints,
                                                                         already_visited,
                                                                         all_original_statements,
                                                                         target_index_original_statements):
         for j in range(target_index_original_statements, len(all_original_statements)):
-            if self._statements_have_same_prop(original_group_to_decide[0],  # todo check have_same_prop_behaviour
-                                               all_original_statements[j]):
-                original_group_to_decide.append(all_original_statements[j])
+            if self._statements_have_same_prop_and_are_node_type(mergeable_constraints[0],  # todo check have_same_prop_behaviour
+                                                                 all_original_statements[j]):
+                mergeable_constraints.add(all_original_statements[j])
                 already_visited.add(all_original_statements[j])
+        # No need to return anything, modifying the received parameters.
 
+    def _statements_have_same_prop_and_are_node_type(self, original_sentence,
+                                                           target_sentence):
+        # In this context, we can assume that the original one does not point to a literal
+        if target_sentence.st_type in [IRI_ELEM_TYPE, BNODE_ELEM_TYPE]:
+            return original_sentence.st_property == target_sentence.st_property
+        return False
 
-    # def _group_node_constraints(self, candidate_statements):
-    #     result = []
-    #     already_visited = set()
-    #     for i in range(0, len(candidate_statements)):
-    #         a_statement = candidate_statements[i]
-    #         if a_statement.st_property == self._instantiation_property_str:
-    #             result.append(a_statement)
-    #             already_visited.add(a_statement)
-    #         else:  # a_statement.st_property != self._instantiation_property_str:
-    #             if a_statement not in already_visited:
-    #                 already_visited.add(a_statement)
-    #                 group_to_decide = [a_statement]
-    #
-    #                 for j in range(i + 1, len(candidate_statements)):
-    #                     if self._statements_have_same_prop(a_statement,
-    #                                                        candidate_statements[j]):
-    #                         group_to_decide.append(candidate_statements[j])
-    #                         already_visited.add(candidate_statements[j])
-    #                 if len(group_to_decide) == 1:
-    #                     result.append(a_statement)
-    #                 else:  # At this point, group_to_decide may contain a list of constraints with the same property and
-    #                        # different node constraint
-    #                     if self._disable_or_statements:
-    #                         for a_sentence in self._manage_group_to_decide_without_or(group_to_decide):
-    #                             result.append(a_sentence)
-    #                     else:
-    #                         for a_sentence in self._manage_group_to_decide_with_or(group_to_decide):
-    #                             result.append(a_sentence)
-    #
-    #     return result
+    def _merge_swapped_constraints_at_node_level(self, group_to_merge):
+        if len(group_to_merge) == 1:
+            return group_to_merge[0]
+        group_to_merge.sort(reverse=True, key=lambda x: x.probability)
+        return group_to_merge.merge_group(disable_or=self._disable_or_statements,
+                                          redundant_or_allowed=self._allow_redundant_or)
+
 
     def _statements_have_same_prop(self, st1, st2):
         if st1.st_property == st2.st_property:
@@ -388,3 +372,95 @@ class AbstractShexingStrategy(object):
             if not a_statement.st_type in shape_names_to_remove:
                 new_statements.append(a_statement)
         return new_statements
+
+
+
+
+class MergeableConstraints(object):
+    """
+    Internal class used to handle constraints created during the voting process that should be merged into a single one.
+    """
+    def __init__(self, initial_constraint=None):
+        self._constraints = [] if initial_constraint is None else [initial_constraint]
+        self._bnode_constraint = None
+        self._shape_constraints = None
+        self._iri_constraint = None
+        self._dominant_constraint = None
+        self._disable_or = True
+        self._redundant_or_enabled = False
+    def add_constraints(self, statement):
+        self._constraints.append(statement)
+        if statement.st_type == BNODE_ELEM_TYPE:
+            self._bnode_constraint = statement
+        elif statement.st_type == IRI_ELEM_TYPE:
+            self._iri_constraint = statement
+        else:
+            if self._shape_constraints is None:
+                self._shape_constraints = []
+            self._shape_constraints.append(statement)
+
+
+    @property
+    def has_bnodes(self):
+        return self._bnode_constraint is not None
+
+    @property
+    def has_iri_constraint(self):
+        return self._iri_constraint is not None
+
+    @property
+    def has_shape_constraints(self):
+        return self._shape_constraints is not None
+
+    def get(self, index):
+        return self._constraints[index]
+
+    def __len__(self):
+        return len(self._constraints)
+
+    def sort(self):
+        self._constraints.sort(reverse=True, key=lambda x: x.probability)
+
+    def constraints(self):
+        for a_constaint in self._constraints:
+            yield a_constaint
+
+    def merge_group(self, disable_or, or_redundant_allowed):
+        self.sort()
+        self._disable_or = disable_or
+        self._redundant_or_enabled = or_redundant_allowed
+        if self.has_bnodes:
+            self._bnode_merging_strategy()
+        else:
+            self._no_bnode_merging_strategy()
+        return self._merge_content_in_single_statement()
+
+    def _bnode_merging_strategy(self):
+        if self.has_iri_constraint:  # iri + bnod = shape
+            if len(self._shape_constraints) == 1 \
+                    and self._iri_constraint.n_occurences + self._bnode_constraint.n_occurences \
+                    == self._shape_constraints[0].n_occurences:
+                self._promote_to_dominant(self._shape_constraints[0])
+            else: # there are iri, bnode, and shape, not composed
+                self._add_dominant(Statement(st_property=self._bnode_constraint.st_property,
+                                             st_type=NONLITERAL_ELEM_TYPE,
+                                             n_occurences=self._bnode_constraint.n_occurences + self._iri_constraint.n_occurences,
+                                             is_inverse=self._bnode_constraint.is_inverse,
+                                             probability=self._bnode_constraint.probability + self._iri_constraint.probability,
+                                             cardinality=self._most_general_cardinality(self._bnode_constraint.cardinality,
+                                                                                        self._iri_constraint.cardinality)
+                                             ))
+
+
+    def _most_general_cardinality(self, a_card1, a_card2):
+        if POSITIVE_CLOSURE in (a_card1, a_card2) or a_card1 != a_card2:
+            return POSITIVE_CLOSURE
+        else:
+            return a_card1
+    def _add_dominant(self, statement):
+        self._dominant_constraint = statement
+
+    def _promote_to_dominant(self, statement):
+        self._dominant_constraint =statement
+        self._constraints.remove(statement)
+
