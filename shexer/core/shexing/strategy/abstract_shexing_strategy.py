@@ -420,6 +420,7 @@ class MergeableConstraints(object):
 
     def sort(self):
         self._constraints.sort(reverse=True, key=lambda x: x.probability)
+        self._shape_constraints.sort(reverse=True, key=lambda x: x.probability)
 
     def constraints(self):
         for a_constaint in self._constraints:
@@ -449,7 +450,21 @@ class MergeableConstraints(object):
                                              probability=self._bnode_constraint.probability + self._iri_constraint.probability,
                                              cardinality=self._most_general_cardinality(self._bnode_constraint.cardinality,
                                                                                         self._iri_constraint.cardinality)
+
                                              ))
+        elif len(self._shape_constraints) != 0 \
+                and self._shape_constraints[0].n_occurences == self._bnode_constraint.n_occurences:
+                # Case of at least a shape being used exactyl as many times as BNODE
+            self._promote_to_dominant(self._shape_constraints[0])
+        else:  # No IRI and no shape is used enough, BNODE should subsume everything.
+            self._promote_to_dominant(self._bnode_constraint)
+
+    def _no_bnode_merging_strategy(self):
+        pass  # TODO
+
+    def _merge_content_in_single_statement(self):
+        pass  # TODO
+
 
 
     def _most_general_cardinality(self, a_card1, a_card2):
