@@ -92,7 +92,7 @@ class AbstractShexingStrategy(object):
                 self._change_statement_cardinality_to_all_compliant(a_statement)
 
     def _change_statement_cardinality_to_all_compliant(self, statement):
-        comment_for_current_sentence = self._turn_statement_into_comment(statement)
+        comment_for_current_sentence = self._turn_statement_into_comment(statement, self._namespaces_dict)
         statement.add_comment(comment=comment_for_current_sentence,
                               insert_first=True)
         statement.cardinality = OPT_CARDINALITY if \
@@ -100,8 +100,10 @@ class AbstractShexingStrategy(object):
             else KLEENE_CLOSURE
         statement.probability = 1
 
-    def _turn_statement_into_comment(self, a_statement):
-        return a_statement.comment_representation(namespaces_dict=self._namespaces_dict)
+
+    @staticmethod
+    def _turn_statement_into_comment(a_statement, namespaces_dict):
+        return a_statement.comment_representation(namespaces_dict=namespaces_dict)
 
     def _generalize_exact_cardinalities(self, statements):
         for a_statement in statements:
@@ -164,7 +166,7 @@ class AbstractShexingStrategy(object):
 
         for a_statement in mergeable_constraints.constraints():
             if a_statement.cardinality != result.cardinality:
-                result.add_comment(self._turn_statement_into_comment(a_statement))
+                result.add_comment(self._turn_statement_into_comment(a_statement, self._namespaces_dict))
         return result
 
     def _is_a_group_of_statements_with_useless_positive_closure(self, list_of_candidate_sentences):  # todo during refactor
@@ -197,7 +199,9 @@ class AbstractShexingStrategy(object):
             else:  # a_statement.st_property != self._instantiation_property_str:
                 if a_statement not in already_visited:
                     already_visited.add(a_statement)
-                    group_to_decide = MergeableConstraints(a_statement)
+                    group_to_decide = MergeableConstraints(initial_constraint=a_statement,
+                                                           statement_serializer_factory=self._statement_serializer_factory,
+                                                           namespaces_dict=self._namespaces_dict)
 
                     result.append(self._find_and_merge_potentially_swapped_constraints(
                         mergeable_constraints=group_to_decide,
@@ -277,7 +281,7 @@ class AbstractShexingStrategy(object):
         if len(to_compose) > 1:
             for a_statement in to_compose:
                 if a_statement.st_type != IRI_ELEM_TYPE:
-                    target_sentence.add_comment(self._turn_statement_into_comment(a_statement))
+                    target_sentence.add_comment(self._turn_statement_into_comment(a_statement, self._namespaces_dict))
             result.append(target_sentence)
         elif len(to_compose) == 1:
             result.append(to_compose[0])
@@ -285,16 +289,18 @@ class AbstractShexingStrategy(object):
 
         return result
 
-    def _manage_group_to_decide_with_or(self, group_to_decide):
-        if not self._group_contains_IRI_statements(group_to_decide):
-            for a_statement in group_to_decide:
-                yield a_statement
-        else:
-            for a_new_statement in self._compose_statements_with_IRI_objects(group_to_decide):
-                yield a_new_statement
+    # def _manage_group_to_decide_with_or(self, group_to_decide):
+    #     if not self._group_contains_IRI_statements(group_to_decide):
+    #         for a_statement in group_to_decide:
+    #             yield a_statement
+    #     else:
+    #         for a_new_statement in self._compose_statements_with_IRI_objects(group_to_decide):
+    #             yield a_new_statement
 
     def _is_a_node(self, statement_type):
-        return statement_type == IRI_ELEM_TYPE or statement_type == BNODE_ELEM_TYPE or statement_type.startswith(STARTING_CHAR_FOR_SHAPE_NAME)  # TODO careful here. Refactor
+        return statement_type == IRI_ELEM_TYPE or \
+            statement_type == BNODE_ELEM_TYPE or \
+            statement_type.startswith(STARTING_CHAR_FOR_SHAPE_NAME)  # TODO careful here. Refactor
 
 
     def _remove_IRI_statements_if_useles(self, group_of_statements):
@@ -347,7 +353,7 @@ class AbstractShexingStrategy(object):
             )
             for a_statement in to_compose:
                 if a_statement.st_type != IRI_ELEM_TYPE:
-                    composed_statement.add_comment(self._turn_statement_into_comment(a_statement))
+                    composed_statement.add_comment(self._turn_statement_into_comment(a_statement, self._namespaces_dict))
             result.append(composed_statement)
         elif len(to_compose) == 1:  # There is just one sentence in the group to join with OR
             result.append(to_compose[0])
@@ -380,7 +386,7 @@ class MergeableConstraints(object):
     """
     Internal class used to handle constraints created during the voting process that should be merged into a single one.
     """
-    def __init__(self, initial_constraint=None):
+    def __init__(self, initial_constraint=None, statement_serializer_factory=None, namespaces_dict=None):
         self._constraints = [] if initial_constraint is None else [initial_constraint]
         self._bnode_constraint = None
         self._shape_constraints = None
@@ -388,6 +394,9 @@ class MergeableConstraints(object):
         self._dominant_constraint = None
         self._disable_or = True
         self._redundant_or_enabled = False
+        self._statement_serializer_factory = statement_serializer_factory
+        self._namespaces_dict = namespaces_dict
+
     def add_constraints(self, statement):
         self._constraints.append(statement)
         if statement.st_type == BNODE_ELEM_TYPE:
@@ -420,7 +429,8 @@ class MergeableConstraints(object):
 
     def sort(self):
         self._constraints.sort(reverse=True, key=lambda x: x.probability)
-        self._shape_constraints.sort(reverse=True, key=lambda x: x.probability)
+        if self._shape_constraints is not None:
+            self._shape_constraints.sort(reverse=True, key=lambda x: x.probability)
 
     def constraints(self):
         for a_constaint in self._constraints:
@@ -434,7 +444,8 @@ class MergeableConstraints(object):
             self._bnode_merging_strategy()
         else:
             self._no_bnode_merging_strategy()
-        return self._merge_content_in_single_statement()
+        self._merge_content_in_single_statement()
+        return self._dominant_constraint
 
     def _bnode_merging_strategy(self):
         if self.has_iri_constraint:  # iri + bnod = shape
@@ -449,8 +460,8 @@ class MergeableConstraints(object):
                                              is_inverse=self._bnode_constraint.is_inverse,
                                              probability=self._bnode_constraint.probability + self._iri_constraint.probability,
                                              cardinality=self._most_general_cardinality(self._bnode_constraint.cardinality,
-                                                                                        self._iri_constraint.cardinality)
-
+                                                                                        self._iri_constraint.cardinality),
+                                             serializer_object=self._statement_serializer_factory.get_base_serializer()
                                              ))
         elif len(self._shape_constraints) != 0 \
                 and self._shape_constraints[0].n_occurences == self._bnode_constraint.n_occurences:
@@ -468,6 +479,27 @@ class MergeableConstraints(object):
             self._promote_to_dominant(self._shape_constraints[0])
 
     def _merge_content_in_single_statement(self):
+        self._tune_dominant_constraint_wrt_or_config()
+        self._feed_dominant_constraint_with_comments()
+
+    def _feed_dominant_constraint_with_comments(self):
+        if self._iri_constraint is not None and self._iri_constraint != self._dominant_constraint:
+            self._dominant_constraint.add_comment(
+                AbstractShexingStrategy._turn_statement_into_comment(self._iri_constraint,
+                                                                     self._namespaces_dict)
+            )
+        if self._bnode_constraint is not None and self._bnode_constraint != self._dominant_constraint:
+            self._dominant_constraint.add_comment(
+                AbstractShexingStrategy._turn_statement_into_comment(self._bnode_constraint,
+                                                                     self._namespaces_dict)
+            )
+        for a_constraint in self._shape_constraints:
+            self._dominant_constraint.add_comment(
+                AbstractShexingStrategy._turn_statement_into_comment(a_constraint,
+                                                                     self._namespaces_dict)
+            )
+
+    def _tune_dominant_constraint_wrt_or_config(self):
         if self._disable_or:
             if self._dominant_constraint.st_type not in [IRI_ELEM_TYPE, BNODE_ELEM_TYPE, NONLITERAL_ELEM_TYPE] \
                     and len(self._shape_constraints) > 0 \
@@ -477,10 +509,16 @@ class MergeableConstraints(object):
                 else:  # It must be a BNODE
                     self._promote_to_dominant(self._bnode_constraint)
         elif self._redundant_or_enabled:
-            pass  # TODO. Create an OR one with all shapes
-        pass # todo. Everything which is not dominant is transformed into comments for the dominant.
-             # todo. The dominant will be then returned as a result
-    
+            self._dominant_constraint = FixedPropChoiceStatement(
+                st_property=self._dominant_constraint.st_property,
+                st_types=[a_constraint.st_type for a_constraint in self._shape_constraints],
+                cardinality=POSITIVE_CLOSURE,
+                probability=self._dominant_constraint.probability,
+                n_occurences=self._dominant_constraint.n_occurences,
+                serializer_object=self._statement_serializer_factory.get_choice_serializer(
+                    is_inverse=self._dominant_constraint.is_inverse
+                ),
+                is_inverse=self._dominant_constraint.is_inverse)
 
 
 
@@ -501,5 +539,4 @@ class MergeableConstraints(object):
             self.add_constraints(self._dominant_constraint)
             self.sort()
         self._dominant_constraint = None
-
 
