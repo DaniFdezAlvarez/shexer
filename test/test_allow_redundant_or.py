@@ -32,6 +32,7 @@ class TestAllowRedundantOr(unittest.TestCase):
                         disable_or_statements=False,
                         allow_redundant_or=True)
         str_result = shaper.shex_graph(string_output=True)
+        print(str_result)
         # In case the choice includes the IRI macro, then no OR should appear
         self.assertTrue(file_vs_str_tunned_comparison(file_path=_BASE_DIR + "redundant_enabled_useful_IRI.shex",
                                                       str_target=str_result,
