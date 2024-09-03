@@ -38,6 +38,9 @@ class RdflibTripleYielder(BaseTriplesYielder):
             )
             self._triples_count += 1
 
+    @property
+    def rdflib_graph(self):
+        return self._rdflib_graph
 
 
     def _turn_rdflib_token_into_model_obj(self, rdflib_obj):

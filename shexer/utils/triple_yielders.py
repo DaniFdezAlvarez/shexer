@@ -28,7 +28,7 @@ def tune_subj(a_token, raise_error_if_no_corners=True):
         return IRI(remove_corners(a_uri=a_token,
                                   raise_error_if_no_corners=raise_error_if_no_corners))
     elif a_token.startswith("_:"):
-        return BNode(identifier=a_token[2:])
+        return BNode(identifier=a_token)
     elif a_token.strip() == "[]":
         return BNode(identifier=a_token)
 
@@ -46,7 +46,7 @@ def tune_token(a_token, allow_untyped_numbers=False, raise_error_if_no_corners=T
         return Literal(content=content,
                        elem_type=elem_type)
     elif a_token.startswith("_:"):
-        return BNode(identifier=a_token[2:])
+        return BNode(identifier=a_token)
     elif a_token.strip() == "[]":
         return BNode(identifier=a_token)
     if allow_untyped_numbers:

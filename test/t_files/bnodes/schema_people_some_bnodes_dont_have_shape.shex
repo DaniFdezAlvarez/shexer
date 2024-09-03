@@ -6,20 +6,8 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX : <http://weso.es/shapes/>
 
-:Person
+:person
 {
-   foaf:name  xsd:string  ;
-   rdf:type  [foaf:Person]  ;
-   ex:foo  IRI  OR  @:Person  OR  @:Document  ;
-   foaf:familyName  xsd:string  ?;
-   foaf:age  xsd:integer  ?;
-   foaf:knows  @:Person  ?
-}
-
-
-:Document
-{
-   foaf:title  xsd:string  ;
-   rdf:type  [foaf:Document]  ;
-   foaf:depiction  xsd:string  ?
+   ex:knows  BNode  ;
+   rdf:type  [ex:person]
 }

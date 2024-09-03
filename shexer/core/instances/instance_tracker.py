@@ -72,7 +72,6 @@ class InstanceTracker(AbstractInstanceTracker):
                 self._not_relevant_triples += 1
 
 
-
     def is_an_instantiation_prop(self, a_property):
         return a_property == self._instantiation_property
 
