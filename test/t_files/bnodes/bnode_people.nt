@@ -1,0 +1,10 @@
+
+_:Alice <http://example.org/knows> _:Bob .
+_:Alice a <http://example.org/person> .
+
+_:Bob <http://example.org/knows> _:Eve .
+_:Bob a <http://example.org/person> .
+_:Bob <http://example.org/name> "Bob" .
+
+_:Eve <http://example.org/name> "Eve" .
+_:Eve a <http://example.org/person> .

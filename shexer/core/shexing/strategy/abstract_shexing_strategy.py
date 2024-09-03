@@ -252,125 +252,6 @@ class AbstractShexingStrategy(object):
                                           redundant_or_allowed=self._allow_redundant_or)
 
 
-    def _statements_have_same_prop(self, st1, st2):
-        if st1.st_property == st2.st_property:
-            return True
-        return False
-
-    def _manage_group_to_decide_without_or(self, group_to_decide):
-        """
-        At this point, the candidate sentences can sahere prop, but no obj.
-        This is, every sentence in group_to_decide has an unique obj.
-
-        if len(group_to_decide) > 2 --> IRI should be picked, everything else to comments.
-        if len(group_to_decide) == 2 --> IRI if it has higher trustworthiness, the specific obj otherwhise
-
-        :param group_to_decide:
-        :return:
-        """
-        result = []
-        to_compose = []
-        for a_statement in group_to_decide:
-            if self._is_a_node(a_statement.st_type):
-                to_compose.append(a_statement)
-            else:
-                result.append(a_statement)
-        to_compose.sort(reverse=True, key=lambda x: x.probability)
-        target_sentence = self._get_IRI_statement_in_group(to_compose)  # May be None
-        self._remove_IRI_statements_if_useles(group_of_statements=to_compose)
-        if len(to_compose) > 1:
-            for a_statement in to_compose:
-                if a_statement.st_type != IRI_ELEM_TYPE:
-                    target_sentence.add_comment(self._turn_statement_into_comment(a_statement, self._namespaces_dict))
-            result.append(target_sentence)
-        elif len(to_compose) == 1:
-            result.append(to_compose[0])
-        # else  # No sentences to join
-
-        return result
-
-    # def _manage_group_to_decide_with_or(self, group_to_decide):
-    #     if not self._group_contains_IRI_statements(group_to_decide):
-    #         for a_statement in group_to_decide:
-    #             yield a_statement
-    #     else:
-    #         for a_new_statement in self._compose_statements_with_IRI_objects(group_to_decide):
-    #             yield a_new_statement
-
-    def _is_a_node(self, statement_type):
-        return statement_type == IRI_ELEM_TYPE or \
-            statement_type == BNODE_ELEM_TYPE or \
-            statement_type.startswith(STARTING_CHAR_FOR_SHAPE_NAME)  # TODO careful here. Refactor
-
-
-    def _remove_IRI_statements_if_useles(self, group_of_statements):
-        # I am assuming a group of statements sorted by probability as param
-        if len(group_of_statements) <= 1:
-            return False
-        index_of_IRI_statement = -1
-        for i in range(0, len(group_of_statements)):
-            if group_of_statements[i].st_type == IRI_ELEM_TYPE:
-                index_of_IRI_statement = i
-                break
-        if index_of_IRI_statement != -1:
-            if group_of_statements[1].probability == group_of_statements[index_of_IRI_statement].probability:
-                # the previous 'if' works, trust me, im an engineer
-                del group_of_statements[index_of_IRI_statement]
-                return True
-        return False
-
-    def _group_contains_IRI_statements(self, list_of_candidate_statements):
-        for a_statement in list_of_candidate_statements:
-            if a_statement.st_type == IRI_ELEM_TYPE:
-                return True
-        return False
-
-    def _compose_statements_with_IRI_objects(self, list_of_candidate_statements):
-        result = []
-        to_compose = []
-        for a_statement in list_of_candidate_statements:
-            if self._is_a_node(a_statement.st_type):
-                to_compose.append(a_statement)
-            else:
-                result.append(a_statement)
-        to_compose.sort(reverse=True, key=lambda x: x.probability)
-        # target_probability = self._get_probability_of_IRI_statement_in_group(to_compose)
-        iri_statement = self._get_IRI_statement_in_group(to_compose)
-        was_removed_IRI = self._remove_IRI_statements_if_useles(to_compose)
-        if not was_removed_IRI and not self._allow_redundant_or:  # The IRI macro is still there
-            return [a_sentence for a_sentence in self._manage_group_to_decide_without_or(to_compose)] + result
-        elif len(to_compose) > 1:  # There are some sentences to join in an OR and no IRI macro
-            composed_statement = FixedPropChoiceStatement(
-                st_property=to_compose[0].st_property,
-                st_types=[a_statement.st_type for a_statement in to_compose],
-                cardinality=POSITIVE_CLOSURE,
-                probability=iri_statement.probability,
-                n_occurences=iri_statement.n_occurences,
-                serializer_object=self._statement_serializer_factory.get_choice_serializer(
-                    is_inverse=to_compose[0].is_inverse
-                ),
-                is_inverse=to_compose[0].is_inverse
-            )
-            for a_statement in to_compose:
-                if a_statement.st_type != IRI_ELEM_TYPE:
-                    composed_statement.add_comment(self._turn_statement_into_comment(a_statement, self._namespaces_dict))
-            result.append(composed_statement)
-        elif len(to_compose) == 1:  # There is just one sentence in the group to join with OR
-            result.append(to_compose[0])
-        # else  # No sentences to join
-        return result
-
-    # def _get_probability_of_IRI_statement_in_group(self, group_of_statements):
-    #     for a_statement in group_of_statements:
-    #         if a_statement.st_type == IRI_ELEM_TYPE:
-    #             return a_statement.probability
-    #     raise ValueError("There is no IRI statement within the received group")
-
-    def _get_IRI_statement_in_group(self, group_of_statements):
-        for a_statement in group_of_statements:
-            if a_statement.st_type == IRI_ELEM_TYPE:
-                return a_statement
-        return None
 
     def _statements_without_shapes_to_remove(self, original_statements, shape_names_to_remove):
         new_statements = []
@@ -463,7 +344,7 @@ class MergeableConstraints(object):
                                              probability=self._bnode_constraint.probability + self._iri_constraint.probability,
                                              cardinality=self._most_general_cardinality(self._bnode_constraint.cardinality,
                                                                                         self._iri_constraint.cardinality),
-                                             serializer_object=self._statement_serializer_factory.get_base_serializer()
+                                             serializer_object=self._statement_serializer_factory.get_base_serializer(is_inverse=self._bnode_constraint.is_inverse)
                                              ))
         elif len(self._shape_constraints) != 0 \
                 and self._shape_constraints[0].n_occurences == self._bnode_constraint.n_occurences:
@@ -485,21 +366,22 @@ class MergeableConstraints(object):
         self._feed_dominant_constraint_with_comments()
 
     def _feed_dominant_constraint_with_comments(self):
-        if self._iri_constraint is not None and self._iri_constraint != self._dominant_constraint:
-            self._dominant_constraint.add_comment(
-                AbstractShexingStrategy._turn_statement_into_comment(self._iri_constraint,
-                                                                     self._namespaces_dict)
-            )
-        if self._bnode_constraint is not None and self._bnode_constraint != self._dominant_constraint:
+        if self._bnode_constraint is not None:
             self._dominant_constraint.add_comment(
                 AbstractShexingStrategy._turn_statement_into_comment(self._bnode_constraint,
                                                                      self._namespaces_dict)
             )
+            if self._iri_constraint is not None:  # Add IRI one only if there are both bnodes and iris.
+                self._dominant_constraint.add_comment(
+                    AbstractShexingStrategy._turn_statement_into_comment(self._iri_constraint,
+                                                                         self._namespaces_dict)
+                )
         for a_constraint in self._shape_constraints:
-            self._dominant_constraint.add_comment(
-                AbstractShexingStrategy._turn_statement_into_comment(a_constraint,
-                                                                     self._namespaces_dict)
-            )
+            if self._dominant_constraint != a_constraint:
+                self._dominant_constraint.add_comment(
+                    AbstractShexingStrategy._turn_statement_into_comment(a_constraint,
+                                                                         self._namespaces_dict)
+                )
 
     def _tune_dominant_constraint_wrt_or_config(self):
         if self._disable_or:
@@ -510,21 +392,27 @@ class MergeableConstraints(object):
                     self._promote_to_dominant(self._iri_constraint)
                 else:  # It must be a BNODE
                     self._promote_to_dominant(self._bnode_constraint)
-        elif self._redundant_or_enabled:
+        else:  # or allowed
             st_types = []
-            if self._dominant_constraint not in self._shape_constraints:
-                st_types.append(self._dominant_constraint.st_type)
-            st_types = st_types + [a_constraint.st_type for a_constraint in self._shape_constraints]
-            self._dominant_constraint = FixedPropChoiceStatement(
-                st_property=self._dominant_constraint.st_property,
-                st_types=st_types,
-                cardinality=self._dominant_constraint.cardinality,
-                probability=self._dominant_constraint.probability,
-                n_occurences=self._dominant_constraint.n_occurences,
-                serializer_object=self._statement_serializer_factory.get_choice_serializer(
-                    is_inverse=self._dominant_constraint.is_inverse
-                ),
-                is_inverse=self._dominant_constraint.is_inverse)
+            if self._redundant_or_enabled:
+                if self._dominant_constraint not in self._shape_constraints:
+                    st_types.append(self._dominant_constraint.st_type)
+                st_types = st_types + [a_constraint.st_type for a_constraint in self._shape_constraints]
+            elif not self._redundant_or_enabled and self._dominant_constraint in self._shape_constraints:
+                st_types = st_types + [a_constraint.st_type for a_constraint in self._shape_constraints]
+            if len(st_types) > 1:
+                self._dominant_constraint = FixedPropChoiceStatement(
+                    st_property=self._dominant_constraint.st_property,
+                    st_types=st_types,
+                    cardinality=self._dominant_constraint.cardinality,
+                    probability=self._dominant_constraint.probability,
+                    n_occurences=self._dominant_constraint.n_occurences,
+                    serializer_object=self._statement_serializer_factory.get_choice_serializer(
+                        is_inverse=self._dominant_constraint.is_inverse
+                    ),
+                    is_inverse=self._dominant_constraint.is_inverse)
+
+
 
 
 
