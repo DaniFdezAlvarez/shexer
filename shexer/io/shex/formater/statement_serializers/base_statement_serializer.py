@@ -1,6 +1,6 @@
 from shexer.io.shex.formater.consts import SPACES_GAP_BETWEEN_TOKENS, \
     COMMENT_INI, TARGET_LINE_LENGHT, SPACES_GAP_FOR_FREQUENCY, KLEENE_CLOSURE, POSITIVE_CLOSURE, OPT_CARDINALITY, SHAPE_LINK_CHAR
-from shexer.model.IRI import IRI_ELEM_TYPE
+from shexer.model.const_elem_types import IRI_ELEM_TYPE, BNODE_ELEM_TYPE, NONLITERAL_ELEM_TYPE
 from shexer.model.shape import STARTING_CHAR_FOR_SHAPE_NAME
 from shexer.utils.shapes import prefixize_shape_name_if_possible
 
@@ -56,7 +56,7 @@ class BaseStatementSerializer(object):
             return SHAPE_LINK_CHAR \
                    + prefixize_shape_name_if_possible(a_shape_name=a_token,
                                                       namespaces_prefix_dict=namespaces_dict)
-        if a_token == IRI_ELEM_TYPE:  # iri
+        if a_token in [IRI_ELEM_TYPE, BNODE_ELEM_TYPE, NONLITERAL_ELEM_TYPE]:  # iri, bnode, nonliteral
             return a_token
         if ":" not in a_token:
             if "<" in a_token:
@@ -73,7 +73,7 @@ class BaseStatementSerializer(object):
     @staticmethod
     def _prefixize_uri_if_possible(uri, namespaces_dict):
         """
-        It returns None it it doesnt find an adequate prefix
+        It returns None if it doesnt find an adequate prefix
 
         :param uri:
         :param namespaces_dict:

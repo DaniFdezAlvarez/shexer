@@ -147,12 +147,6 @@ def _yielder_for_rdflib_parser(source_file, allow_untyped_numbers, raw_graph,
                                input_format, namespaces_dict, list_of_source_files,
                                compression_mode, zip_base_archives):
     if zip_base_archives is not None:
-        # return MultiRdfLibTripleYielder(list_of_files=list_of_zip_internal_files(zip_base_archive),
-        #                                 allow_untyped_numbers=allow_untyped_numbers,
-        #                                 input_format=input_format,
-        #                                 namespaces_dict=namespaces_dict,
-        #                                 compression_mode=compression_mode,
-        #                                 zip_archive_file=zip_base_archives)
         return _yielder_for_compressed_inputs(
             base_yielders=[MultiRdfLibTripleYielder(list_of_files=list_of_zip_internal_files(a_zip_file),
                                                     allow_untyped_numbers=allow_untyped_numbers,
