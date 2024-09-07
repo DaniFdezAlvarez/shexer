@@ -193,10 +193,10 @@ class AbstractShexingStrategy(object):
         already_visited = set()
         for i in range(0, len(candidate_statements)):
             a_statement = candidate_statements[i]
-            if a_statement.st_property == self._instantiation_property_str:
+            if a_statement.st_property == self._instantiation_property_str or self._is_a_literal(a_statement.st_type):
                 result.append(a_statement)
                 already_visited.add(a_statement)
-            else:  # a_statement.st_property != self._instantiation_property_str:
+            else:  # a_statement.st_property != self._instantiation_property_str and it is not a literal obj
                 if a_statement not in already_visited:
                     already_visited.add(a_statement)
                     group_to_decide = MergeableConstraints(initial_constraint=a_statement,
@@ -260,8 +260,12 @@ class AbstractShexingStrategy(object):
                 new_statements.append(a_statement)
         return new_statements
 
-
-
+    def _is_a_literal(self, node_kind_str):
+        if node_kind_str.startswith(STARTING_CHAR_FOR_SHAPE_NAME):
+            return False
+        if node_kind_str in [IRI_ELEM_TYPE, BNODE_ELEM_TYPE]:
+            return False
+        return True
 
 class MergeableConstraints(object):
     """
